@@ -5,6 +5,11 @@ import connectDB from "./config/database.js";
 import dotenv from "dotenv";
 import cors from "cors";
 
+import swaggerUI from 'swagger-ui-express';
+import swaggerDOC from './swagger.json' with { type:'json' }
+
+import authRoutes from './routes/authRoutes.js';
+
 
 dotenv.config();
 const app = express();
@@ -35,6 +40,9 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
+
+app.use('/api/swagger', swaggerUI.serve, swaggerUI.setup(swaggerDOC));
+app.use('/api/auth', authRoutes);
 
 
 app.listen(PORT, () => {
