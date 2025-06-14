@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import { nameRegex, surnameRegex,emailRegex,passwordRegex } from "../utils/regex";
+import { nameRegex, surnameRegex,emailRegex,passwordRegex } from "../utils/regex.js";
 
 const UserSchema = new mongoose.Schema({
     name:{
