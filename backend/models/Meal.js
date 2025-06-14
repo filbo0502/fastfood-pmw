@@ -1,39 +1,53 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const MealSchema = new mongoose.Schema({
-    name:{
-        type: String,
-        required: true
-    },
-    description:{
-        type: String,
-        required: true
-    },
-    ingredients:[{
-        type: String,
-        isAllergen: true,
-        required: true
-    }],
-    category:{
-        type: String,
-        required: true
-    },
-    imageUrl:{
-        type: String
-    },
-    price:{
-        type: Number,
-        required: true
-    },
-    createdBy:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Restaurant'
-    },
-    createdAt:{
-        type: Date,
-        default: Date.now
-    }
+  idMeal: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  strMeal: {
+    type: String,
+    required: [true, 'Meal name is mandatory.'],
+    trim: true,
+  },
+  strMealAlternate: {
+    type: String,
+    default: null,
+  },
+  strCategory: {
+    type: String,
+    trim: true,
+  },
+  strArea: {
+    type: String,
+    trim: true,
+  },
+  strMealThumb: {
+    type: String,
+    trim: true,
+  },
+  strCreativeCommonsConfirmed: {
+    type: String, 
+    default: null,
+  },
+  dateModified: {
+    type: Date,
+    default: null,
+  },
+  price: {
+    type: Number,
+    default: 0,
+    min: [0, 'Price could not be negative'],
+  },
+  isAvailable: {
+    type: Boolean,
+    default: true,
+  },
+}, {
+  timestamps: true,
 });
 
 const Meal = mongoose.model('Meal', MealSchema);
+
 export default Meal;
