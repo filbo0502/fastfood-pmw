@@ -18,7 +18,7 @@ const RestaurantSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    partitaIva:{
+    vatNumber:{
         type: String,
         required: true
     },
@@ -32,10 +32,6 @@ const RestaurantSchema = new mongoose.Schema({
             required: true
         },
         zipCode:{
-            type: String,
-            required: true
-        },
-        country:{
             type: String,
             required: true
         },

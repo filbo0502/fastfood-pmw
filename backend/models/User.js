@@ -28,7 +28,7 @@ const UserSchema = new mongoose.Schema({
     },
     userType:{
         type: String,
-        enum: ['custumer', 'restaurateur'],
+        enum: ['customer', 'restaurateur'],
         required: true
     },
     paymentInfo:{
@@ -40,7 +40,6 @@ const UserSchema = new mongoose.Schema({
         street: String,
         city: String,
         zipCode: String,
-        country: String
     },
     preferences:{
         favouriteCategories: [String],
