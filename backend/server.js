@@ -9,7 +9,10 @@ import swaggerUI from 'swagger-ui-express';
 import swaggerDOC from './swagger.json' with { type:'json' }
 
 import authRoutes from './routes/authRoutes.js';
-import mealRoutes from './routes/mealRoutes.js'
+import mealRoutes from './routes/mealRoutes.js';
+import restaurantRoutes from './routes/restaurantRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 
 dotenv.config();
@@ -30,10 +33,6 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname).replace(/^\/([
 
 app.use(express.static(path.resolve(__dirname, '../frontend'), { index: 'index.html' }));
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
-
 app.get("/", (req,res) => {
     res.sendFile(path.resolve(__dirname, '../frontend', 'index.html'));
 });
@@ -42,6 +41,9 @@ app.get("/", (req,res) => {
 app.use('/api/swagger', swaggerUI.serve, swaggerUI.setup(swaggerDOC));
 app.use('/api/auth', authRoutes);
 app.use('/api/meals', mealRoutes);
+app.use('/api/restaurants', restaurantRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/users', userRoutes);
 
 
 app.listen(PORT, () => {

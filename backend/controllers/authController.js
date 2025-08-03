@@ -11,7 +11,7 @@ import asyncHandler from 'express-async-handler';
  * @body    { name, surname, email, password, confirmPassword, userType, restaurant: { name, vatNumber, phone, address: { street, city, zipCode } } }
  */
 export const register = asyncHandler(async (req, res) => {
-    const { name, surname, email, password, confirmPassword, userType, restaurant } = req.body;
+    const { name, surname, email, password, confirmPassword, userType } = req.body;
 
     if (!name || !surname || !email || !password || !confirmPassword || !userType) {
         return res.status(400).json({ message: "Tutti i campi utente sono obbligatori." });
@@ -42,7 +42,7 @@ export const register = asyncHandler(async (req, res) => {
 
             if (!restaurant || !restaurant.name || !restaurant.vatNumber || !restaurant.phone || !restaurant.address || !restaurant.address.street || !restaurant.address.city || !restaurant.address.zipCode) {
                 await User.findByIdAndDelete(user._id); 
-                return res.status(400).json({ message: 'Per i ristoratori, tutti i dati del ristorante sono obbligatori.' });
+                return res.status(400).json({ message: 'For restaurateurs, all data fields are required.' });
             }
 
             const newRestaurant = new Restaurant({
@@ -74,7 +74,7 @@ export const register = asyncHandler(async (req, res) => {
 
         res.status(201).json({ 
             success: true, 
-            message: "Utente creato con successo!", 
+            message: "User created successfully!", 
             token 
         });
 
@@ -94,24 +94,24 @@ export const register = asyncHandler(async (req, res) => {
 
 
 /**
- * @desc    Login utente
+ * @desc    Login user
  * @route   POST /api/auth/login
  * @access  Public
  */
 export const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
-        return res.status(400).json({ message: "Tutti i campi sono obbligatori." });
+        return res.status(400).json({ message: "All fields are required." });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
-        return res.status(404).json({ success: false, message: "Utente non trovato." }); // Cambiato status a 404
+        return res.status(404).json({ success: false, message: "User not found." }); // Cambiato status a 404
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-        return res.status(401).json({ success: false, message: "Password non corretta." }); // Cambiato status a 401
+        return res.status(401).json({ success: false, message: "Incorrect password." }); // Cambiato status a 401
     }
 
     const tokenDuration = 2 * 3600; // 2 ore in secondi
@@ -125,7 +125,7 @@ export const login = asyncHandler(async (req, res) => {
 
     res.status(200).json({
         success: true,
-        message: 'Login effettuato con successo',
+        message: 'Login success!',
         token,
         user: {
             id: user._id.toString(),
@@ -136,7 +136,7 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Logout utente
+ * @desc    Logout user
  * @route   POST /api/auth/logout
  * @access  Private
  */

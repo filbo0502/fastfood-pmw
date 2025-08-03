@@ -1,7 +1,7 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from 'mongoose';
 
 const OrderSchema = new mongoose.Schema({
-    custumer:{
+    customer:{
         type: mongoose.Schema.Types.ObjectId,
         ref:'User',
         required: true
@@ -24,7 +24,11 @@ const OrderSchema = new mongoose.Schema({
         },
         price:{
             type: Number,
-            required: tru
+            required: true
+        },
+        preparationTime:{
+            type: Number,
+            required: true
         }
     }],
     totalAmount:{
@@ -34,6 +38,7 @@ const OrderSchema = new mongoose.Schema({
     status:{
         type: String,
         enum: ['ordered', 'preparing', 'delivering', 'delivered'],
+        default: 'ordered',
         required: true
     },
     deliveryType: {
@@ -51,8 +56,9 @@ const OrderSchema = new mongoose.Schema({
             longitude: Number
         }
     },
-    estimatedTime: {
-    type: Number  // In minutes
+    estimatedPreparationTime: {
+    type: Number,
+    required: true
   },
   createdAt: {
     type: Date,

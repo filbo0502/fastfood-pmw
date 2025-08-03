@@ -2,7 +2,7 @@ import Meal from "../models/Meal.js";
 import asyncHandler from "express-async-handler";
 
 /**
- * @desc    Ottiene tutti i piatti
+ * @desc    Get all meals in DB
  * @route   GET /api/meals
  * @access  Public
  */
@@ -12,7 +12,7 @@ export const getMeals = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Ottiene un singolo piatto tramite ID
+ * @desc    Gett a meal by ID
  * @route   GET /api/meals/:id
  * @access  Public
  */
@@ -28,7 +28,7 @@ export const getMealById = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Crea un nuovo piatto
+ * @desc    Create a new meal
  * @route   POST /api/meals
  * @access  Private
  */
@@ -62,7 +62,7 @@ export const createMeal = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Elimina un piatto
+ * @desc    Delete a meal
  * @route   DELETE /api/meals/:id
  * @access  Private
  */
@@ -78,7 +78,7 @@ export const deleteMeal = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Aggiorna un piatto esistente
+ * @desc    Update a meal
  * @route   PUT /api/meals/:id
  * @access  Private
  */
@@ -89,8 +89,35 @@ export const updateMeal = asyncHandler(async (req, res) => {
     });
 
     if (!updatedMeal) {
-        res.status(404).json({ message: "Piatto non trovato." });
+        res.status(404).json({ message: "Meal not found." });
         return; 
     }
     res.status(200).json(updatedMeal);
 });
+
+/** 
+ * @desc   Cerca i piatti in base a diversi criteri 
+ * @route  GET /api/meals
+ * @access Public
+ */
+
+export const searchMeal = asyncHandler(async (req, res) => {
+    const { name, category } = req.query;
+    let query = {}
+
+    if(name){
+        query.strMeal = {$regex: name, $options: 'i'}
+    }
+    if(category){
+        query.strCategory = {$regex: category, $options: 'i'}
+    }
+
+    const meals = await Meal.find(query);
+
+    if(meals.length === 0){
+        return res.status(404).json({ message: 'No meal founded with this criteria.'});
+    }
+
+    res.status(200).json(meals);
+});
+

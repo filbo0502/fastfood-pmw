@@ -41,8 +41,25 @@ const RestaurantSchema = new mongoose.Schema({
         }
     },
     menu:[{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'Meal'
+        meal:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Meal',
+            required: true
+        },
+        price:{
+            type: Number,
+            required: true,
+            min: [0, 'Price could not be negative.']
+        },
+        preparationTime:{
+            type: Number,
+            required: true,
+            min: [0, 'Preparation time could not be negative.']
+        },
+        isAvailable:{
+            type: Boolean,
+            default: true
+        }
     }],
     createdAt:{
         type: Date,

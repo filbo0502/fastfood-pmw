@@ -30,7 +30,7 @@
                         <a class="nav-link" href="../index.html#about">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../index.html#menu">Menu</a>
+                        <a class="nav-link" href="./searchRestaturant.html">Search</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="../index.html#contact">Contacts</a>
@@ -42,76 +42,79 @@
         </div>
     </nav>
 
-    <main class="main-content">
+     <main class="main-content">
         <div class="container d-flex justify-content-center align-items-center min-vh-100 py-5">
-            <div class="row border rounded-5 p-3 bg-white shadow box-area">
-                <div class="col-md-6 rounded-4 d-none d-md-flex justify-content-center align-items-center flex-column left-box">
-                    <img src="../images/spaghetti.png" class="img-fluid" alt="Illustrative image" style="border-radius: 1rem;">
-                </div>
+            
+            <div class="col-lg-8 col-xl-7">
+                <div class="row border rounded-5 p-3 bg-white shadow box-area">
+                    <div class="col-md-6 rounded-4 d-none d-md-flex justify-content-center align-items-center flex-column left-box">
+                        <img src="../images/spaghetti.png" class="img-fluid" alt="Illustrative image" style="border-radius: 1rem;">
+                    </div>
 
-                <div class="col-md-6 p-4">
-                    <div class="row align-items-center">
-                        <div class="header-text mb-4 text-center">
-                            <h1>Registration</h1>
-                        </div>
-                        <form id="registrationForm">
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control form-control-lg bg-light fs-6" id="name" name="name" placeholder="Name" aria-label="Name" required>
+                    <div class="col-md-6 p-4">
+                        <div class="row align-items-center">
+                            <div class="header-text mb-4 text-center">
+                                <h2>Registration</h2>
                             </div>
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control form-control-lg bg-light fs-6" id="surname" name="surname" placeholder="Surname" aria-label="Surname" required>
-                            </div>
-                            <div class="input-group mb-3">
-                                <input type="email" class="form-control form-control-lg bg-light fs-6" id="email" name="email" placeholder="Email Address" aria-label="Email" required>
-                            </div>
-                            <div class="input-group mb-3">
-                                <input type="password" class="form-control form-control-lg bg-light fs-6" id="password" name="password" placeholder="Password" aria-label="Password" required>
-                                <button type="button" class="btn btn-light border" id="togglePassword" aria-label="Show/hide password">
-                                    <i class="fa fa-eye"></i>
-                                </button>
-                            </div>
-                             <div class="input-group mb-3">
-                                <input type="password" class="form-control form-control-lg bg-light fs-6" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" aria-label="Confirm Password" required>
-                            </div>
-                            <div class="input-group mb-3">
-                                <select id="userType" class="form-select form-select-lg bg-light fs-6" name="userType" aria-label="User Type" required>
-                                    <option value="" disabled selected>Select user type...</option>
-                                    <option value="customer">Customer</option>
-                                    <option value="restaurateur">Restaurateur</option>
-                                </select>
-                            </div>
-                            <div id="restaurantFields" style="display: none;">
-                                <hr>
-                                <h5 class="mb-3">Restaurant Data</h5>
+                            <form id="registrationForm">
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control form-control-lg bg-light fs-6" id="restaurantName" name="restaurantName" placeholder="Restaurant Name" aria-label="Restaurant Name">
+                                    <input type="text" class="form-control bg-light fs-6" id="name" name="name" placeholder="Name" aria-label="Name" required>
                                 </div>
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control form-control-lg bg-light fs-6" id="vatNumber" name="vatNumber" placeholder="Vat Number" aria-label="Vat Number">
+                                    <input type="text" class="form-control bg-light fs-6" id="surname" name="surname" placeholder="Surname" aria-label="Surname" required>
                                 </div>
                                 <div class="input-group mb-3">
-                                    <input type="tel" class="form-control form-control-lg bg-light fs-6" id="phone" name="phone" placeholder="Restaurant Phone Number" aria-label="Restaurant Phone Number">
+                                    <input type="email" class="form-control bg-light fs-6" id="email" name="email" placeholder="Email Address" aria-label="Email" required>
                                 </div>
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control form-control-lg bg-light fs-6" id="addressStreet" name="addressStreet" placeholder="Address Street" aria-label="Address Street">
+                                    <input type="password" class="form-control bg-light fs-6" id="password" name="password" placeholder="Password" aria-label="Password" required>
+                                    <button type="button" class="btn btn-light border" id="togglePassword" aria-label="Show/hide password">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
                                 </div>
                                  <div class="input-group mb-3">
-                                    <input type="text" class="form-control form-control-lg bg-light fs-6" id="addressCity" name="addressCity" placeholder="City" aria-label="City">
+                                    <input type="password" class="form-control bg-light fs-6" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" aria-label="Confirm Password" required>
                                 </div>
-                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control form-control-lg bg-light fs-6" id="addressZip" name="addressZip" placeholder="Zip Code" aria-label="Zip Code">
+                                <div class="input-group mb-3">
+                                    <select id="userType" class="form-select bg-light fs-6" name="userType" aria-label="User Type" required>
+                                        <option value="" disabled selected>Select user type...</option>
+                                        <option value="customer">Customer</option>
+                                        <option value="restaurateur">Restaurateur</option>
+                                    </select>
                                 </div>
+                                <div id="restaurantFields" style="display: none;">
+                                    <hr>
+                                    <h5 class="mb-3">Restaurant Data</h5>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control bg-light fs-6" id="restaurantName" name="restaurantName" placeholder="Restaurant Name" aria-label="Restaurant Name">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control bg-light fs-6" id="vatNumber" name="vatNumber" placeholder="Vat Number" aria-label="Vat Number">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <input type="tel" class="form-control bg-light fs-6" id="phone" name="phone" placeholder="Restaurant Phone Number" aria-label="Restaurant Phone Number">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control bg-light fs-6" id="addressStreet" name="addressStreet" placeholder="Address Street" aria-label="Address Street">
+                                    </div>
+                                     <div class="input-group mb-3">
+                                        <input type="text" class="form-control bg-light fs-6" id="addressCity" name="addressCity" placeholder="City" aria-label="City">
+                                    </div>
+                                     <div class="input-group mb-3">
+                                        <input type="text" class="form-control bg-light fs-6" id="addressZip" name="addressZip" placeholder="Zip Code" aria-label="Zip Code">
+                                    </div>
+                                </div>
+                                <div class="input-group mb-4">
+                                    <button class="btn btn-primary w-100 fs-6" type="submit">
+                                        Register
+                                        <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                            </form>
+                            <div class="d-flex justify-content-center mt-2">
+                                <p class="me-2">Do you already have an account?</p>
+                                <a href="login.html">Log In</a>
                             </div>
-                            <div class="input-group mb-4">
-                                <button class="btn btn-lg btn-primary w-100 fs-6" type="submit">
-                                    Register
-                                    <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
-                                </button>
-                            </div>
-                        </form>
-                        <div class="d-flex justify-content-center mt-2">
-                            <p class="me-2">Do you already have an account?</p>
-                            <a href="login.html">Log In</a>
                         </div>
                     </div>
                 </div>

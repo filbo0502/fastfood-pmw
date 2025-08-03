@@ -30,7 +30,7 @@
                         <a class="nav-link" href="../index.html#about">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../index.html#menu">Menu</a>
+                        <a class="nav-link" href="./searchRestaturant.html">Search</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="../index.html#contact">Contacts</a>
@@ -44,94 +44,89 @@
 
     <main class="main-content">
         <div class="container d-flex justify-content-center align-items-center min-vh-100 py-5">
-            <div class="row border rounded-5 p-3 bg-white shadow box-area">
-                <div class="col-md-6 rounded-4 d-none d-md-flex justify-content-center align-items-center flex-column left-box">
-                     <img src="../images/hamburger.png" class="img-fluid" alt="Immagine illustrativa login" style="border-radius: 1rem;">
-                </div>
-                
-                <div class="col-md-6 p-4">
-                    <div class="row align-items-center">
-                        <div class="header-text mb-4 text-center">
-                            <h1>Login</h1>
-                        </div>
+            
+            <div class="col-lg-8 col-xl-7">
+                <div class="row border rounded-5 p-3 bg-white shadow box-area">
+                    <div class="col-md-6 rounded-4 d-none d-md-flex justify-content-center align-items-center flex-column left-box">
+                         <img src="../images/hamburger.png" class="img-fluid" alt="Immagine illustrativa login" style="border-radius: 1rem;">
+                    </div>
+                    
+                    <div class="col-md-6 p-4">
+                        <div class="row align-items-center">
+                            <div class="header-text mb-4 text-center">
+                                <h2>Login</h2>
+                            </div>
 
-                        <form id="login_form">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                                <input type="email" class="form-control form-control-lg bg-light fs-6" id="email" name="email" placeholder="Email" aria-label="Email" required>
-                            </div>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                                <input type="password" class="form-control form-control-lg bg-light fs-6" id="password" name="password" placeholder="Password" aria-label="Password" required>
-                            </div>
-                            <div class="input-group mb-4">
-                                <button class="btn btn-lg btn-primary w-100 fs-6" type="submit">
-                                    Login
-                                    <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
-                                </button>
-                            </div>
-                        </form>
+                            <form id="login_form">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                                    <input type="email" class="form-control bg-light fs-6" id="email" name="email" placeholder="Email" aria-label="Email" required>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                    <input type="password" class="form-control bg-light fs-6" id="password" name="password" placeholder="Password" aria-label="Password" required>
+                                </div>
+                                <div class="input-group mb-4">
+                                    <button class="btn btn-primary w-100 fs-6" type="submit">
+                                        Login
+                                        <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                            </form>
 
-                        <div class="d-flex justify-content-center mt-2">
-                            <p class="me-2">Don't you have an acccount?</p>
-                            <a href="registration.html">Sign Up</a>
+                            <div class="d-flex justify-content-center mt-2">
+                                <p class="me-2">Don't you have an acccount?</p>
+                                <a href="registration.html">Sign Up</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </main>
-    
-    <div class="modal fade" id="credentialsModal" tabindex="-1" aria-labelledby="credentialsModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="credentialsModalLabel">Credentials not valid</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+       <!-- Footer -->
+<footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="logo-icon me-2">
+                            <i class="fa-solid fa-burger text-white"></i>
+                        </div>
+                        <h5 class="mb-0">CodeBite</h5>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <p>Password incorrect! Try again.</p>
+                
+                <div class="col-lg-4 col-md-6">
+                    <h5>Link Utili</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white-50 text-decoration-none">Home</a></li>
+                        <li><a href="./pages/login.html" class="text-white-50 text-decoration-none">Login</a></li>
+                        <li><a href="./pages/registration.html" class="text-white-50 text-decoration-none">Register</a></li>
+                    </ul>
                 </div>
-                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                
+                <div class="col-lg-4 col-md-12 text-lg-end">
+                    <h5>Powered By</h5>
+                    <div class="d-flex gap-3 justify-content-lg-end">
+                        <img src="../images/nodejs.png" alt="Node.js Logo" style="height: 30px;">
+                        <img src="../images/express.png" alt="Express Logo" style="height: 30px;">
+                        <img src="../images/mongo.png" alt="MongoDB Logo" style="height: 50px;">
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-white-50 mb-0">&copy; 2025 Fast Food. All rights reserved</p>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div class="modal fade" id="userNotFoundModal" tabindex="-1" aria-labelledby="userNotFoundModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="userNotFoundModalLabel">User not found</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>User not found with this address. <a href="registration.html">Sign Up?</a></p>
-                </div>
-                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="modal fade" id="genericErrorModal" tabindex="-1" aria-labelledby="genericErrorModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="genericErrorModalLabel">Error</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Unexpected error occured. Please try again later.</p>
-                </div>
-                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    </footer>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

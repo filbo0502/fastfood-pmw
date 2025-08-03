@@ -1,16 +1,19 @@
 import express from 'express';
-import { getMeals, getMealById, createMeal, deleteMeal, updateMeal } from '../controllers/mealController.js';
+import { authMiddleware, authRestaurateurMiddleware } from '../middlewares/authMiddleware.js';
+import { getMeals, getMealById, createMeal, deleteMeal, updateMeal, searchMeal } from '../controllers/mealController.js';
 
 const router = express.Router();
 
-router.get('/', getMeals);
+router.get('/',authMiddleware, getMeals);
 
-router.get('/:id', getMealById);
+router.get('/:id',authMiddleware, getMealById);
 
-router.post('/', createMeal);
+router.get('/search', authMiddleware, searchMeal);
 
-router.delete('/:id', deleteMeal);
+router.post('/',authMiddleware, authRestaurateurMiddleware, createMeal);
 
-router.post('/:id', updateMeal);
+router.delete('/:id',authMiddleware, authRestaurateurMiddleware, deleteMeal);
+
+router.post('/:id',authMiddleware, authRestaurateurMiddleware, updateMeal);
 
 export default router

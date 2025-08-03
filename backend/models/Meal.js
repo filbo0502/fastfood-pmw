@@ -35,15 +35,6 @@ const MealSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
-  price: {
-    type: Number,
-    default: 0,
-    min: [0, 'Price could not be negative'],
-  },
-  isAvailable: {
-    type: Boolean,
-    default: true,
-  },
 }, {
   timestamps: true,
 });
