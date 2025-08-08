@@ -45,6 +45,14 @@ app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)

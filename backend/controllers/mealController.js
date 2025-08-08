@@ -96,7 +96,7 @@ export const updateMeal = asyncHandler(async (req, res) => {
 });
 
 /** 
- * @desc   Cerca i piatti in base a diversi criteri 
+ * @desc   Search meals by name and category
  * @route  GET /api/meals
  * @access Public
  */
@@ -119,5 +119,116 @@ export const searchMeal = asyncHandler(async (req, res) => {
     }
 
     res.status(200).json(meals);
+});
+
+/**
+ * @desc    Search meals by ingredients
+ * @route   GET /api/meals/search/ingredients
+ * @access  Public
+ */
+export const searchMealsByIngredients = asyncHandler(async (req, res) => {
+    const { ingredients } = req.query;
+    
+    if (!ingredients) {
+        return res.status(400).json({ message: 'Ingredients parameter is required.' });
+    }
+
+    const ingredientArray = ingredients.split(',').map(ingredient => ingredient.trim());
+    
+    const meals = await Meal.find({
+        ingredients: { $in: ingredientArray }
+    });
+
+    if (meals.length === 0) {
+        return res.status(404).json({ message: 'No meals found with these ingredients.' });
+    }
+
+    res.status(200).json(meals);
+});
+
+/**
+ * @desc    Search meals by allergies (exclude meals with these allergens)
+ * @route   GET /api/meals/search/allergies
+ * @access  Public
+ */
+export const searchMealsByAllergies = asyncHandler(async (req, res) => {
+    const { allergies } = req.query;
+    
+    if (!allergies) {
+        return res.status(400).json({ message: 'Allergies parameter is required.' });
+    }
+
+    const allergyArray = allergies.split(',').map(allergy => allergy.trim());
+    
+    const meals = await Meal.find({
+        allergies: { $nin: allergyArray }
+    });
+
+    if (meals.length === 0) {
+        return res.status(404).json({ message: 'No meals found without these allergens.' });
+    }
+
+    res.status(200).json(meals);
+});
+
+/**
+ * @desc    Create custom meal for restaurant owner
+ * @route   POST /api/meals/custom
+ * @access  Private (Restaurant Owner only)
+ */
+export const createCustomMeal = asyncHandler(async (req, res) => {
+    const { 
+        strMeal, 
+        strCategory, 
+        strArea, 
+        strMealThumb, 
+        ingredients, 
+        allergies,
+        price,
+        preparationTime 
+    } = req.body;
+
+    if (!strMeal || !ingredients || !price || !preparationTime) {
+        return res.status(400).json({ 
+            message: 'Meal name, ingredients, price, and preparation time are required.' 
+        });
+    }
+
+    const customId = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    try {
+        const newCustomMeal = await Meal.create({
+            idMeal: customId,
+            strMeal,
+            strCategory,
+            strArea,
+            strMealThumb,
+            ingredients,
+            allergies: allergies || [],
+            isCustom: true,
+            createdBy: req.user.id
+        });
+
+        res.status(201).json({
+            message: 'Custom meal created successfully',
+            meal: newCustomMeal
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+/**
+ * @desc    Get custom meals for a restaurant owner
+ * @route   GET /api/meals/custom
+ * @access  Private (Restaurant Owner only)
+ */
+export const getCustomMeals = asyncHandler(async (req, res) => {
+    const customMeals = await Meal.find({
+        isCustom: true,
+        createdBy: req.user.id
+    });
+
+    res.status(200).json(customMeals);
 });
 

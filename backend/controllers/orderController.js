@@ -2,6 +2,14 @@ import Order from '../models/Order.js';
 import Restaurant from '../models/Restaurant.js';
 import asyncHandler from 'express-async-handler';
 
+export const getAllOrders = asyncHandler(async (req, res) => {
+    const orders = await Order.find()
+        .populate('customer', 'name')
+        .populate('restaurant', 'name')
+        .populate('items.meal', 'strMeal strMealThumb');
+    res.status(200).json(orders);
+});
+
 /**
  * @desc Create new order
  * @route POST /api/orders
@@ -21,7 +29,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     const orderItems = [];
 
     for(const item of items){
-        const menuItem = restaurant.menu.find(m => m.meal.toString() === item.mealId);
+        const menuItem = restaurant.menu.find(m => m.meal.toString() === item.idMeal);
         if(!menuItem || !menuItem.isAvailable){
             return res.status(400).json({ message: 'Meal not available.' });
         }
@@ -30,7 +38,7 @@ export const createOrder = asyncHandler(async (req, res) => {
         totalAmount += menuItem.price * item.quantity;
 
         orderItems.push({
-            meal: item.mealId,
+            meal: item.idMeal,
             quantity: item.quantity,
             price: menuItem.price,
             preparationTime: menuItem.preparationTime
@@ -65,7 +73,11 @@ export const createOrder = asyncHandler(async (req, res) => {
     });
 
     const saveOrder = await newOrder.save();
-    res.status(201).json({ message: 'Order successfully done!', order: saveOrder, estimatedWaitTime: totalWaitTime });
+    res.status(201).json({ 
+        message: 'Order successfully done!', 
+        order: saveOrder, 
+        estimatedWaitTime: totalWaitTime,
+    });
 });
 
 export const getUserOrders = asyncHandler(async (req, res) => {
@@ -113,10 +125,35 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     }
         
     if(order.deliveryType === 'pickup' && status === 'preparing') {
-            // Potrebbe esserci uno stato intermedio 'ready_for_pickup' o gestito diversamente
-            // qui si semplifica in 'delivered' al momento del ritiro
+        order.status = status;
+    } 
+    
+    else if(order.deliveryType === 'pickup' && status === 'delivered') {
+        if (order.status === 'preparing') {
+            order.status = status;
+        } else {
+            return res.status(400).json({ message: 'Pickup order can only be marked as delivered when it is in preparing status' });
+        }
+    } 
+    
+    else if(order.deliveryType === 'pickup' && status === 'delivering') {
+        return res.status(400).json({ message: 'Pickup orders cannot be marked as delivering. Use delivered status when customer picks up.' });
     }
 
     const updatedOrder = await order.save();
     res.status(200).json(updatedOrder);
+});
+
+/**
+ * @desc delete a single order
+ * @route DELETE /api/orders/:id
+ * @access Private
+ */
+
+export const deleteOrder = asyncHandler(async (req, res) => {
+    const order = await Order.findByIdAndDelete(req.params.id);
+    if(!order){
+        return res.status(404).json({ message: 'Order not found.' });
+    }
+    res.status(200).json({ message: 'Order deleted successfully.' });
 });
