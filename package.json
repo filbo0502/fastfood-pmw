@@ -25,6 +25,7 @@
     "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.1",
+    "multer": "^2.0.2",
     "swagger-ui-express": "^5.0.1",
     "toastify-js": "^1.12.0"
   },

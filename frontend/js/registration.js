@@ -89,7 +89,13 @@ async function handleRegistration(event) {
         return;
     }
 
-    const payload = { name, surname, email, password, confirmPassword, userType };
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('surname', surname);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('confirmPassword', confirmPassword);
+    formData.append('userType', userType);
 
     if (userType === 'restaurateur') {
         const restaurantName = document.getElementById('restaurantName').value.trim();
@@ -104,25 +110,24 @@ async function handleRegistration(event) {
             enableButton();
             return;
         }
-        
-        payload.restaurant = {
-            name: restaurantName,
-            vatNumber: vatNumber, 
-            phone,
-            address: {
-                street: addressStreet,
-                city: addressCity,
-                zipCode: addressZip
-            }
-        };
+
+        formData.append('restaurantName', restaurantName);
+        formData.append('vatNumber', vatNumber);
+        formData.append('phone', phone);
+        formData.append('addressStreet', addressStreet);
+        formData.append('addressCity', addressCity);
+        formData.append('addressZip', addressZip);
+
+        const restaurantImageInput = document.getElementById('restaurantImage');
+        if (restaurantImageInput && restaurantImageInput.files.length > 0) {
+            formData.append('restaurantImage', restaurantImageInput.files[0]);
+        }
     }
 
     try {
         const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
-            // Correzione dell'header
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: formData
         });
 
         const data = await response.json();

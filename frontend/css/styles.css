@@ -9,6 +9,32 @@ body {
     background-color: var(--light-bg);
 }
 
+.container {
+  width: 100%; 
+  margin: 0 auto; 
+}
+
+@media (min-width: 1600px) {
+
+    .container, .search-container {
+        max-width: 1400px; 
+    }
+
+    body {
+        font-size: 18px; /* Ancora più leggibile */
+    }
+    .main-title {
+        font-size: 4.5rem;
+    }
+    .story-title, .section-title {
+        font-size: 3rem;
+    }
+
+    .services-grid-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
 .navbar {
     background-color: white;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);

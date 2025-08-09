@@ -1,14 +1,54 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs';
 import Restaurant from "../models/Restaurant.js";
 import asyncHandler from 'express-async-handler';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadPath = 'uploads/restaurants';
+        // Crea la cartella se non esiste
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+        // Genera un nome file unico
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'restaurant-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    // Accetta solo file immagine
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only image files are allowed!'), false);
+    }
+};
+
+/**
+ * @desc    Upload an image with multer library
+ * @route   POST /api/auth/login
+ * @access  Public
+ */
+export const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    },
+    fileFilter: fileFilter
+});
 
 /**
  * @desc    Registrazione utente (Cliente o Ristoratore)
  * @route   POST /api/auth/register
  * @access  Public
- * @body    { name, surname, email, password, confirmPassword, userType, restaurant: { name, vatNumber, phone, address: { street, city, zipCode } } }
  */
 export const register = asyncHandler(async (req, res) => {
     const { name, surname, email, password, confirmPassword, userType } = req.body;
@@ -21,7 +61,6 @@ export const register = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "Le password non coincidono." });
     }
 
-    // Controlla se l'utente esiste già
     const userExists = await User.findOne({ email });
     if (userExists) {
         return res.status(409).json({ message: "Un utente con questa email è già registrato." });
@@ -38,25 +77,42 @@ export const register = asyncHandler(async (req, res) => {
 
     try {
         if (user.userType === 'restaurateur') {
-            const { restaurant } = req.body;
+            const {
+                restaurantName,
+                vatNumber,
+                phone,
+                addressStreet,
+                addressCity,
+                addressZip,
+                description
+            } = req.body;
 
-            if (!restaurant || !restaurant.name || !restaurant.vatNumber || !restaurant.phone || !restaurant.address || !restaurant.address.street || !restaurant.address.city || !restaurant.address.zipCode) {
+            if (!restaurantName || !vatNumber || !phone || !addressStreet || !addressCity || !addressZip) {
                 await User.findByIdAndDelete(user._id); 
-                return res.status(400).json({ message: 'For restaurateurs, all data fields are required.' });
+                if (req.file) {
+                    fs.unlinkSync(req.file.path);
+                }
+                return res.status(400).json({ message: 'For restaurateurs, all restaurant fields are required.' });
             }
 
-            const newRestaurant = new Restaurant({
-                name: restaurant.name,
-                vatNumber: restaurant.vatNumber, 
-                phone: restaurant.phone,
+            const restaurantData = {
+                name: restaurantName,
+                vatNumber: vatNumber, 
+                phone: phone,
                 address: {
-                    street: restaurant.address.street,
-                    city: restaurant.address.city,
-                    zipCode: restaurant.address.zipCode,
+                    street: addressStreet,
+                    city: addressCity,
+                    zipCode: addressZip,
                 },
                 owner: user._id,
-                description: restaurant.description || `Welcome at ${restaurant.name}`
-            });
+                description: description || `Welcome at ${restaurantName}`
+            };
+
+            if (req.file) {
+                restaurantData.image = `/uploads/restaurants/${req.file.filename}`;
+            }
+
+            const newRestaurant = new Restaurant(restaurantData);
             await newRestaurant.save();
 
             user.restaurant = newRestaurant._id;
@@ -80,8 +136,13 @@ export const register = asyncHandler(async (req, res) => {
 
     } catch (error) {
         console.error("Error during the registration:", error);
+    
         if(user && user._id) {
             await User.findByIdAndDelete(user._id);
+        }
+
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
         }
 
         if (error.name === 'ValidationError') {
@@ -91,7 +152,6 @@ export const register = asyncHandler(async (req, res) => {
         res.status(500).json({ success: false, message: "Errore durante la creazione dell'utente." });
     }
 });
-
 
 /**
  * @desc    Login user
@@ -106,12 +166,12 @@ export const login = asyncHandler(async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-        return res.status(404).json({ success: false, message: "User not found." }); // Cambiato status a 404
+        return res.status(404).json({ success: false, message: "User not found." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-        return res.status(401).json({ success: false, message: "Incorrect password." }); // Cambiato status a 401
+        return res.status(401).json({ success: false, message: "Incorrect password." });
     }
 
     const tokenDuration = 2 * 3600; // 2 ore in secondi

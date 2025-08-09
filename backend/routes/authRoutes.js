@@ -1,11 +1,11 @@
 import express from 'express';
-import { login, logout, register } from '../controllers/authController.js';
+import { login, logout, register, upload } from '../controllers/authController.js';
 
 const router = express.Router();
 
 router.post('/login', login);
 
-router.post('/register', register);
+router.post('/register', upload.single('restaurantImage'), register);
 
 router.delete('/logout', logout);
 

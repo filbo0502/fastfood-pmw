@@ -22,6 +22,11 @@ const RestaurantSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    image:{
+        type: String,
+        required: false,
+        default: null
+    },
     address:{
         street:{
             type: String,
