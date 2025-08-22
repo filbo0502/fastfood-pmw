@@ -33,6 +33,8 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname).replace(/^\/([
 
 app.use(express.static(path.resolve(__dirname, '../frontend'), { index: 'index.html' }));
 
+app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
+
 app.get("/", (req,res) => {
     res.sendFile(path.resolve(__dirname, '../frontend', 'index.html'));
 });

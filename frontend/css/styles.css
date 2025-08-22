@@ -297,3 +297,67 @@ body {
     background: var(--secondary-color);
     color: white;
 }
+
+/* Restaurant Cards Styling */
+.custom-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.custom-card .card-img-top {
+    transition: transform 0.3s ease;
+}
+
+.custom-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.custom-card .card-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.custom-card .card-text {
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+.custom-card .card-footer {
+    background: transparent;
+    border-top: 1px solid #e9ecef;
+    padding: 1rem;
+}
+
+#searchResultsInfo {
+    font-size: 0.9rem;
+    color: #6c757d;
+    padding: 0.5rem 1rem;
+    background: rgba(108, 117, 125, 0.1);
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.restaurant-section {
+    padding: 2rem 0;
+    background: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .search-container {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+    
+    .custom-card {
+        margin-bottom: 1rem;
+    }
+}

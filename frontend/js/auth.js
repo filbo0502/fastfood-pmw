@@ -17,11 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutItem.classList.add('d-none');
     }
     
-    // Aggiungi event listener solo se l'elemento esiste
     logoutItem.addEventListener('click', (e) => {
         e.preventDefault();
         localStorage.removeItem('jwtToken');
         localStorage.removeItem('userID');
-        window.location.href = './pages/login.html';
     });
 });
