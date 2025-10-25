@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - CodeBite</title>
+    <link rel="icon" type="image/x-icon" href="../images/logo.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="../index.html">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-burger text-white"></i>
+                </div>
+                CodeBite
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto me-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./searchRestaurant.html">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./restaurantDashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./menuManagement.html">Menu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item cart-link d-none">
+                        <a class="nav-link" href="./pages/order.html">
+                            <i class="fas fa-shopping-cart"></i> Cart
+                            <span id="cart-count" class="badge bg-danger ms-1">0</span>
+                        </a>
+                    </li>
+                </ul>
+                <a href="./login.html" class="btn login-btn btn-primary">Log In</a>
+                <a href="#" class="btn logout-btn btn-primary d-none" id="logoutBtn">Log Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Header with Period -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h2 class="mb-3">
+                        <i class="fas fa-chart-bar text-primary"></i> 
+                        Restaurant Statistics
+                        <span class="period-badge" id="periodBadge">Last 7 days</span>
+                    </h2>
+                    <p class="text-muted mb-0" id="restaurantName">
+                        <i class="fas fa-store"></i> Loading restaurant data...
+                    </p>
+                </div>
+            </div>
+
+            <!-- Main Statistics -->
+            <div class="row mb-5">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalOrders">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <div class="stats-label">Total Orders</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="completedOrders">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <div class="stats-label">Delivered Orders</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalRevenue">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <div class="stats-label">Total Revenue</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="successRate">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <div class="stats-label">Success Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="row mb-5">
+                <div class="col-md-8">
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-line text-primary"></i> 
+                                Daily Orders Trend
+                            </h5>
+                            <small class="text-muted">Last 7 days trend</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="dailyOrdersChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-pie text-success"></i> 
+                                Order Status
+                            </h5>
+                            <small class="text-muted">Order status distribution</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Meals -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card chart-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0">
+                                    <i class="fas fa-trophy text-warning"></i> 
+                                    Top 3 Best Selling Meals
+                                </h5>
+                                <small class="text-muted">Last 7 days ranking</small>
+                            </div>
+                            <div class="text-muted">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="topMealsList">
+                                <div class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div id="loading" class="text-center py-5 loading-container" style="display: none;">
+                <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h5 class="text-primary">Loading statistics...</h5>
+                <p class="text-muted">Processing data in progress</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="alert alert-danger" style="display: none;">
+                <h4 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle"></i> Loading Error
+                </h4>
+                <p class="mb-0">An error occurred while loading statistics. Please try again later.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white pt-5 pb-4">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="logo-icon me-2">
+                            <i class="fa-solid fa-burger text-white"></i>
+                        </div>
+                        <h5 class="mb-0">CodeBite</h5>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <h5>Useful Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="../index.html" class="text-white-50 text-decoration-none">Home</a></li>
+                        <li><a href="./login.html" class="text-white-50 text-decoration-none">Login</a></li>
+                        <li><a href="./registration.html" class="text-white-50 text-decoration-none">Register</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-4 col-md-12 text-lg-end">
+                    <h5>Powered By</h5>
+                    <div class="d-flex gap-3 justify-content-lg-end">
+                        <img src="../images/nodejs.png" alt="Node.js Logo" style="height: 30px;">
+                        <img src="../images/express.png" alt="Express Logo" style="height: 30px;">
+                        <img src="../images/mongo.png" alt="MongoDB Logo" style="height: 50px;">
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-white-50 mb-0">&copy; 2025 CodeBite. All rights reserved</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Navbar background change on scroll
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.backdropFilter = 'blur(10px)';
+            } else {
+                navbar.style.backgroundColor = 'white';
+                navbar.style.backdropFilter = 'none';
+            }
+        });
+    </script>
+    <script src="../config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/statistics.js"></script>
+</body>
+</html>

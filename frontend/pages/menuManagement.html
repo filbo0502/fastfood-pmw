@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Management - CodeBite</title>
+    <link rel="icon" type="image/x-icon" href="./images/logo.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="../index.html">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-burger text-white"></i>
+                </div>
+                CodeBite
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto me-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./searchRestaurant.html">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item cart-link d-none">
+                        <a class="nav-link" href="./pages/order.html">
+                            <i class="fas fa-shopping-cart"></i> Cart
+                            <span id="cart-count" class="badge bg-danger ms-1">0</span>
+                        </a>
+                    </li>
+                </ul>
+                <a href="./login.html" class="btn login-btn btn-primary">Log In</a>
+                <a href="#" class="btn logout-btn btn-primary d-none">Log Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h2>Menu Management</h2>
+                <button id="add-custom-meal" class="btn btn-primary">Create Custom Meal</button>
+            </div>
+
+            <div class="search-section">
+                <input type="text" id="meal-search" placeholder="Search meals..." class="search-input">
+            </div>
+
+            <div class="menu-sections">
+                <section class="available-meals-section">
+                    <h3>Available Meals Database</h3>
+                    <div id="available-meals" class="meals-grid">
+                        <!-- Available meals will be loaded here -->
+                    </div>
+                </section>
+
+                <section class="current-menu-section">
+                    <h3>Your Custom Meals</h3>
+                    <div id="current-menu" class="menu-items-grid">
+                        <!-- Custom meals will be loaded here -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <div id="custom-meal-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Custom Meal</h3>
+            <form id="custom-meal-form">
+                <div class="form-group">
+                    <label for="meal-name">Meal Name *</label>
+                    <input type="text" id="meal-name" name="meal-name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="meal-category">Category</label>
+                    <input type="text" id="meal-category" name="meal-category" placeholder="e.g., Burger, Pizza">
+                </div>
+                
+                <div class="form-group">
+                    <label for="meal-price">Price (€) *</label>
+                    <input type="number" id="meal-price" name="meal-price" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="meal-available" name="meal-available" checked>
+                        Available for ordering
+                    </label>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Create Meal</button>
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('custom-meal-modal').style.display='none'">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="../js/auth.js"></script>
+    <script src="../js/menuManagement.js"></script>
+</body>
+</html>

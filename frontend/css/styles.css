@@ -1,0 +1,432 @@
+:root {
+    --primary-color: #8B4513;
+    --secondary-color: #A0522D;
+    --light-bg: #f8f9fa;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-bg);
+}
+
+.container {
+  width: 100%; 
+  margin: 0 auto; 
+}
+
+@media (min-width: 1600px) {
+
+    .container, .search-container {
+        max-width: 1400px; 
+    }
+
+    body {
+        font-size: 18px; /* Ancora più leggibile */
+    }
+    .main-title {
+        font-size: 4.5rem;
+    }
+    .story-title, .section-title {
+        font-size: 3rem;
+    }
+
+    .services-grid-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.navbar {
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: var(--primary-color) !important;
+}
+
+.navbar-nav .nav-link {
+    color: #333 !important;
+    font-weight: 500;
+    margin: 0 1rem;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    color: #6c757d;
+    border-color: #6c757d;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    transform: translateY(-2px);
+}
+
+.main-section {
+    padding: 4rem 1rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+}
+
+.main-title {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.story-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.main-text, .story-text {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.food-illustration {
+    position: relative;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.delivery-icon {
+    font-size: 12rem;
+    color: var(--primary-color);
+    opacity: 0.9;
+}
+
+.services-section {
+    padding: 4rem 0;
+    background-color: white;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 3rem;
+    color: #333;
+}
+
+.service-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+    border: 1px solid #f0f0f0;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.service-icon {
+    font-size: 3.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+.service-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.service-text {
+    color: #666;
+    line-height: 1.6;
+}
+
+.btn-light {
+    padding: 1rem 2rem;
+    font-weight: 600;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2.5rem;
+    }
+            
+    .delivery-icon {
+        font-size: 8rem;
+    }
+            
+    .main-section {
+        padding: 2rem 1rem;
+    }
+            
+    .services-section {
+        padding: 3rem 0;
+    }
+}
+
+.login_section, .signin_section {
+    padding: 40px 30px;
+}
+
+::placeholder {
+    font-size: 1rem; 
+    color: #6c757d; 
+}
+
+.signin_section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.padding-custom {
+    padding-top: 50px;
+    padding-bottom: 100px !important; 
+}
+
+.login__opt p, .signing__opt p {
+    margin-bottom: 0;
+}
+.login__opt a, .signing__opt a {
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+.login__opt a:hover, .signing__opt a:hover {
+    text-decoration: underline;
+}
+  
+.search-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    width: 100%; /* Modificato per migliore responsività */
+    max-width: 800px;
+}
+
+.search-input {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.search-tags {
+    gap: 0.5rem;
+}
+
+.tag {
+    background: #f3f4f6;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tag:hover {
+    background: var(--secondary-color);
+    color: white;
+}
+
+/* Restaurant Cards Styling */
+.custom-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.custom-card .card-img-top {
+    transition: transform 0.3s ease;
+}
+
+.custom-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.custom-card .card-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.custom-card .card-text {
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+.custom-card .card-footer {
+    background: transparent;
+    border-top: 1px solid #e9ecef;
+    padding: 1rem;
+}
+
+#searchResultsInfo {
+    font-size: 0.9rem;
+    color: #6c757d;
+    padding: 0.5rem 1rem;
+    background: rgba(108, 117, 125, 0.1);
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.restaurant-section {
+    padding: 2rem 0;
+    background: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .search-container {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+    
+    .custom-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Stili per le stats */
+
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+.stats-number {
+    font-size: 2.8rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.stats-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.chart-container {
+    position: relative;
+    height: 350px;
+    margin: 20px 0;
+}
+.chart-card {
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 15px;
+}
+.chart-card .card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px 15px 0 0;
+    border: none;
+    padding: 15px 20px;
+}
+.top-meals-item {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s;
+}
+.top-meals-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.loading-container {
+    background: rgba(255,255,255,0.9);
+    border-radius: 15px;
+    padding: 40px;
+}
+.period-badge {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin-left: 10px;
+}

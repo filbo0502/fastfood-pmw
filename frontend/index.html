@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeBite - Food Delivery Made Easy</title>
+    <link rel="icon" type="image/x-icon" href="./images/logo.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="./css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="./index.html">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-burger text-white"></i>
+                </div>
+                CodeBite
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto me-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="./index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./pages/about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./pages/searchRestaurant.html">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item cart-link d-none">
+                        <a class="nav-link" href="./pages/order.html">
+                            <i class="fas fa-shopping-cart"></i> Cart
+                            <span id="cart-count" class="badge bg-danger ms-1">0</span>
+                        </a>
+                    </li>
+                    </ul>
+                <a href="./pages/login.html" class="btn login-btn btn-primary">Log In</a>
+                <a href="#" class="btn logout-btn btn-primary d-none">Log Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="main-section" style="margin-top: 80px;">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="main-title">Food Delivery<br>Made Easy</h1>
+                    <p class="main-text">
+                        Order your favorite meals from local restaurants with CodeBite and get it delivered to your door fast.
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <button class="btn btn-primary btn-lg">Order Now</button>
+                        <button class="btn btn-outline-secondary btn-lg">Learn More</button>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="food-illustration text-center">
+                        <div class="delivery-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                            <div style="position: absolute; top: -20px; right: -20px;">
+                                <i class="fas fa-pizza-slice" style="font-size: 3rem; color: var(--secondary-color);"></i>
+                            </div>
+                            <div style="position: absolute; top: 20px; left: -30px;">
+                                <i class="fas fa-utensils" style="font-size: 2.5rem; color: var(--secondary-color);"></i>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h3 style="color: var(--primary-color); font-weight: bold;">CodeBite</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="services-section">
+        <div class="container">
+            <h2 class="section-title">Our Services</h2>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="service-card ">
+                        <div class="service-icon">
+                            <i class="fa-solid fa-map-marker-alt"></i>
+                        </div>
+                        <h3 class="service-title">Browse<br>Restaurants</h3>
+                        <p class="service-text">
+                            Find a variety of local restaurants offering wide range of cuisines.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                        <h3 class="service-title">Place Your Order</h3>
+                        <p class="service-text">
+                            Choose your dishes and place your order with just a few clicks.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fa-solid fa-motorcycle"></i>
+                        </div>
+                        <h3 class="service-title">Fast Delivery</h3>
+                        <p class="service-text">
+                            Get your food delivered quickly by our reliable delivery partners.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="logo-icon me-2">
+                            <i class="fa-solid fa-burger text-white"></i>
+                        </div>
+                        <h5 class="mb-0">CodeBite</h5>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <h5>Link Utili</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white-50 text-decoration-none">Home</a></li>
+                        <li><a href="./pages/login.html" class="text-white-50 text-decoration-none">Login</a></li>
+                        <li><a href="./pages/registration.html" class="text-white-50 text-decoration-none">Register</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-4 col-md-12 text-lg-end">
+                    <h5>Powered By</h5>
+                    <div class="d-flex gap-3 justify-content-lg-end">
+                        <img src="./images/nodejs.png" alt="Node.js Logo" style="height: 30px;">
+                        <img src="./images/express.png" alt="Express Logo" style="height: 30px;">
+                        <img src="./images/mongo.png" alt="MongoDB Logo" style="height: 50px;">
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-white-50 mb-0">&copy; 2025 Fast Food. All rights reserved</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.backdropFilter = 'blur(10px)';
+            } else {
+                navbar.style.backgroundColor = 'white';
+                navbar.style.backdropFilter = 'none';
+            }
+        });
+
+    </script>
+    <script type="module" src="./js/auth.js"></script>
+
+</body>
+</html>
