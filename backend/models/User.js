@@ -32,6 +32,10 @@ const UserSchema = new mongoose.Schema({
         enum: ['customer', 'restaurateur'],
         required: true
     },
+    restaurant:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Restaurant'
+    },
     paymentInfo:{
         cardType: String,
         cardNumb: String,

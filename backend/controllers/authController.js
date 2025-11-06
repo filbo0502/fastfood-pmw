@@ -56,6 +56,10 @@ export const register = asyncHandler(async (req, res) => {
 
     const { name, surname, email, password, confirmPassword, userType } = req.body;
 
+    if(password !== confirmPassword){
+        return res.status(400).json({ message: 'Password and confirm password don\'t matches'});
+    }
+
     const userExists = await User.findOne({ email });
     if (userExists) {
         return res.status(409).json({ message: "Un utente con questa email è già registrato." });
@@ -161,7 +165,7 @@ export const login = asyncHandler(async (req, res) => {
         return res.status(401).json({ success: false, message: "Incorrect password." });
     }
 
-    const tokenDuration = 2 * 3600; 
+    const tokenDuration = 2 * 3600;
     const token = jwt.sign({ id: user._id, type: user.userType }, process.env.JWT_SECRET, { expiresIn: tokenDuration });
 
     let restaurantId = null;
@@ -171,13 +175,6 @@ export const login = asyncHandler(async (req, res) => {
             restaurantId = restaurant._id.toString();
         }
     }
-
-    res.json({
-        token: generateToken(user._id),
-        name: user.name,
-        userType: user.userType,
-        restaurantId: restaurantId
-});
 
     res.cookie('jwtToken', token, {
         httpOnly: true,
@@ -193,7 +190,8 @@ export const login = asyncHandler(async (req, res) => {
             id: user._id.toString(),
             name: user.name,
             userType: user.userType
-        }
+        },
+        restaurantId: restaurantId 
     });
 });
 
