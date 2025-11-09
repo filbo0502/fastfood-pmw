@@ -53,6 +53,9 @@ async function handleLogin(event) {
             if (data.user && data.user.id) {
                 localStorage.setItem('userID', data.user.id);
             }
+            if(data.user.userType){
+                localStorage.setItem('userType', data.user.userType);
+            }
             if (data.restaurantId) {
                 localStorage.setItem('restaurantId', data.restaurantId);
             }   

@@ -39,6 +39,7 @@ const UserSchema = new mongoose.Schema({
     paymentInfo:{
         cardType: String,
         cardNumb: String,
+        CVC: Number,
         expiryDate: Date
     },
     address:{

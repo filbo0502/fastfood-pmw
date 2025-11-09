@@ -45,6 +45,8 @@
                     </li>
                     </ul>
                 <a href="./pages/login.html" class="btn login-btn btn-primary">Log In</a>
+                <a href="./pages/profile.html" class="btn my-profile-btn btn-outline-primary me-2 d-none">My Profile</a>
+                <a href="./pages/restaurantDashboard.html" class="btn my-restaurant-btn btn-outline-primary me-2 d-none">My Restaurant</a>
                 <a href="#" class="btn logout-btn btn-primary d-none">Log Out</a>
             </div>
         </div>
@@ -138,7 +140,7 @@
                 </div>
                 
                 <div class="col-lg-4 col-md-6">
-                    <h5>Link Utili</h5>
+                    <h5>Useful Links</h5>
                     <ul class="list-unstyled">
                         <li><a href="#" class="text-white-50 text-decoration-none">Home</a></li>
                         <li><a href="./pages/login.html" class="text-white-50 text-decoration-none">Login</a></li>
@@ -190,8 +192,47 @@
             }
         });
 
+        window.addEventListener('DOMContentLoaded', () => {
+            const loginItem = document.querySelector('.login-btn');
+            const logoutItem = document.querySelector('.logout-btn');
+            const myProfileItem = document.querySelector('.my-profile-btn');
+            const myRestaurantItem = document.querySelector('.my-restaurant-btn');
+    
+            if (!loginItem || !logoutItem || !myProfileItem || !myRestaurantItem) {
+                console.error('Elements like login-btn, logout-btn, my-profile-btn or my-restaurant-btn not found.');
+                return;
+            }
+    
+            const token = localStorage.getItem('jwtToken');
+            const userType = localStorage.getItem('userType');
+    
+            if(token){
+                loginItem.classList.add('d-none');
+                logoutItem.classList.remove('d-none');
+                myProfileItem.classList.remove('d-none');
+            if (userType === 'restaurateur') {
+                myRestaurantItem.classList.remove('d-none');
+            } else {
+                myRestaurantItem.classList.add('d-none');
+            }
+        } else {
+            loginItem.classList.remove('d-none');
+            logoutItem.classList.add('d-none');
+            myProfileItem.classList.add('d-none');
+            myRestaurantItem.classList.add('d-none');
+        }
+    
+        logoutItem.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('userID');
+            localStorage.removeItem('userType');
+            localStorage.removeItem('restaurantId');
+            window.location.href = './pages/login.html'
+        });
+    });
+
     </script>
-    <script type="module" src="./js/auth.js"></script>
 
 </body>
 </html>

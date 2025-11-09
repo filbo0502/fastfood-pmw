@@ -1,5 +1,4 @@
-import CONFIG from "../config.js";
-
+import CONFIG from "./config.js";
 const API_BASE_URL = CONFIG.API_BASE_URL;
 
 let allRestaurants = [];

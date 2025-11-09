@@ -47,7 +47,7 @@ app.use('/api/meals', mealRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/statistics', statisticsRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/user', userRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
