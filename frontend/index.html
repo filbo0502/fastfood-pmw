@@ -61,9 +61,9 @@
                         Order your favorite meals from local restaurants with CodeBite and get it delivered to your door fast.
                     </p>
                     <div class="d-flex gap-3 flex-wrap">
-                        <button class="btn btn-primary btn-lg">Order Now</button>
-                        <button class="btn btn-outline-secondary btn-lg">Learn More</button>
-                    </div>
+                        <a href="./pages/searchRestaurant.html" class="btn btn-primary btn-lg" role="button">Order Now</a>
+                        <a href="./pages/about.html" class="btn btn-outline-secondary btn-lg" role="button">Learn More</a>
+                </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="food-illustration text-center">
@@ -192,47 +192,8 @@
             }
         });
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const loginItem = document.querySelector('.login-btn');
-            const logoutItem = document.querySelector('.logout-btn');
-            const myProfileItem = document.querySelector('.my-profile-btn');
-            const myRestaurantItem = document.querySelector('.my-restaurant-btn');
-    
-            if (!loginItem || !logoutItem || !myProfileItem || !myRestaurantItem) {
-                console.error('Elements like login-btn, logout-btn, my-profile-btn or my-restaurant-btn not found.');
-                return;
-            }
-    
-            const token = localStorage.getItem('jwtToken');
-            const userType = localStorage.getItem('userType');
-    
-            if(token){
-                loginItem.classList.add('d-none');
-                logoutItem.classList.remove('d-none');
-                myProfileItem.classList.remove('d-none');
-            if (userType === 'restaurateur') {
-                myRestaurantItem.classList.remove('d-none');
-            } else {
-                myRestaurantItem.classList.add('d-none');
-            }
-        } else {
-            loginItem.classList.remove('d-none');
-            logoutItem.classList.add('d-none');
-            myProfileItem.classList.add('d-none');
-            myRestaurantItem.classList.add('d-none');
-        }
-    
-        logoutItem.addEventListener('click', (e) => {
-            e.preventDefault();
-            localStorage.removeItem('jwtToken');
-            localStorage.removeItem('userID');
-            localStorage.removeItem('userType');
-            localStorage.removeItem('restaurantId');
-            window.location.href = './pages/login.html'
-        });
-    });
-
     </script>
+    <script type="module" src="./js/auth.js"></script>
 
 </body>
 </html>

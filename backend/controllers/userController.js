@@ -80,18 +80,16 @@ export const updatePassword = asyncHandler(async(req, res) => {
         return res.status(404).json({ message: 'User not found.'});
     }
 
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if(!isMatch){
-        return res.status(400).json({ message: 'Incorrect password.'});
-    }
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if(!isMatch){
+        return res.status(400).json({ message: 'Incorrect password.'});
+    }
 
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
-    await user.save();
+    user.password = newPassword; 
+    await user.save(); 
 
-    res.status(200).json({ message: 'Password successfully updated.'})
+    res.status(200).json({ message: 'Password successfully updated.'})
 });
-
 /**
  * @desc Update user preferences
  * @route PUT /api/users/:id/preferences

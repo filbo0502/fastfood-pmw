@@ -186,16 +186,33 @@
                         </div>
 
                         <div class="tab-pane fade" id="payment-pane" role="tabpanel" aria-labelledby="payment-tab">
-                            <div class="card service-card p-4 p-md-5">
+                        <div class="card service-card p-4 p-md-5">
+                            <h3 class="service-title text-start mb-4">Payment Information</h3>
+                            <div id="payment-display-view" class="d-none">
+                                <p class="service-text text-start mb-3">Your current payment info:</p>
+                                <div class="border rounded p-3 mb-3 bg-light">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <i id="saved-card-icon" class="fab fa-cc-visa fa-2x me-3 text-primary"></i>
+                                            <span id="saved-card-details" class="fw-bold fs-5">Visa ---1234</span>
+                                        </div>
+                                        <span id="saved-card-expiry" class="text-muted">Expire in 12/25</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 mt-4">
+                                    <button type="button" id="edit-payment-btn" class="btn btn-secondary">Edit</button>
+                                    <button type="button" id="remove-payment-btn" class="btn btn-outline-danger">Remove</button>
+                                </div>
+                            </div>
+
+                            <div id="payment-form-view">
+                                <p id="payment-form-intro" class="service-text text-start mb-3">
+                                    You don't have any payment method saved at the moment.
+                                </p>
                                 <form id="payment-form">
-                                    <h3 class="service-title text-start mb-4">Payment Information</h3>
-                                    <p class="service-text text-start mb-3">
-                                        Update your saved credit card details. This information is stored securely.
-                                    </p>
-                                    
                                     <div class="form-floating mb-3">
-                                        <select class="form-select" id="cardType" placeholder="Card Type">
-                                            <option value="">Select Card Type...</option>
+                                        <select class="form-select" id="cardType" placeholder="Card Type" required>
+                                            <option value="" disabled>Select Card Type</option>
                                             <option value="Visa">Visa</option>
                                             <option value="Mastercard">Mastercard</option>
                                             <option value="Amex">American Express</option>
@@ -205,24 +222,31 @@
                                     </div>
 
                                     <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="cardNumb" placeholder="1234 5678 9012 3456" inputmode="numeric" pattern="[\d\s]{13,19}" maxlength="19">
-                                        <label for="cardNMB">Card Number</label>
+                                        <input type="text" class="form-control" id="cardNumb" placeholder="1234 5678 9012 3456" inputmode="numeric" pattern="[\d\s]{13,19}" maxlength="19" required>
+                                        <label for="cardNumb">Card Number</label>
                                     </div>
 
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="CVC" placeholder="123" inputmode="numeric" pattern="[\d\s]{3,3}" maxlength="3">
-                                        <label for="cardNMB">CVC</label>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="form-floating mb-3">
+                                                <input type="month" class="form-control" id="expiryDate" placeholder="MM/YYYY" required>
+                                                <label for="expiryDate">Expiry Date (MM/YYYY)</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating mb-3">
+                                                <input type="text" class="form-control" id="CVC" placeholder="123" inputmode="numeric" pattern="\d{3,3}" maxlength="3" required>
+                                                <label for="CVC">CVC</label>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div class="form-floating mb-3">
-                                        <input type="month" class="form-control" id="expiryDate" placeholder="MM/YYYY">
-                                        <label for="expiryDate">Expiry Date (MM/YYYY)</label>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Save Payment Info</button>
+                                    <button type="submit" id="save-payment-btn" class="btn btn-primary btn-lg w-100 mt-3">Save Payment Info</button>
+                                    <button type="button" id="cancel-edit-btn" class="btn btn-outline-secondary btn-lg w-100 mt-2 d-none">Cancel</button>
                                 </form>
                             </div>
                         </div>
+                    </div>
 
                         <div class="tab-pane fade" id="security-pane" role="tabpanel" aria-labelledby="security-tab">
                             <div class="card service-card p-4 p-md-5">

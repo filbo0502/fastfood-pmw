@@ -1,5 +1,7 @@
+import CONFIG from "./config.js";
+const API_BASE_URL = CONFIG.API_BASE_URL;
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Seleziona gli elementi: è normale se alcuni sono 'null'
     const loginItem = document.querySelector('.login-btn');
     const logoutItem = document.querySelector('.logout-btn');
     const myProfileItem = document.querySelector('.my-profile-btn');
@@ -29,13 +31,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (logoutItem) {
-        logoutItem.addEventListener('click', (e) => {
+        logoutItem.addEventListener('click', async (e) => { 
             e.preventDefault();
-            localStorage.removeItem('jwtToken');
-            localStorage.removeItem('userID');
-            localStorage.removeItem('userType');
-            localStorage.removeItem('restaurantId');
-            window.location.href = './login.html'; 
+            try {
+                await fetch(`${API_BASE_URL}/auth/logout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            } catch (error) {
+                console.error('Error calling server logout:', error);
+            } finally {
+                localStorage.removeItem('jwtToken');
+                localStorage.removeItem('userID');
+                localStorage.removeItem('userType');
+                localStorage.removeItem('restaurantId');
+                window.location.href = '../pages/login.html'; 
+            }
         });
     }
 });

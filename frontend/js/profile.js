@@ -3,7 +3,6 @@ const API_BASE_URL = CONFIG.API_BASE_URL;
 
 document.addEventListener('DOMContentLoaded', () => {
 
-
     const token = localStorage.getItem('jwtToken');
     const userID = localStorage.getItem('userID');
 
@@ -13,13 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Selettori Form
     const profileForm = document.getElementById('profile-details-form');
     const addressForm = document.getElementById('address-form');
-    const paymentForm = document.getElementById('payment-form'); 
     const passwordForm = document.getElementById('password-form');
+    const paymentForm = document.getElementById('payment-form');
 
-    const deleteBtn = document.getElementById('confirmDeleteBtn');
-
+    // Selettori Campi
     const nameInput = document.getElementById('name');
     const surnameInput = document.getElementById('surname');
     const emailInput = document.getElementById('email');
@@ -28,18 +27,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const cityInput = document.getElementById('city');
     const zipInput = document.getElementById('zipCode');
 
-
-    const cardTypeInput = document.getElementById('cardType');
-    const cardNumbInput = document.getElementById('cardNumb');
-    const CVCInput = document.getElementById('CVC')
-    const expiryDateInput = document.getElementById('expiryDate');
-
-    // "Password" form fields
     const currentPassInput = document.getElementById('currentPassword');
     const newPassInput = document.getElementById('newPassword');
     const confirmPassInput = document.getElementById('confirmPassword');
 
+    const deleteBtn = document.getElementById('confirmDeleteBtn');
+
+    const cardTypeInput = document.getElementById('cardType');
+    const cardNumbInput = document.getElementById('cardNumb');
+    const CVCInput = document.getElementById('CVC');
+    const expiryDateInput = document.getElementById('expiryDate');
+
+    const paymentDisplayView = document.getElementById('payment-display-view');
+    const paymentFormView = document.getElementById('payment-form-view');
+    const editPaymentBtn = document.getElementById('edit-payment-btn');
+    const removePaymentBtn = document.getElementById('remove-payment-btn');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    const savePaymentBtn = document.getElementById('save-payment-btn');
+    const paymentFormIntro = document.getElementById('payment-form-intro');
+
+    const savedCardIcon = document.getElementById('saved-card-icon');
+    const savedCardDetails = document.getElementById('saved-card-details');
+    const savedCardExpiry = document.getElementById('saved-card-expiry');
+
     let currentUserData = null;
+
+    function getCardIconClass(cardType) {
+        if (!cardType) return 'fas fa-credit-card';
+        switch (cardType.toLowerCase()) {
+            case 'visa': return 'fab fa-cc-visa';
+            case 'mastercard': return 'fab fa-cc-mastercard';
+            case 'amex': return 'fab fa-cc-amex';
+            default: return 'fas fa-credit-card';
+        }
+    }
 
     async function loadUserData() {
         try {
@@ -52,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const user = await response.json();
-            currentUserData = user; 
+            currentUserData = user;
             populateForms(user);
 
         } catch (error) {
@@ -74,23 +95,100 @@ document.addEventListener('DOMContentLoaded', () => {
             zipInput.value = user.address.zipCode || '';
         }
 
-        if (user.paymentInfo) {
-            cardTypeInput.value = user.paymentInfo.cardType || '';
-            CVCInput.value = user.paymentInfo.CVC || '';
-            cardNumbInput.value = user.paymentInfo.cardNumb || '';
-            
-            if (user.paymentInfo.expiryDate) {
+        if (user.paymentInfo && user.paymentInfo.cardNumb) {
+            paymentDisplayView.classList.remove('d-none');
+            paymentFormView.classList.add('d-none');
+
+            const { cardType, cardNumb, CVC, expiryDate } = user.paymentInfo;
+
+            const lastFour = cardNumb.slice(-4);
+            savedCardIcon.className = `${getCardIconClass(cardType)} fa-2x me-3 text-primary`;
+            savedCardDetails.textContent = `${cardType || 'Card'}----${lastFour}`;
+
+            let expiryText = 'Expire in: --/--';
+            if (expiryDate) {
                 try {
-                    const date = new Date(user.paymentInfo.expiryDate);
-                    const year = date.getFullYear();
+                    const date = new Date(expiryDate);
                     const month = String(date.getMonth() + 1).padStart(2, '0');
-                    expiryDateInput.value = `${year}-${month}`;
+                    const year = String(date.getFullYear()).slice(-2);
+                    expiryText = `Expire in ${month}/${year}`;
+                    
+                    const formYear = date.getFullYear();
+                    expiryDateInput.value = `${formYear}/${month}`;
                 } catch (e) {
-                    console.warn('Could not parse expiryDate:', user.paymentInfo.expiryDate);
+                    console.warn('Could not parse expiryDate:', expiryDate);
                 }
             }
+            savedCardExpiry.textContent = expiryText;
+
+            cardTypeInput.value = cardType || '';
+            cardNumbInput.value = cardNumb || '';
+            CVCInput.value = CVC || '';
+
+        } else {
+            paymentDisplayView.classList.add('d-none');
+            paymentFormView.classList.remove('d-none');
+            cancelEditBtn.classList.add('d-none'); 
+            paymentFormIntro.textContent = 'You don\'t have any payment method saved.';
+            savePaymentBtn.textContent = 'Save Payment method';
+            
+            paymentForm.reset();
         }
     }
+
+    editPaymentBtn.addEventListener('click', () => {
+        paymentDisplayView.classList.add('d-none');
+        paymentFormView.classList.remove('d-none');
+        
+        cancelEditBtn.classList.remove('d-none'); 
+        paymentFormIntro.textContent = 'Modify your payment method.';
+        savePaymentBtn.textContent = 'Save Edit';
+    });
+
+    cancelEditBtn.addEventListener('click', () => {
+        populateForms(currentUserData);
+    });
+
+    removePaymentBtn.addEventListener('click', async () => {
+        if (!currentUserData) return;
+
+        if (!confirm('Are you sure you want to remove this payment method?')) {
+            return;
+        }
+
+        const payload = {
+            name: currentUserData.name,
+            surname: currentUserData.surname,
+            email: currentUserData.email,
+            address: currentUserData.address,
+            userType: currentUserData.userType,
+            paymentInfo: null 
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/user/${userID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Error during remove.');
+            }
+
+            currentUserData = data.user;
+            populateForms(currentUserData); 
+            showAlert('Payment method removed successfully!', 'success');
+
+        } catch (error) {
+            showAlert(error.message, 'danger');
+        }
+    });
+
 
     profileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -120,15 +218,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.message || 'Error updating details.');
             }
             
-            currentUserData = data.user; 
-            populateForms(currentUserData); 
+            currentUserData = data.user;
+            populateForms(currentUserData);
             showAlert('Profile details updated!', 'success');
 
         } catch (error) {
             showAlert(error.message, 'danger');
         }
     });
-
 
     addressForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -162,8 +259,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.message || 'Error updating address.');
             }
 
-            currentUserData = data.user; // Update the saved data
-            populateForms(currentUserData); // Repopulate
+            currentUserData = data.user;
+            populateForms(currentUserData);
             showAlert('Address updated successfully!', 'success');
 
         } catch (error) {
@@ -178,11 +275,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let expiryDateObj = null;
         if (expiryDateInput.value) {
             try {
-                const [year, month] = expiryDateInput.value.split('-').map(Number);
-                expiryDateObj = new Date(year, month, 0);
+                const [year, month] = expiryDateInput.value.split('/').map(Number);
+                expiryDateObj = new Date(year, month, 0); 
             } catch (e) {
                 console.error('Invalid date format');
-                showAlert('Invalid expiry date format. Use MM/YYYY.', 'danger');
+                showAlert('Expiry date not valid.', 'danger');
                 return;
             }
         }
@@ -217,14 +314,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             currentUserData = data.user;
-            populateForms(currentUserData);
+            populateForms(currentUserData); 
             showAlert('Payment info updated successfully!', 'success');
 
         } catch (error) {
             showAlert(error.message, 'danger');
         }
     });
-
 
     passwordForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -239,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/user/${userId}/password`, {
+            const response = await fetch(`${API_BASE_URL}/user/${userID}/password`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -254,7 +350,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             showAlert('Password updated successfully!', 'success');
-            // Clear the fields
             currentPassInput.value = '';
             newPassInput.value = '';
             confirmPassInput.value = '';
@@ -265,7 +360,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     deleteBtn.addEventListener('click', async () => {
-
         try {
             const response = await fetch(`${API_BASE_URL}/user/${userID}`, {
                 method: 'DELETE',
@@ -292,18 +386,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('userType');
-        window.location.href = '../index.html';
-    }
-
-    /**
-     * Displays a dynamic alert on the page.
-     * @param {string} message - The message to display.
-     * @param {string} type - The alert type (e.g., 'success', 'danger').
-     */
     function showAlert(message, type) {
         const container = document.querySelector('.main-section .container');
         if (!container) return;
@@ -333,6 +415,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     }
 
-    loadUserData();
+    async function logout() {
+        try {
+            const token = localStorage.getItem('jwtToken');
+            await fetch(`${API_BASE_URL}/auth/logout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+        } catch (error) {
+            console.error('Error calling server logout:', error);
+        } finally {
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('userID');
+            localStorage.removeItem('userType');
+            localStorage.removeItem('restaurantId');
+            window.location.href = '../index.html';
+        }
+    }
 
+    loadUserData();
 });
