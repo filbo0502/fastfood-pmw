@@ -4,8 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Dashboard - CodeBite</title>
+    <link rel="icon" type="image/x-icon" href="../images/logo.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../css/styles.css" rel="stylesheet">
 </head>
 <body>
-    
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="../index.html">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-burger text-white"></i>
+                </div>
+                CodeBite
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+             <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto me-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./searchRestaturant.html">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item cart-link d-none">
+                        <a class="nav-link" href="./order.html">
+                            <i class="fas fa-shopping-cart"></i> Cart
+                            <span id="cart-count" class="badge bg-danger ms-1">0</span>
+                        </a>
+                    </li>
+                </ul>
+                <a href="../pages/login.html" class="btn login-btn btn-primary">Log In</a>
+                <a href="./profile.html" class="btn my-profile-btn btn-outline-primary me-2 d-none">My Profile</a>
+                <a href="./restaurantDashboard.html" class="btn my-restaurant-btn btn-outline-primary me-2 d-none">My Restaurant</a>
+                <a href="#" class="btn logout-btn btn-primary d-none">Log Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="main-section" style="margin-top: 80px;">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="fw-bold text-primary">Restaurant Dashboard</h2>
+                    <p class="text-muted">Manage your business from one place</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0 hover-card">
+                        <div class="card-body text-center p-5">
+                            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-4" style="width: 70px; height: 70px; font-size: 30px;">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <h3 class="card-title h4">Incoming Orders</h3>
+                            <p class="card-text text-muted mb-4">View new orders, update status to cooking or delivering, and manage workflow.</p>
+                            <a href="./orderHistory.html" class="btn btn-outline-primary stretched-link w-100">Manage Orders</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0 hover-card">
+                        <div class="card-body text-center p-5">
+                            <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-4" style="width: 70px; height: 70px; font-size: 30px;">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <h3 class="card-title h4">Menu Management</h3>
+                            <p class="card-text text-muted mb-4">Add new custom dishes, update prices, availability, and edit descriptions.</p>
+                            <a href="./menuManagement.html" class="btn btn-outline-success stretched-link w-100">Edit Menu</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0 hover-card">
+                        <div class="card-body text-center p-5">
+                            <div class="rounded-circle bg-warning text-white d-inline-flex align-items-center justify-content-center mb-4" style="width: 70px; height: 70px; font-size: 30px;">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <h3 class="card-title h4">Statistics</h3>
+                            <p class="card-text text-muted mb-4">Analyze your sales performance, revenue trends, and top selling items.</p>
+                            <a href="./statistics.html" class="btn btn-outline-warning stretched-link w-100">View Analytics</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container text-center">
+            <p class="mb-0 text-white-50">&copy; 2025 CodeBite. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="../js/auth.js"></script>
+    <script>
+        const userType = localStorage.getItem('userType');
+        if(userType !== 'restaurateur') {
+            window.location.href = '../index.html';
+        }
+    </script>
 </body>
 </html>

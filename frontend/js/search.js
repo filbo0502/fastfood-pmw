@@ -85,7 +85,6 @@ const performSearch = () => {
     if (!searchTerm) {
         filteredRestaurants = [...allRestaurants];
     } else {
-        // Filter restaurants based on name or location
         filteredRestaurants = allRestaurants.filter(restaurant => {
             const matchesName = restaurant.name && restaurant.name.toLowerCase().includes(searchTerm);
             const matchesDescription = restaurant.description && restaurant.description.toLowerCase().includes(searchTerm);
