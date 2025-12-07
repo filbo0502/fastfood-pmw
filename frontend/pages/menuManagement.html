@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +10,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="../css/styles.css" rel="stylesheet">
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="../index.html">
                 <div class="logo-icon">
@@ -30,7 +32,10 @@
                         <a class="nav-link" href="./about.html">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./searchRestaurant.html">Search</a>
+                        <a class="nav-link" href="./searchRestaurant.html">Restaurants</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./searchDish.html">Dishes</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#contact">Contact</a>
@@ -44,7 +49,9 @@
                 </ul>
                 <a href="../pages/login.html" class="btn login-btn btn-primary">Log In</a>
                 <a href="./profile.html" class="btn my-profile-btn btn-outline-primary me-2 d-none">My Profile</a>
-                <a href="./restaurantDashboard.html" class="btn my-restaurant-btn btn-outline-primary me-2 d-none">My Restaurant</a>
+                <a href="./orderHistory.html" class="btn my-orders-btn btn-outline-primary me-2 d-none">My Orders</a>
+                <a href="./restaurantDashboard.html" class="btn my-restaurant-btn btn-outline-primary me-2 d-none">My
+                    Restaurant</a>
                 <a href="#" class="btn logout-btn btn-primary d-none">Log Out</a>
             </div>
         </div>
@@ -86,34 +93,35 @@
                     <label for="meal-name">Meal Name *</label>
                     <input type="text" id="meal-name" name="meal-name" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="meal-category">Category</label>
                     <input type="text" id="meal-category" name="meal-category" placeholder="e.g., Burger, Pizza">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="meal-price">Price (€) *</label>
                     <input type="number" id="meal-price" name="meal-price" step="0.01" min="0" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label>
                         <input type="checkbox" id="meal-available" name="meal-available" checked>
                         Available for ordering
                     </label>
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Create Meal</button>
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('custom-meal-modal').style.display='none'">Cancel</button>
+                    <button type="button" class="btn btn-secondary"
+                        onclick="document.getElementById('custom-meal-modal').style.display='none'">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Footer -->
-<footer class="bg-dark text-white py-5">
+    <footer class="bg-dark text-white py-5">
         <div class="container">
             <div class="row gy-4">
                 <div class="col-lg-4 col-md-6">
@@ -124,16 +132,17 @@
                         <h5 class="mb-0">CodeBite</h5>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-6">
                     <h5>Useful Links</h5>
                     <ul class="list-unstyled">
                         <li><a href="#" class="text-white-50 text-decoration-none">Home</a></li>
                         <li><a href="./pages/login.html" class="text-white-50 text-decoration-none">Login</a></li>
-                        <li><a href="./pages/registration.html" class="text-white-50 text-decoration-none">Register</a></li>
+                        <li><a href="./pages/registration.html" class="text-white-50 text-decoration-none">Register</a>
+                        </li>
                     </ul>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-12 text-lg-end">
                     <h5>Powered By</h5>
                     <div class="d-flex gap-3 justify-content-lg-end">
@@ -143,9 +152,9 @@
                     </div>
                 </div>
             </div>
-            
+
             <hr class="my-4">
-            
+
             <div class="row">
                 <div class="col-12 text-center">
                     <p class="text-white-50 mb-0">&copy; 2025 Fast Food. All rights reserved</p>
@@ -158,4 +167,5 @@
     <script type="module" src="../js/auth.js"></script>
     <script src="../js/menuManagement.js"></script>
 </body>
+
 </html>

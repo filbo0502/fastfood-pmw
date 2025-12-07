@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CodeBite - Manage Profile</title>
-    
+
     <link rel="icon" type="image/x-icon" href="../images/logo.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -41,6 +42,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
@@ -51,11 +53,11 @@
                 </div>
                 CodeBite
             </a>
-            
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto me-4">
                     <li class="nav-item">
@@ -65,7 +67,10 @@
                         <a class="nav-link" href="./about.html">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./searchRestaurant.html">Search</a>
+                        <a class="nav-link" href="./searchRestaurant.html">Restaurants</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./searchDish.html">Dishes</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#contact">Contact</a>
@@ -82,7 +87,9 @@
                 </ul>
                 <a href="../pages/login.html" class="btn login-btn btn-primary">Log In</a>
                 <a href="./profile.html" class="btn my-profile-btn btn-outline-primary me-2 d-none">My Profile</a>
-                <a href="./restaurantDashboard.html" class="btn my-restaurant-btn btn-outline-primary me-2 d-none">My Restaurant</a>
+                <a href="./orderHistory.html" class="btn my-orders-btn btn-outline-primary me-2 d-none">My Orders</a>
+                <a href="./restaurantDashboard.html" class="btn my-restaurant-btn btn-outline-primary me-2 d-none">My
+                    Restaurant</a>
                 <a href="#" class="btn logout-btn btn-primary d-none">Log Out</a>
             </div>
         </div>
@@ -93,67 +100,83 @@
             <div class="row justify-content-center">
                 <div class="col-lg-10">
                     <h2 class="section-title text-center mb-4">Manage Your Account</h2>
-                    <p class="main-text text-center" style="font-size: 1.1rem; max-width: 600px; margin: 0 auto 2.5rem auto;">
+                    <p class="main-text text-center"
+                        style="font-size: 1.1rem; max-width: 600px; margin: 0 auto 2.5rem auto;">
                         Update your personal details, change your address, or manage your account security.
                     </p>
 
                     <ul class="nav nav-pills profile-tabs nav-fill mb-4" id="profileTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details-pane" type="button" role="tab" aria-controls="details-pane" aria-selected="true">
+                            <button class="nav-link active" id="details-tab" data-bs-toggle="tab"
+                                data-bs-target="#details-pane" type="button" role="tab" aria-controls="details-pane"
+                                aria-selected="true">
                                 <i class="fas fa-user-edit me-2"></i>Profile Details
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address-pane" type="button" role="tab" aria-controls="address-pane" aria-selected="false">
+                            <button class="nav-link" id="address-tab" data-bs-toggle="tab"
+                                data-bs-target="#address-pane" type="button" role="tab" aria-controls="address-pane"
+                                aria-selected="false">
                                 <i class="fas fa-map-marker-alt me-2"></i>Address
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="payment-tab" data-bs-toggle="tab" data-bs-target="#payment-pane" type="button" role="tab" aria-controls="payment-pane" aria-selected="false">
+                            <button class="nav-link" id="payment-tab" data-bs-toggle="tab"
+                                data-bs-target="#payment-pane" type="button" role="tab" aria-controls="payment-pane"
+                                aria-selected="false">
                                 <i class="fas fa-credit-card me-2"></i>Payment Info
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security-pane" type="button" role="tab" aria-controls="security-pane" aria-selected="false">
+                            <button class="nav-link" id="security-tab" data-bs-toggle="tab"
+                                data-bs-target="#security-pane" type="button" role="tab" aria-controls="security-pane"
+                                aria-selected="false">
                                 <i class="fas fa-key me-2"></i>Change Password
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="delete-tab" data-bs-toggle="tab" data-bs-target="#delete-pane" type="button" role="tab" aria-controls="delete-pane" aria-selected="false">
+                            <button class="nav-link" id="delete-tab" data-bs-toggle="tab" data-bs-target="#delete-pane"
+                                type="button" role="tab" aria-controls="delete-pane" aria-selected="false">
                                 <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
                             </button>
                         </li>
                     </ul>
 
                     <div class="tab-content" id="profileTabContent">
-                        
-                        <div class="tab-pane fade show active" id="details-pane" role="tabpanel" aria-labelledby="details-tab">
+
+                        <div class="tab-pane fade show active" id="details-pane" role="tabpanel"
+                            aria-labelledby="details-tab">
                             <div class="card service-card p-4 p-md-5">
                                 <form id="profile-details-form">
                                     <h3 class="service-title text-start mb-4">Personal Information</h3>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="name" placeholder="Your Name" value="John" required>
+                                                <input type="text" class="form-control" id="name"
+                                                    placeholder="Your Name" value="John" required>
                                                 <label for="name">Name</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="surname" placeholder="Your Surname" value="Doe" required>
+                                                <input type="text" class="form-control" id="surname"
+                                                    placeholder="Your Surname" value="Doe" required>
                                                 <label for="surname">Surname</label>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input type="email" class="form-control" id="email" placeholder="name@example.com" value="john.doe@example.com" required>
+                                        <input type="email" class="form-control" id="email"
+                                            placeholder="name@example.com" value="john.doe@example.com" required>
                                         <label for="email">Email Address</label>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input type="tel" class="form-control" id="phone" placeholder="+1234567890" value="+1 555 123 4567">
+                                        <input type="tel" class="form-control" id="phone" placeholder="+1234567890"
+                                            value="+1 555 123 4567">
                                         <label for="phone">Phone Number (Optional)</label>
                                     </div>
-                                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Save Changes</button>
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Save
+                                        Changes</button>
                                 </form>
                             </div>
                         </div>
@@ -163,123 +186,145 @@
                                 <form id="address-form">
                                     <h3 class="service-title text-start mb-4">Delivery Address</h3>
                                     <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="street" placeholder="123 Main St" value="123 Main St">
+                                        <input type="text" class="form-control" id="street" placeholder="123 Main St"
+                                            value="123 Main St">
                                         <label for="street">Street</label>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-8">
                                             <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="city" placeholder="New York" value="New York">
+                                                <input type="text" class="form-control" id="city" placeholder="New York"
+                                                    value="New York">
                                                 <label for="city">City</label>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="zipCode" placeholder="10001" value="10001">
+                                                <input type="text" class="form-control" id="zipCode" placeholder="10001"
+                                                    value="10001">
                                                 <label for="zipCode">Zip Code</label>
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Save Address</button>
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Save
+                                        Address</button>
                                 </form>
                             </div>
                         </div>
 
                         <div class="tab-pane fade" id="payment-pane" role="tabpanel" aria-labelledby="payment-tab">
-                        <div class="card service-card p-4 p-md-5">
-                            <h3 class="service-title text-start mb-4">Payment Information</h3>
-                            <div id="payment-display-view" class="d-none">
-                                <p class="service-text text-start mb-3">Your current payment info:</p>
-                                <div class="border rounded p-3 mb-3 bg-light">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <i id="saved-card-icon" class="fab fa-cc-visa fa-2x me-3 text-primary"></i>
-                                            <span id="saved-card-details" class="fw-bold fs-5">Visa ---1234</span>
+                            <div class="card service-card p-4 p-md-5">
+                                <h3 class="service-title text-start mb-4">Payment Information</h3>
+                                <div id="payment-display-view" class="d-none">
+                                    <p class="service-text text-start mb-3">Your current payment info:</p>
+                                    <div class="border rounded p-3 mb-3 bg-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center">
+                                                <i id="saved-card-icon"
+                                                    class="fab fa-cc-visa fa-2x me-3 text-primary"></i>
+                                                <span id="saved-card-details" class="fw-bold fs-5">Visa ---1234</span>
+                                            </div>
+                                            <span id="saved-card-expiry" class="text-muted">Expire in 12/25</span>
                                         </div>
-                                        <span id="saved-card-expiry" class="text-muted">Expire in 12/25</span>
+                                    </div>
+                                    <div class="d-flex gap-2 mt-4">
+                                        <button type="button" id="edit-payment-btn"
+                                            class="btn btn-secondary">Edit</button>
+                                        <button type="button" id="remove-payment-btn"
+                                            class="btn btn-outline-danger">Remove</button>
                                     </div>
                                 </div>
-                                <div class="d-flex gap-2 mt-4">
-                                    <button type="button" id="edit-payment-btn" class="btn btn-secondary">Edit</button>
-                                    <button type="button" id="remove-payment-btn" class="btn btn-outline-danger">Remove</button>
+
+                                <div id="payment-form-view">
+                                    <p id="payment-form-intro" class="service-text text-start mb-3">
+                                        You don't have any payment method saved at the moment.
+                                    </p>
+                                    <form id="payment-form">
+                                        <div class="form-floating mb-3">
+                                            <select class="form-select" id="cardType" placeholder="Card Type" required>
+                                                <option value="" disabled>Select Card Type</option>
+                                                <option value="Visa">Visa</option>
+                                                <option value="Mastercard">Mastercard</option>
+                                                <option value="Amex">American Express</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                            <label for="cardType">Card Type</label>
+                                        </div>
+
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="cardNumb"
+                                                placeholder="1234 5678 9012 3456" inputmode="numeric"
+                                                pattern="[\d\s]{13,19}" maxlength="19" required>
+                                            <label for="cardNumb">Card Number</label>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <div class="form-floating mb-3">
+                                                    <input type="month" class="form-control" id="expiryDate"
+                                                        placeholder="MM/YYYY" required>
+                                                    <label for="expiryDate">Expiry Date (MM/YYYY)</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating mb-3">
+                                                    <input type="text" class="form-control" id="CVC" placeholder="123"
+                                                        inputmode="numeric" pattern="\d{3,3}" maxlength="3" required>
+                                                    <label for="CVC">CVC</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" id="save-payment-btn"
+                                            class="btn btn-primary btn-lg w-100 mt-3">Save Payment Info</button>
+                                        <button type="button" id="cancel-edit-btn"
+                                            class="btn btn-outline-secondary btn-lg w-100 mt-2 d-none">Cancel</button>
+                                    </form>
                                 </div>
-                            </div>
-
-                            <div id="payment-form-view">
-                                <p id="payment-form-intro" class="service-text text-start mb-3">
-                                    You don't have any payment method saved at the moment.
-                                </p>
-                                <form id="payment-form">
-                                    <div class="form-floating mb-3">
-                                        <select class="form-select" id="cardType" placeholder="Card Type" required>
-                                            <option value="" disabled>Select Card Type</option>
-                                            <option value="Visa">Visa</option>
-                                            <option value="Mastercard">Mastercard</option>
-                                            <option value="Amex">American Express</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                        <label for="cardType">Card Type</label>
-                                    </div>
-
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="cardNumb" placeholder="1234 5678 9012 3456" inputmode="numeric" pattern="[\d\s]{13,19}" maxlength="19" required>
-                                        <label for="cardNumb">Card Number</label>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                            <div class="form-floating mb-3">
-                                                <input type="month" class="form-control" id="expiryDate" placeholder="MM/YYYY" required>
-                                                <label for="expiryDate">Expiry Date (MM/YYYY)</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="CVC" placeholder="123" inputmode="numeric" pattern="\d{3,3}" maxlength="3" required>
-                                                <label for="CVC">CVC</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <button type="submit" id="save-payment-btn" class="btn btn-primary btn-lg w-100 mt-3">Save Payment Info</button>
-                                    <button type="button" id="cancel-edit-btn" class="btn btn-outline-secondary btn-lg w-100 mt-2 d-none">Cancel</button>
-                                </form>
                             </div>
                         </div>
-                    </div>
 
                         <div class="tab-pane fade" id="security-pane" role="tabpanel" aria-labelledby="security-tab">
                             <div class="card service-card p-4 p-md-5">
                                 <form id="password-form">
                                     <h3 class="service-title text-start mb-4">Change Password</h3>
-                                    <p class="service-text text-start mb-3">Your new password must be at least 8 characters long and different from your current password.</p>
+                                    <p class="service-text text-start mb-3">Your new password must be at least 8
+                                        characters long and different from your current password.</p>
                                     <div class="form-floating mb-3">
-                                        <input type="password" class="form-control" id="currentPassword" placeholder="Current Password" required>
+                                        <input type="password" class="form-control" id="currentPassword"
+                                            placeholder="Current Password" required>
                                         <label for="currentPassword">Current Password</label>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input type="password" class="form-control" id="newPassword" placeholder="New Password" required>
+                                        <input type="password" class="form-control" id="newPassword"
+                                            placeholder="New Password" required>
                                         <label for="newPassword">New Password</label>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm New Password" required>
+                                        <input type="password" class="form-control" id="confirmPassword"
+                                            placeholder="Confirm New Password" required>
                                         <label for="confirmPassword">Confirm New Password</label>
                                     </div>
-                                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Update Password</button>
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Update
+                                        Password</button>
                                 </form>
                             </div>
                         </div>
 
                         <div class="tab-pane fade" id="delete-pane" role="tabpanel" aria-labelledby="delete-tab">
                             <div class="card service-card p-4 p-md-5 border-danger">
-                                <h3 class="service-title text-start mb-3 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Delete Account</h3>
+                                <h3 class="service-title text-start mb-3 text-danger"><i
+                                        class="fas fa-exclamation-triangle me-2"></i>Delete Account</h3>
                                 <p class="service-text text-start">
-                                    This action is permanent and cannot be undone. Deleting your account will remove all your personal information, order history, and saved preferences.
+                                    This action is permanent and cannot be undone. Deleting your account will remove all
+                                    your personal information, order history, and saved preferences.
                                 </p>
                                 <p class="service-text text-start mb-4">
-                                    <strong>If you are a restaurateur, this will also delete your restaurant and all associated data.</strong>
+                                    <strong>If you are a restaurateur, this will also delete your restaurant and all
+                                        associated data.</strong>
                                 </p>
-                                <button type="button" class="btn btn-danger btn-lg w-100" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
+                                <button type="button" class="btn btn-danger btn-lg w-100" data-bs-toggle="modal"
+                                    data-bs-target="#deleteConfirmModal">
                                     I understand, delete my account
                                 </button>
                             </div>
@@ -302,7 +347,7 @@
                         <h5 class="mb-0">CodeBite</h5>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-6">
                     <h5>Useful Links</h5>
                     <ul class="list-unstyled">
@@ -311,7 +356,7 @@
                         <li><a href="./registration.html" class="text-white-50 text-decoration-none">Register</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-12 text-lg-end">
                     <h5>Powered By</h5>
                     <div class="d-flex gap-3 justify-content-lg-end">
@@ -321,9 +366,9 @@
                     </div>
                 </div>
             </div>
-            
+
             <hr class="my-4">
-            
+
             <div class="row">
                 <div class="col-12 text-center">
                     <p class="text-white-50 mb-0">&copy; 2025 Fast Food. All rights reserved</p>
@@ -354,11 +399,11 @@
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         const deleteConfirmInput = document.getElementById('deleteConfirmInput');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-        
+
         deleteConfirmInput.addEventListener('input', () => {
             if (deleteConfirmInput.value === 'DELETE') {
                 confirmDeleteBtn.disabled = false;
@@ -368,9 +413,10 @@
         });
 
     </script>
-    
+
     <script type="module" src="../js/profile.js"></script>
     <script type="module" src="../js/auth.js"></script>
 
 </body>
+
 </html>

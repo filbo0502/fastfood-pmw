@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Order from '../models/Order.js';
 import Restaurant from '../models/Restaurant.js';
+import mongoose from 'mongoose';
 
 /**
  * @desc Get restaurant statistics with chart data
@@ -9,14 +10,14 @@ import Restaurant from '../models/Restaurant.js';
  */
 export const getRestaurantStats = asyncHandler(async (req, res) => {
     const restaurantId = req.params.id;
-    
+
     const restaurant = await Restaurant.findById(restaurantId);
     if (!restaurant) {
         res.status(404);
         throw new Error('Ristorante non trovato');
     }
-    
-    if (restaurant.owner.toString() !== req.user._id.toString()) {
+
+    if (restaurant.owner.toString() !== req.user.id.toString()) {
         res.status(403);
         throw new Error('Non autorizzato');
     }
@@ -93,39 +94,39 @@ export const getRestaurantStats = asyncHandler(async (req, res) => {
 
     // Top 3 meals (simple)
     // Correzione suggerita
-const topMeals = await Order.aggregate([
-    {
-        $match: {
-            restaurant: new mongoose.Types.ObjectId(restaurantId), // È buona norma castare l'ID
-            createdAt: { $gte: startDate }
+    const topMeals = await Order.aggregate([
+        {
+            $match: {
+                restaurant: new mongoose.Types.ObjectId(restaurantId), // È buona norma castare l'ID
+                createdAt: { $gte: startDate }
+            }
+        },
+        { $unwind: '$items' },
+        {
+            $lookup: {
+                from: 'meals',
+                localField: 'items.meal',
+                foreignField: '_id',
+                as: 'mealInfo'
+            }
+        },
+        { $unwind: '$mealInfo' },
+        {
+            $group: {
+                _id: '$mealInfo.strMeal',
+                count: { $sum: '$items.quantity' }
+            }
+        },
+        { $sort: { count: -1 } },
+        { $limit: 3 },
+        {
+            $project: {
+                _id: 0,
+                mealName: '$_id',
+                quantitySold: '$count'
+            }
         }
-    },
-    { $unwind: '$items' },
-    {
-        $lookup: {
-            from: 'meals', 
-            localField: 'items.meal',
-            foreignField: '_id',
-            as: 'mealInfo'
-        }
-    },
-    { $unwind: '$mealInfo' }, 
-    {
-        $group: {
-            _id: '$mealInfo.strMeal',
-            count: { $sum: '$items.quantity' }
-        }
-    },
-    { $sort: { count: -1 } },
-    { $limit: 3 },
-    {
-        $project: {
-            _id: 0,
-            mealName: '$_id',
-            quantitySold: '$count'
-        }
-    }
-]);
+    ]);
 
     res.json({
         restaurant: restaurant.name,

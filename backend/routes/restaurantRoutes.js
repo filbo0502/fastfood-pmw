@@ -1,6 +1,6 @@
 import express from 'express';
 import { authMiddleware, authRestaurateurMiddleware } from '../middlewares/authMiddleware.js';
-import { getAllRestaurants, getRestaurant, getRestaurantMenu, updateRestaurant, deleteRestaurant, searchRestaurant, addOrUpdateMealInMenu, deleteMealFromMenu, searchRestaurantsByDish } from '../controllers/restaurantController.js';
+import { getAllRestaurants, getRestaurant, getRestaurantMenu, updateRestaurant, deleteRestaurant, searchRestaurant, addOrUpdateMealInMenu, deleteMealFromMenu, searchRestaurantsByDish, getRestaurantOrders } from '../controllers/restaurantController.js';
 
 const router = express.Router();
 
@@ -21,5 +21,7 @@ router.get('/search/dish', searchRestaurantsByDish);
 router.post('/:id/menu', authMiddleware, authRestaurateurMiddleware, addOrUpdateMealInMenu);
 
 router.delete('/:id/menu/:idMeal', authMiddleware, authRestaurateurMiddleware, deleteMealFromMenu);
+
+router.get('/:id/orders', authMiddleware, authRestaurateurMiddleware, getRestaurantOrders);
 
 export default router;

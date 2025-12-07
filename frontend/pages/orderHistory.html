@@ -1,11 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order History - CodeBite</title>
+    <link rel="icon" type="image/x-icon" href="../images/logo.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.css">
+    <link href="../css/styles.css" rel="stylesheet">
+    <style>
+        .order-card {
+            transition: transform 0.2s;
+            border-left: 5px solid transparent;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-ordered {
+            border-left-color: #ffc107;
+        }
+
+        .status-preparing {
+            border-left-color: #20c997;
+        }
+
+        .status-delivering {
+            border-left-color: #17a2b8;
+        }
+
+        .status-delivered {
+            border-left-color: #28a745;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Order History</h1>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="../index.html">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-burger text-white"></i>
+                </div>
+                CodeBite
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto me-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./searchRestaurant.html">Restaurants</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./searchDish.html">Dishes</a>
+                    </li>
+                    <li class="nav-item cart-link d-none">
+                        <a class="nav-link" href="./order.html">
+                            <i class="fas fa-shopping-cart"></i> Cart
+                            <span id="cart-count" class="badge bg-danger ms-1">0</span>
+                        </a>
+                    </li>
+                </ul>
+                <a href="../pages/login.html" class="btn login-btn btn-primary">Log In</a>
+                <a href="./profile.html" class="btn my-profile-btn btn-outline-primary me-2 d-none">My Profile</a>
+                <a href="./restaurantDashboard.html" class="btn my-restaurant-btn btn-outline-primary me-2 d-none">My
+                    Restaurant</a>
+                <a href="./orderHistory.html" class="btn my-orders-btn btn-primary me-2 d-none">My Orders</a>
+                <a href="#" class="btn logout-btn btn-primary d-none">Log Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 100px; margin-bottom: 50px;">
+        <h2 class="mb-4"><i class="fas fa-history me-2"></i>My Orders</h2>
+
+        <ul class="nav nav-tabs mb-4" id="orderTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active"
+                    type="button" role="tab">Active Orders</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button"
+                    role="tab">Order History</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="orderTabsContent">
+            <!-- Active Orders Tab -->
+            <div class="tab-pane fade show active" id="active" role="tabpanel">
+                <div id="active-orders-container" class="row g-4">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div class="tab-pane fade" id="history" role="tabpanel">
+                <div id="past-orders-container" class="row g-4">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.js"></script>
+
+    <script type="module" src="../js/auth.js"></script>
+    <script type="module" src="../js/orderHistory.js"></script>
 </body>
+
 </html>

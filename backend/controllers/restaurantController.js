@@ -21,8 +21,8 @@ export const getAllRestaurants = asyncHandler(async (req, res) => {
 
 export const getRestaurant = asyncHandler(async (req, res) => {
     const restaurant = await Restaurant.findById(req.params.id);
-    if(!restaurant){
-       return res.status(404).json({ message: 'Restaurant not found.' });
+    if (!restaurant) {
+        return res.status(404).json({ message: 'Restaurant not found.' });
     }
     res.status(200).json(restaurant);
 });
@@ -35,7 +35,7 @@ export const getRestaurant = asyncHandler(async (req, res) => {
 
 export const getRestaurantMenu = asyncHandler(async (req, res) => {
     const restaurant = await Restaurant.findById(req.params.id);
-    if(!restaurant || !restaurant.menu){
+    if (!restaurant || !restaurant.menu) {
         return res.status(404).json({ message: 'Restaurant or menu not found.' });
     }
     res.status(200).json(restaurant.menu);
@@ -49,8 +49,8 @@ export const getRestaurantMenu = asyncHandler(async (req, res) => {
  */
 
 export const updateRestaurant = asyncHandler(async (req, res) => {
-    const udpdatedRestaurant = await Restaurant.findByIdAndUpdate(req.params.id, req.body, {new: true});
-    if(!udpdatedRestaurant){
+    const udpdatedRestaurant = await Restaurant.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!udpdatedRestaurant) {
         return res.status(404).json({ message: 'Restaurant not found.' });
     }
     res.status(200).json({ message: 'Restaurant successfully updated.' });
@@ -64,7 +64,7 @@ export const updateRestaurant = asyncHandler(async (req, res) => {
 
 export const deleteRestaurant = asyncHandler(async (req, res) => {
     const deletedRestaurant = await Restaurant.findByIdAndDelete(req.params.id);
-    if(!deletedRestaurant){
+    if (!deletedRestaurant) {
         return res.status(404).json({ message: 'Restaurant not found.' });
     }
     res.status(200).json({ message: 'Restaurant successfully deleted.' });
@@ -80,7 +80,7 @@ export const searchRestaurant = asyncHandler(async (req, res) => {
     const { q } = req.query;
 
     let query = {};
-    if(q){
+    if (q) {
         const SearchTerm = String(q);
         query = {
             $or: [
@@ -92,7 +92,7 @@ export const searchRestaurant = asyncHandler(async (req, res) => {
     }
 
     const restaurants = await Restaurant.find(query);
-    if(!restaurants.length){
+    if (!restaurants.length) {
         return res.status(200).json([]);
     }
     res.status(200).json(restaurants);
@@ -107,18 +107,18 @@ export const searchRestaurant = asyncHandler(async (req, res) => {
 export const addOrUpdateMealInMenu = asyncHandler(async (req, res) => {
     const { idMeal, price, preparationTime, isAvailable } = req.body;
     const restaurantId = req.params.id;
-    
+
     const restaurant = await Restaurant.findById(restaurantId);
 
     if (!restaurant) {
         return res.status(404).json({ message: 'Restaurant not found.' });
-  }
-  
+    }
+
     const mealExists = await Meal.findById(idMeal);
     if (!mealExists) {
         return res.status(404).json({ message: 'Meal not found in the global list.' });
     }
-  
+
     const menuItem = {
         meal: idMeal,
         price,
@@ -145,12 +145,12 @@ export const addOrUpdateMealInMenu = asyncHandler(async (req, res) => {
 export const deleteMealFromMenu = asyncHandler(async (req, res) => {
     const restaurantId = req.params.id;
     const idMeal = req.params.idMeal;
-    
+
     const updatedRestaurant = await Restaurant.findByIdAndUpdate(restaurantId, {
         $pull: { menu: { meal: idMeal } }
     }, { new: true, runValidators: true });
 
-    if(!updatedRestaurant){
+    if (!updatedRestaurant) {
         return res.status(404).json({ message: 'Restaurant not found.' });
     }
     res.status(200).json({ message: 'Meal successfully deleted from the restaurant\'s menu.' });
@@ -163,7 +163,7 @@ export const deleteMealFromMenu = asyncHandler(async (req, res) => {
  */
 export const searchRestaurantsByDish = asyncHandler(async (req, res) => {
     const { dishName } = req.query;
-    
+
     if (!dishName) {
         return res.status(400).json({ message: 'Dish name parameter is required.' });
     }
@@ -187,4 +187,34 @@ export const searchRestaurantsByDish = asyncHandler(async (req, res) => {
     }
 
     res.status(200).json(restaurants);
+});
+
+/**
+ * @desc   Get orders for a specific restaurant
+ * @route  GET /api/restaurants/:id/orders
+ * @access Private (Restaurateur only)
+ */
+export const getRestaurantOrders = asyncHandler(async (req, res) => {
+    const restaurantId = req.params.id;
+
+    // Authorization check: Ensure the user owns this restaurant
+    // Note: This assumes authRestaurateurMiddleware is used and req.user is set
+    // But we should verify if the user actually owns the restaurant if strictly needed
+    // The middleware checks userType, but logic here should check ownership if we want to be strict.
+    // However, usually we might just trust the middleware + ID, or check:
+    const restaurant = await Restaurant.findById(restaurantId);
+    if (!restaurant) {
+        return res.status(404).json({ message: 'Restaurant not found' });
+    }
+
+    if (restaurant.owner.toString() !== req.user.id.toString()) {
+        return res.status(403).json({ message: 'Not authorized to view orders for this restaurant' });
+    }
+
+    const orders = await Order.find({ restaurant: restaurantId })
+        .populate('customer', 'name email address')
+        .populate('items.meal', 'strMeal')
+        .sort({ createdAt: -1 });
+
+    res.status(200).json(orders);
 });

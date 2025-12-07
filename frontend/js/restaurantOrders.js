@@ -1,0 +1,195 @@
+import CONFIG from "./config.js";
+const API_BASE_URL = CONFIG.API_BASE_URL;
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
+    loadRestaurantOrders();
+});
+
+const checkAuth = () => {
+    const token = localStorage.getItem('jwtToken');
+    const userType = localStorage.getItem('userType');
+
+    if (!token || userType !== 'restaurateur') {
+        window.location.href = './login.html';
+        return;
+    }
+}
+
+window.loadRestaurantOrders = async () => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        // We first need the restaurant ID. It's usually in local storage if we set it on login, 
+        // OR we fetch the user's restaurant.
+        // Assuming we need to fetch the restaurant associated with this user first.
+        // BUT, the dashboard usually knows the restaurant ID? 
+        // Let's check how other pages get it.
+        // `restaurantDashboard.js` is empty.
+        // `profile.js` gets user info.
+        // `authController` login returns user and if restaurateur, maybe restaurant info?
+        // Let's check login response or logic.
+        // Actually, we can fetch the restaurant by owner ID, or just fetch all restaurants and filter.
+        // Faster way: use an endpoint to "get my restaurant".
+        // `restaurantController` doesn't have "get my restaurant".
+        // BUT `getRestaurantOrders` endpoint uses `req.params.id`. We need the ID.
+        // So step 1: Get User Profile to find Restaurant ID? Or fetch all restaurants and find one owned by `req.user.id`.
+
+        // Let's try to find the restaurant ID from the user info.
+        // We can decode the token to get the user ID, then call an endpoint or search restaurants.
+
+        const userId = localStorage.getItem('userID');
+        if (!userId) throw new Error("User ID not found");
+
+        // Fetch all restaurants and find the one owned by this user
+        // This is not ideal but works if we don't have a direct endpoint
+        const resResponse = await fetch(`${API_BASE_URL}/restaurants`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const restaurants = await resResponse.json();
+        const myRestaurant = restaurants.find(r => r.owner === userId);
+
+        if (!myRestaurant) {
+            document.getElementById('orders-container').innerHTML = '<div class="alert alert-warning">You do not have a restaurant associated yet.</div>';
+            return;
+        }
+
+        const restaurantId = myRestaurant._id;
+
+        const response = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}/orders`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch orders');
+
+        const orders = await response.json();
+        renderOrders(orders);
+
+    } catch (error) {
+        console.error('Error:', error);
+        showError(error.message);
+    }
+}
+
+const renderOrders = (orders) => {
+    const container = document.getElementById('orders-container');
+    container.innerHTML = '';
+
+    if (orders.length === 0) {
+        container.innerHTML = '<div class="col-12 text-center text-muted">No incoming orders.</div>';
+        return;
+    }
+
+    orders.forEach(order => {
+        container.appendChild(createOrderCard(order));
+    });
+}
+
+const createOrderCard = (order) => {
+    const col = document.createElement('div');
+    col.className = 'col-md-6 col-lg-4';
+
+    const date = new Date(order.createdAt).toLocaleDateString('it-IT', {
+        day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+    });
+
+    const itemsList = order.items.map(item => `
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            ${item.quantity}x ${item.meal?.strMeal || 'Deleted Item'}
+            <span class="badge bg-primary rounded-pill">€${(item.price * item.quantity).toFixed(2)}</span>
+        </li>
+    `).join('');
+
+    const statusOptions = ['ordered', 'preparing', 'delivering', 'delivered']
+        .map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status.charAt(0).toUpperCase() + status.slice(1)}</option>`)
+        .join('');
+
+    col.innerHTML = `
+        <div class="card h-100 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="fw-bold">Order #${order._id.slice(-6)}</span>
+                <small class="text-muted">${date}</small>
+            </div>
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Customer: ${order.customer?.name || 'Unknown'}</h6>
+                <div class="mb-3">
+                   <ul class="list-group list-group-flush mb-3">
+                        ${itemsList}
+                   </ul>
+                   <div class="d-flex justify-content-between fw-bold">
+                        <span>Total:</span>
+                        <span>€${order.totalAmount.toFixed(2)}</span>
+                   </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Delivery Type</label>
+                    <div><span class="badge bg-secondary">${order.deliveryType}</span></div>
+                     ${order.deliveryType === 'delivery' && order.deliveryAddress ? `<small class="text-muted d-block mt-1"><i class="fas fa-map-marker-alt me-1"></i>${order.deliveryAddress}</small>` : ''}
+                </div>
+
+                <div class="alert alert-light border p-2 mb-0">
+                    <label class="form-label small fw-bold">Update Status:</label>
+                    <div class="d-flex gap-2">
+                        <select class="form-select status-select" data-id="${order._id}">
+                            ${statusOptions}
+                        </select>
+                        <button class="btn btn-primary btn-sm update-status-btn" data-id="${order._id}">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const btn = col.querySelector('.update-status-btn');
+    btn.addEventListener('click', () => {
+        const select = col.querySelector(`.status-select`);
+        updateStatus(order._id, select.value);
+    });
+
+    return col;
+}
+
+const updateStatus = async (orderId, newStatus) => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Error updating status');
+        }
+
+        Toastify({
+            text: "Status updated successfully!",
+            backgroundColor: "#28a745",
+            duration: 3000
+        }).showToast();
+
+        // Optional: reload orders to reflect changes (e.g. if moved to delivered?)
+        // loadRestaurantOrders();
+
+    } catch (error) {
+        console.error('Error:', error);
+        Toastify({
+            text: error.message,
+            backgroundColor: "#dc3545",
+            duration: 3000
+        }).showToast();
+    }
+}
+
+const showError = (message) => {
+    document.getElementById('orders-container').innerHTML =
+        `<div class="col-12 text-center text-danger">Error: ${message}</div>`;
+}

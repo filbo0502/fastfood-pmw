@@ -2,14 +2,18 @@ import CONFIG from "./config.js";
 const API_BASE_URL = CONFIG.API_BASE_URL;
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('credentialsModal')) {
-        window.credentialsModal = new bootstrap.Modal(document.getElementById('credentialsModal'));
+    // Only initialize if element exists
+    const credModalEl = document.getElementById('credentialsModal');
+    if (credModalEl) {
+        window.credentialsModal = new bootstrap.Modal(credModalEl);
     }
-    if (document.getElementById('userNotFoundModal')) {
-        window.userNotFoundModal = new bootstrap.Modal(document.getElementById('userNotFoundModal'));
+    const userNotFoundModalEl = document.getElementById('userNotFoundModal');
+    if (userNotFoundModalEl) {
+        window.userNotFoundModal = new bootstrap.Modal(userNotFoundModalEl);
     }
-    if (document.getElementById('genericErrorModal')) {
-        window.genericErrorModal = new bootstrap.Modal(document.getElementById('genericErrorModal'));
+    const genericErrorModalEl = document.getElementById('genericErrorModal');
+    if (genericErrorModalEl) {
+        window.genericErrorModal = new bootstrap.Modal(genericErrorModalEl);
     }
 });
 
@@ -53,12 +57,12 @@ async function handleLogin(event) {
             if (data.user && data.user.id) {
                 localStorage.setItem('userID', data.user.id);
             }
-            if(data.user.userType){
+            if (data.user.userType) {
                 localStorage.setItem('userType', data.user.userType);
             }
             if (data.restaurantId) {
                 localStorage.setItem('restaurantId', data.restaurantId);
-            }   
+            }
 
             Toastify({
                 text: "Login successful!",

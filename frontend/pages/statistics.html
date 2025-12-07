@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="../css/styles.css" rel="stylesheet">
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
@@ -31,7 +33,10 @@
                         <a class="nav-link" href="./about.html">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./searchRestaurant.html">Search</a>
+                        <a class="nav-link" href="./searchRestaurant.html">Restaurants</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./searchDish.html">Dishes</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="./restaurantDashboard.html">Dashboard</a>
@@ -51,7 +56,9 @@
                 </ul>
                 <a href="../pages/login.html" class="btn login-btn btn-primary">Log In</a>
                 <a href="./profile.html" class="btn my-profile-btn btn-outline-primary me-2 d-none">My Profile</a>
-                <a href="./restaurantDashboard.html" class="btn my-restaurant-btn btn-outline-primary me-2 d-none">My Restaurant</a>
+                <a href="./orderHistory.html" class="btn my-orders-btn btn-outline-primary me-2 d-none">My Orders</a>
+                <a href="./restaurantDashboard.html" class="btn my-restaurant-btn btn-outline-primary me-2 d-none">My
+                    Restaurant</a>
                 <a href="#" class="btn logout-btn btn-primary d-none">Log Out</a>
             </div>
         </div>
@@ -63,7 +70,7 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <h2 class="mb-3">
-                        <i class="fas fa-chart-bar text-primary"></i> 
+                        <i class="fas fa-chart-bar text-primary"></i>
                         Restaurant Statistics
                         <span class="period-badge" id="periodBadge">Last 7 days</span>
                     </h2>
@@ -115,7 +122,7 @@
                     <div class="card chart-card">
                         <div class="card-header">
                             <h5 class="mb-0">
-                                <i class="fas fa-chart-line text-primary"></i> 
+                                <i class="fas fa-chart-line text-primary"></i>
                                 Daily Orders Trend
                             </h5>
                             <small class="text-muted">Last 7 days trend</small>
@@ -131,7 +138,7 @@
                     <div class="card chart-card">
                         <div class="card-header">
                             <h5 class="mb-0">
-                                <i class="fas fa-chart-pie text-success"></i> 
+                                <i class="fas fa-chart-pie text-success"></i>
                                 Order Status
                             </h5>
                             <small class="text-muted">Order status distribution</small>
@@ -152,7 +159,7 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="mb-0">
-                                    <i class="fas fa-trophy text-warning"></i> 
+                                    <i class="fas fa-trophy text-warning"></i>
                                     Top 3 Best Selling Meals
                                 </h5>
                                 <small class="text-muted">Last 7 days ranking</small>
@@ -205,7 +212,7 @@
                         <h5 class="mb-0">CodeBite</h5>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-6">
                     <h5>Useful Links</h5>
                     <ul class="list-unstyled">
@@ -214,7 +221,7 @@
                         <li><a href="./registration.html" class="text-white-50 text-decoration-none">Register</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-12 text-lg-end">
                     <h5>Powered By</h5>
                     <div class="d-flex gap-3 justify-content-lg-end">
@@ -224,9 +231,9 @@
                     </div>
                 </div>
             </div>
-            
+
             <hr class="my-4">
-            
+
             <div class="row">
                 <div class="col-12 text-center">
                     <p class="text-white-50 mb-0">&copy; 2025 CodeBite. All rights reserved</p>
@@ -240,7 +247,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Navbar background change on scroll
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
             const navbar = document.querySelector('.navbar');
             if (window.scrollY > 50) {
                 navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
@@ -255,4 +262,5 @@
     <script src="../js/auth.js"></script>
     <script src="../js/statistics.js"></script>
 </body>
+
 </html>

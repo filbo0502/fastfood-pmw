@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +18,7 @@
             border-radius: 8px;
             margin-top: 10px;
         }
+
         .image-upload-container {
             position: relative;
             border: 2px dashed #dee2e6;
@@ -25,13 +27,16 @@
             text-align: center;
             transition: border-color 0.3s;
         }
+
         .image-upload-container:hover {
             border-color: #0d6efd;
         }
+
         .image-upload-container.drag-over {
             border-color: #0d6efd;
             background-color: #f8f9fa;
         }
+
         .remove-image-btn {
             position: absolute;
             top: 5px;
@@ -46,6 +51,7 @@
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
@@ -67,13 +73,17 @@
                         <a class="nav-link" href="../index.html#about">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./searchRestaurant.html">Search</a>
+                        <a class="nav-link" href="./searchRestaurant.html">Restaurants</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./searchDish.html">Dishes</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="../index.html#contact">Contacts</a>
                     </li>
                 </ul>
-                <a href="./login.html" class="btn login-btn btn-primary">Log In</a>
+                <a href="./profile.html" class="btn my-profile-btn btn-outline-primary me-2 d-none">My Profile</a>
+                <a href="./orderHistory.html" class="btn my-orders-btn btn-outline-primary me-2 d-none">My Orders</a>
                 <a href="#" class="btn logout-btn btn-primary d-none">Log Out</a>
             </div>
         </div>
@@ -83,8 +93,10 @@
         <div class="container d-flex justify-content-center align-items-center min-vh-100 py-5">
             <div class="col-lg-8 col-xl-7">
                 <div class="row border rounded-5 p-3 bg-white shadow box-area">
-                    <div class="col-md-6 rounded-4 d-none d-md-flex justify-content-center align-items-center flex-column left-box">
-                        <img src="../images/fullplate.png" class="img-fluid" alt="Illustrative image" style="border-radius: 1rem;">
+                    <div
+                        class="col-md-6 rounded-4 d-none d-md-flex justify-content-center align-items-center flex-column left-box">
+                        <img src="../images/fullplate.png" class="img-fluid" alt="Illustrative image"
+                            style="border-radius: 1rem;">
                     </div>
 
                     <div class="col-md-6 p-4">
@@ -94,61 +106,80 @@
                             </div>
                             <form id="registrationForm" enctype="multipart/form-data">
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control bg-light fs-6" id="name" name="name" placeholder="Name" aria-label="Name" required>
+                                    <input type="text" class="form-control bg-light fs-6" id="name" name="name"
+                                        placeholder="Name" aria-label="Name" required>
                                 </div>
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control bg-light fs-6" id="surname" name="surname" placeholder="Surname" aria-label="Surname" required>
+                                    <input type="text" class="form-control bg-light fs-6" id="surname" name="surname"
+                                        placeholder="Surname" aria-label="Surname" required>
                                 </div>
                                 <div class="input-group mb-3">
-                                    <input type="email" class="form-control bg-light fs-6" id="email" name="email" placeholder="Email Address" aria-label="Email" required>
+                                    <input type="email" class="form-control bg-light fs-6" id="email" name="email"
+                                        placeholder="Email Address" aria-label="Email" required>
                                 </div>
                                 <div class="input-group mb-3">
-                                    <input type="password" class="form-control bg-light fs-6" id="password" name="password" placeholder="Password" aria-label="Password" required>
-                                    <button type="button" class="btn btn-light border" id="togglePassword" aria-label="Show/hide password">
+                                    <input type="password" class="form-control bg-light fs-6" id="password"
+                                        name="password" placeholder="Password" aria-label="Password" required>
+                                    <button type="button" class="btn btn-light border" id="togglePassword"
+                                        aria-label="Show/hide password">
                                         <i class="fa fa-eye"></i>
                                     </button>
                                 </div>
                                 <div class="input-group mb-3">
-                                    <input type="password" class="form-control bg-light fs-6" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" aria-label="Confirm Password" required>
+                                    <input type="password" class="form-control bg-light fs-6" id="confirmPassword"
+                                        name="confirmPassword" placeholder="Confirm Password"
+                                        aria-label="Confirm Password" required>
                                 </div>
                                 <div class="input-group mb-3">
-                                    <select id="userType" class="form-select bg-light fs-6" name="userType" aria-label="User Type" required>
+                                    <select id="userType" class="form-select bg-light fs-6" name="userType"
+                                        aria-label="User Type" required>
                                         <option value="" disabled selected>Select user type...</option>
                                         <option value="customer">Customer</option>
                                         <option value="restaurateur">Restaurateur</option>
                                     </select>
                                 </div>
-                                
+
                                 <div id="restaurantFields" style="display: none;">
                                     <hr>
                                     <h5 class="mb-3">Restaurant Data</h5>
                                     <div class="input-group mb-3">
-                                        <input type="text" class="form-control bg-light fs-6" id="restaurantName" name="restaurantName" placeholder="Restaurant Name" aria-label="Restaurant Name">
+                                        <input type="text" class="form-control bg-light fs-6" id="restaurantName"
+                                            name="restaurantName" placeholder="Restaurant Name"
+                                            aria-label="Restaurant Name">
                                     </div>
                                     <div class="input-group mb-3">
-                                        <input type="text" class="form-control bg-light fs-6" id="vatNumber" name="vatNumber" placeholder="Vat Number" aria-label="Vat Number">
+                                        <input type="text" class="form-control bg-light fs-6" id="vatNumber"
+                                            name="vatNumber" placeholder="Vat Number" aria-label="Vat Number">
                                     </div>
                                     <div class="input-group mb-3">
-                                        <input type="tel" class="form-control bg-light fs-6" id="phone" name="phone" placeholder="Restaurant Phone Number" aria-label="Restaurant Phone Number">
+                                        <input type="tel" class="form-control bg-light fs-6" id="phone" name="phone"
+                                            placeholder="Restaurant Phone Number" aria-label="Restaurant Phone Number">
                                     </div>
                                     <div class="input-group mb-3">
-                                        <input type="text" class="form-control bg-light fs-6" id="addressStreet" name="addressStreet" placeholder="Address Street" aria-label="Address Street">
+                                        <input type="text" class="form-control bg-light fs-6" id="addressStreet"
+                                            name="addressStreet" placeholder="Address Street"
+                                            aria-label="Address Street">
                                     </div>
                                     <div class="input-group mb-3">
-                                        <input type="text" class="form-control bg-light fs-6" id="addressCity" name="addressCity" placeholder="City" aria-label="City">
+                                        <input type="text" class="form-control bg-light fs-6" id="addressCity"
+                                            name="addressCity" placeholder="City" aria-label="City">
                                     </div>
                                     <div class="input-group mb-3">
-                                        <input type="text" class="form-control bg-light fs-6" id="addressZip" name="addressZip" placeholder="Zip Code" aria-label="Zip Code">
+                                        <input type="text" class="form-control bg-light fs-6" id="addressZip"
+                                            name="addressZip" placeholder="Zip Code" aria-label="Zip Code">
                                     </div>
-                                    
+
                                     <div class="mb-3">
-                                        <label class="form-label">Restaurant Image <small class="text-muted">(Optional)</small></label>
+                                        <label class="form-label">Restaurant Image <small
+                                                class="text-muted">(Optional)</small></label>
                                         <div class="image-upload-container" id="imageUploadContainer">
-                                            <input type="file" id="restaurantImage" name="restaurantImage" accept="image/*" style="display: none;">
+                                            <input type="file" id="restaurantImage" name="restaurantImage"
+                                                accept="image/*" style="display: none;">
                                             <div id="uploadPrompt">
                                                 <i class="fa fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
                                                 <p class="text-muted">Click here or drag and drop an image</p>
-                                                <small class="text-muted">Supported formats: JPG, PNG, GIF (Max 5MB)</small>
+                                                <small class="text-muted">Supported formats: JPG, PNG, GIF (Max
+                                                    5MB)</small>
                                             </div>
                                             <div id="imagePreviewContainer" style="display: none;">
                                                 <button type="button" class="remove-image-btn" id="removeImageBtn">
@@ -159,11 +190,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="input-group mb-4">
                                     <button class="btn btn-primary w-100 fs-6" type="submit">
                                         Register
-                                        <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                                        <span class="spinner-border spinner-border-sm ms-2 d-none" role="status"
+                                            aria-hidden="true"></span>
                                     </button>
                                 </div>
                             </form>
@@ -178,7 +210,8 @@
         </div>
     </main>
 
-    <div class="modal fade" id="userExistsModal" tabindex="-1" aria-labelledby="userExistsModalLabel" aria-hidden="true">
+    <div class="modal fade" id="userExistsModal" tabindex="-1" aria-labelledby="userExistsModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-warning text-dark">
@@ -194,8 +227,9 @@
             </div>
         </div>
     </div>
-    
-    <div class="modal fade" id="validationErrorModal" tabindex="-1" aria-labelledby="validationErrorModalLabel" aria-hidden="true">
+
+    <div class="modal fade" id="validationErrorModal" tabindex="-1" aria-labelledby="validationErrorModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
@@ -212,7 +246,8 @@
         </div>
     </div>
 
-    <div class="modal fade" id="genericErrorModal" tabindex="-1" aria-labelledby="genericErrorModalLabel" aria-hidden="true">
+    <div class="modal fade" id="genericErrorModal" tabindex="-1" aria-labelledby="genericErrorModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
@@ -230,7 +265,7 @@
     </div>
 
     <!-- Footer -->
-<footer class="bg-dark text-white py-5">
+    <footer class="bg-dark text-white py-5">
         <div class="container">
             <div class="row gy-4">
                 <div class="col-lg-4 col-md-6">
@@ -241,16 +276,17 @@
                         <h5 class="mb-0">CodeBite</h5>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-6">
                     <h5>Useful Links</h5>
                     <ul class="list-unstyled">
                         <li><a href="#" class="text-white-50 text-decoration-none">Home</a></li>
                         <li><a href="./pages/login.html" class="text-white-50 text-decoration-none">Login</a></li>
-                        <li><a href="./pages/registration.html" class="text-white-50 text-decoration-none">Register</a></li>
+                        <li><a href="./pages/registration.html" class="text-white-50 text-decoration-none">Register</a>
+                        </li>
                     </ul>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-12 text-lg-end">
                     <h5>Powered By</h5>
                     <div class="d-flex gap-3 justify-content-lg-end">
@@ -260,9 +296,9 @@
                     </div>
                 </div>
             </div>
-            
+
             <hr class="my-4">
-            
+
             <div class="row">
                 <div class="col-12 text-center">
                     <p class="text-white-50 mb-0">&copy; 2025 Fast Food. All rights reserved</p>
@@ -270,14 +306,14 @@
             </div>
         </div>
     </footer>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Password toggle
             const togglePasswordButton = document.getElementById('togglePassword');
             const passwordInput = document.getElementById('password');
-            
-            if(togglePasswordButton) {
+
+            if (togglePasswordButton) {
                 const icon = togglePasswordButton.querySelector('i');
                 togglePasswordButton.addEventListener('click', function () {
                     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -295,23 +331,23 @@
             const removeImageBtn = document.getElementById('removeImageBtn');
 
             // Click to upload
-            imageUploadContainer.addEventListener('click', function(e) {
+            imageUploadContainer.addEventListener('click', function (e) {
                 if (e.target === removeImageBtn || removeImageBtn.contains(e.target)) return;
                 restaurantImageInput.click();
             });
 
             // Drag and drop
-            imageUploadContainer.addEventListener('dragover', function(e) {
+            imageUploadContainer.addEventListener('dragover', function (e) {
                 e.preventDefault();
                 this.classList.add('drag-over');
             });
 
-            imageUploadContainer.addEventListener('dragleave', function(e) {
+            imageUploadContainer.addEventListener('dragleave', function (e) {
                 e.preventDefault();
                 this.classList.remove('drag-over');
             });
 
-            imageUploadContainer.addEventListener('drop', function(e) {
+            imageUploadContainer.addEventListener('drop', function (e) {
                 e.preventDefault();
                 this.classList.remove('drag-over');
                 const files = e.dataTransfer.files;
@@ -321,14 +357,14 @@
             });
 
             // File input change
-            restaurantImageInput.addEventListener('change', function(e) {
+            restaurantImageInput.addEventListener('change', function (e) {
                 if (e.target.files.length > 0) {
                     handleImageFile(e.target.files[0]);
                 }
             });
 
             // Remove image
-            removeImageBtn.addEventListener('click', function(e) {
+            removeImageBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 restaurantImageInput.value = '';
                 uploadPrompt.style.display = 'block';
@@ -350,7 +386,7 @@
 
                 // Show preview
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     imagePreview.src = e.target.result;
                     uploadPrompt.style.display = 'none';
                     imagePreviewContainer.style.display = 'block';
@@ -370,4 +406,5 @@
     <script type="module" src="../js/registration.js"></script>
     <script type="module" src="../js/auth.js"></script>
 </body>
+
 </html>

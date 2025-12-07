@@ -52,12 +52,12 @@ export const register = asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
-    } 
+    }
 
     const { name, surname, email, password, confirmPassword, userType } = req.body;
 
-    if(password !== confirmPassword){
-        return res.status(400).json({ message: 'Password and confirm password don\'t matches'});
+    if (password !== confirmPassword) {
+        return res.status(400).json({ message: 'Password and confirm password don\'t matches' });
     }
 
     const userExists = await User.findOne({ email });
@@ -72,7 +72,7 @@ export const register = asyncHandler(async (req, res) => {
         password,
         userType
     });
-    await user.save(); 
+    await user.save();
 
     try {
         if (user.userType === 'restaurateur') {
@@ -88,7 +88,7 @@ export const register = asyncHandler(async (req, res) => {
 
             const restaurantData = {
                 name: restaurantName,
-                vatNumber: vatNumber, 
+                vatNumber: vatNumber,
                 phone: phone,
                 address: {
                     street: addressStreet,
@@ -110,25 +110,25 @@ export const register = asyncHandler(async (req, res) => {
             await user.save();
         }
 
-        const tokenDuration = 2 * 3600; 
-        const token = jwt.sign({ id: user._id, type: user.userType }, process.env.JWT_SECRET, { expiresIn: tokenDuration });
-        
+        const tokenDuration = 2 * 3600;
+        const token = jwt.sign({ id: user._id, userType: user.userType }, process.env.JWT_SECRET, { expiresIn: tokenDuration });
+
         res.cookie('jwtToken', token, {
-            httpOnly: true, 
+            httpOnly: true,
             sameSite: 'lax',
-            maxAge: tokenDuration * 1000 
+            maxAge: tokenDuration * 1000
         });
 
-        res.status(201).json({ 
-            success: true, 
-            message: "User created successfully!", 
-            token 
+        res.status(201).json({
+            success: true,
+            message: "User created successfully!",
+            token
         });
 
     } catch (error) {
         console.error("Error during the registration:", error);
-    
-        if(user && user._id) {
+
+        if (user && user._id) {
             await User.findByIdAndDelete(user._id);
         }
 
@@ -166,7 +166,7 @@ export const login = asyncHandler(async (req, res) => {
     }
 
     const tokenDuration = 2 * 3600;
-    const token = jwt.sign({ id: user._id, type: user.userType }, process.env.JWT_SECRET, { expiresIn: tokenDuration });
+    const token = jwt.sign({ id: user._id, userType: user.userType }, process.env.JWT_SECRET, { expiresIn: tokenDuration });
 
     let restaurantId = null;
     if (user.userType === 'restaurateur') {
@@ -191,7 +191,7 @@ export const login = asyncHandler(async (req, res) => {
             name: user.name,
             userType: user.userType
         },
-        restaurantId: restaurantId 
+        restaurantId: restaurantId
     });
 });
 
