@@ -62,14 +62,6 @@ const displayResults = (restaurants) => {
     container.innerHTML = '';
 
     restaurants.forEach(restaurant => {
-        // Since the backend returns restaurants populated with the matching meal in menu,
-        // we might want to highlight which meal matched, but the API structure 
-        // returns the whole restaurant with populated menu.meal
-        // Let's display the restaurant card similar to searchRestaurant, 
-        // but maybe listing the matching meals?
-        // Actually the backend `searchRestaurantsByDish` filters restaurants but returns the full restaurant object
-        // with populated menu.meal. We can iterate the menu to find matches.
-
         const searchTerm = dishSearchInput.value.toLowerCase();
         const matchingMeals = restaurant.menu.filter(item =>
             item.meal && item.meal.strMeal && item.meal.strMeal.toLowerCase().includes(searchTerm)

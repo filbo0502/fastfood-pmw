@@ -186,7 +186,7 @@ const updateCartCount = () => {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
     const count = cart.reduce((acc, item) => acc + item.quantity, 0);
     
-    const cartCountElement = document.getElementById('cart-count'); // Assumendo che questo ID esista nella tua navbar
+    const cartCountElement = document.getElementById('cart-count'); 
     if (cartCountElement) {
         cartCountElement.textContent = count;
         cartCountElement.style.display = count > 0 ? 'inline-block' : 'none';
@@ -217,7 +217,6 @@ window.addToCart = (mealId, mealName, price) => {
         cart = [];
     }
 
-    // Imposta l'ID del ristorante corrente
     localStorage.setItem('restaurantId', currentRestaurantId);
 
     const existingItem = cart.find(item => item._id === mealId);

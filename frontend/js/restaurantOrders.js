@@ -1,50 +1,17 @@
-import CONFIG from "./config.js";
-const API_BASE_URL = CONFIG.API_BASE_URL;
+import { checkAuth, apiFetch, getUserID, showToast } from "./utils.js";
 
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
-    loadRestaurantOrders();
-});
-
-const checkAuth = () => {
-    const token = localStorage.getItem('jwtToken');
-    const userType = localStorage.getItem('userType');
-
-    if (!token || userType !== 'restaurateur') {
-        window.location.href = './login.html';
-        return;
+    if (checkAuth('restaurateur')) {
+        loadRestaurantOrders();
     }
-}
+});
 
 window.loadRestaurantOrders = async () => {
     try {
-        const token = localStorage.getItem('jwtToken');
-        // We first need the restaurant ID. It's usually in local storage if we set it on login, 
-        // OR we fetch the user's restaurant.
-        // Assuming we need to fetch the restaurant associated with this user first.
-        // BUT, the dashboard usually knows the restaurant ID? 
-        // Let's check how other pages get it.
-        // `restaurantDashboard.js` is empty.
-        // `profile.js` gets user info.
-        // `authController` login returns user and if restaurateur, maybe restaurant info?
-        // Let's check login response or logic.
-        // Actually, we can fetch the restaurant by owner ID, or just fetch all restaurants and filter.
-        // Faster way: use an endpoint to "get my restaurant".
-        // `restaurantController` doesn't have "get my restaurant".
-        // BUT `getRestaurantOrders` endpoint uses `req.params.id`. We need the ID.
-        // So step 1: Get User Profile to find Restaurant ID? Or fetch all restaurants and find one owned by `req.user.id`.
-
-        // Let's try to find the restaurant ID from the user info.
-        // We can decode the token to get the user ID, then call an endpoint or search restaurants.
-
-        const userId = localStorage.getItem('userID');
+        const userId = getUserID();
         if (!userId) throw new Error("User ID not found");
 
-        // Fetch all restaurants and find the one owned by this user
-        // This is not ideal but works if we don't have a direct endpoint
-        const resResponse = await fetch(`${API_BASE_URL}/restaurants`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const resResponse = await apiFetch(`/restaurants`);
         const restaurants = await resResponse.json();
         const myRestaurant = restaurants.find(r => r.owner === userId);
 
@@ -54,12 +21,7 @@ window.loadRestaurantOrders = async () => {
         }
 
         const restaurantId = myRestaurant._id;
-
-        const response = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}/orders`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await apiFetch(`/restaurants/${restaurantId}/orders`);
 
         if (!response.ok) throw new Error('Failed to fetch orders');
 
@@ -155,13 +117,8 @@ const createOrderCard = (order) => {
 
 const updateStatus = async (orderId, newStatus) => {
     try {
-        const token = localStorage.getItem('jwtToken');
-        const response = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
+        const response = await apiFetch(`/orders/${orderId}/status`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify({ status: newStatus })
         });
 
@@ -170,22 +127,11 @@ const updateStatus = async (orderId, newStatus) => {
             throw new Error(data.message || 'Error updating status');
         }
 
-        Toastify({
-            text: "Status updated successfully!",
-            backgroundColor: "#28a745",
-            duration: 3000
-        }).showToast();
-
-        // Optional: reload orders to reflect changes (e.g. if moved to delivered?)
-        // loadRestaurantOrders();
+        showToast("Status updated successfully!", "success");
 
     } catch (error) {
         console.error('Error:', error);
-        Toastify({
-            text: error.message,
-            backgroundColor: "#dc3545",
-            duration: 3000
-        }).showToast();
+        showToast(error.message, "error");
     }
 }
 

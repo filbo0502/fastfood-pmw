@@ -74,7 +74,7 @@
                                 style="width: 70px; height: 70px; font-size: 30px;">
                                 <i class="fas fa-clipboard-list"></i>
                             </div>
-                            <h3 class="card-title h4">Incoming Orders</h3>
+                            <h3 class="card-title h4" id="orders-title">Incoming Orders</h3>
                             <p class="card-text text-muted mb-4">View new orders, update status to cooking or
                                 delivering, and manage workflow.</p>
                             <a href="./restaurantOrders.html"
@@ -91,7 +91,7 @@
                                 style="width: 70px; height: 70px; font-size: 30px;">
                                 <i class="fas fa-utensils"></i>
                             </div>
-                            <h3 class="card-title h4">Menu Management</h3>
+                            <h3 class="card-title h4" id="menu-title">Menu Management</h3>
                             <p class="card-text text-muted mb-4">Add new custom dishes, update prices, availability, and
                                 edit descriptions.</p>
                             <a href="./menuManagement.html" class="btn btn-outline-success stretched-link w-100">Edit
@@ -107,7 +107,7 @@
                                 style="width: 70px; height: 70px; font-size: 30px;">
                                 <i class="fas fa-chart-pie"></i>
                             </div>
-                            <h3 class="card-title h4">Statistics</h3>
+                            <h3 class="card-title h4" id="stats-title">Statistics</h3>
                             <p class="card-text text-muted mb-4">Analyze your sales performance, revenue trends, and top
                                 selling items.</p>
                             <a href="./statistics.html" class="btn btn-outline-warning stretched-link w-100">View
@@ -127,12 +127,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="../js/auth.js"></script>
-    <script>
-        const userType = localStorage.getItem('userType');
-        if (userType !== 'restaurateur') {
-            window.location.href = '../index.html';
-        }
-    </script>
+    <script type="module" src="../js/restaurantDashboard.js"></script>
 </body>
 
 </html>

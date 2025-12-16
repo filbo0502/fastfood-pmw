@@ -2,7 +2,6 @@ import CONFIG from "./config.js";
 const API_BASE_URL = CONFIG.API_BASE_URL;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Only initialize if element exists
     const credModalEl = document.getElementById('credentialsModal');
     if (credModalEl) {
         window.credentialsModal = new bootstrap.Modal(credModalEl);

@@ -22,7 +22,9 @@ const loadOrders = async () => {
             }
         });
 
-        if (!response.ok) throw new Error('Failed to fetch orders');
+        if (!response.ok){
+            throw new Error('Failed to fetch orders');
+        }
 
         const orders = await response.json();
         renderOrders(orders);
@@ -46,7 +48,6 @@ const renderOrders = (orders) => {
         return;
     }
 
-    // Sort orders by date descending
     orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     const activeOrders = orders.filter(o => o.status !== 'delivered');
@@ -80,8 +81,6 @@ const createOrderCard = (order, isActive) => {
     const restaurantName = order.restaurant?.name || 'Unknown Restaurant';
     const statusBadge = getStatusBadge(order.status);
 
-    // Status Flow: ordered -> preparing -> delivering -> delivered
-    // Customer can only confirm delivery if status is 'delivering'
 
     let actionButton = '';
     if (isActive && order.status === 'delivering') {
@@ -133,7 +132,6 @@ const createOrderCard = (order, isActive) => {
         </div>
     `;
 
-    // Attach event listener to button if it exists
     const btn = col.querySelector('.confirm-delivery-btn');
     if (btn) {
         btn.addEventListener('click', () => confirmDelivery(order._id));
@@ -181,7 +179,7 @@ const confirmDelivery = async (orderId) => {
             duration: 3000
         }).showToast();
 
-        loadOrders(); // Reload to update UI
+        loadOrders();
 
     } catch (error) {
         console.error('Error:', error);
