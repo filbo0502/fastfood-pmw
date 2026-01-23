@@ -26,17 +26,17 @@ export const createOrder = asyncHandler(async (req, res) => {
     const { restaurantId, items, deliveryType, deliveryAddress } = req.body;
 
     const restaurant = await Restaurant.findById(restaurantId);
-    if(!restaurant){
-        return res.status(404).json({message: 'Restaurant not found.'});
+    if (!restaurant) {
+        return res.status(404).json({ message: 'Restaurant not found.' });
     }
 
     let currentPrepTime = 0;
     let totalAmount = 0;
     const orderItems = [];
 
-    for(const item of items){
+    for (const item of items) {
         const menuItem = restaurant.menu.find(m => m.meal.toString() === item.idMeal);
-        if(!menuItem || !menuItem.isAvailable){
+        if (!menuItem || !menuItem.isAvailable) {
             return res.status(400).json({ message: 'Meal not available.' });
         }
 
@@ -50,30 +50,30 @@ export const createOrder = asyncHandler(async (req, res) => {
             preparationTime: menuItem.preparationTime
         });
     }
-    
-    let totalWaitTime = currentPrepTime; 
-    
+
+    let totalWaitTime = currentPrepTime;
+
     if (deliveryType === 'pickup') {
-         totalWaitTime = await calculateWaitTime(restaurantId, currentPrepTime);
+        totalWaitTime = await calculateWaitTime(restaurantId, currentPrepTime);
     } else if (deliveryType === 'delivery') {
-        totalWaitTime = currentPrepTime; 
+        totalWaitTime = currentPrepTime;
     }
 
     const newOrder = new Order({
         customer: req.user.id,
         restaurant: restaurantId,
-        items: orderItems, 
+        items: orderItems,
         totalAmount,
         status: 'ordered',
         deliveryType,
         deliveryAddress: deliveryType === 'delivery' ? deliveryAddress : null,
-        estimatedPreparationTime: currentPrepTime, 
+        estimatedPreparationTime: currentPrepTime,
     });
 
     const saveOrder = await newOrder.save();
-    res.status(201).json({ 
-        message: 'Order successfully done!', 
-        order: saveOrder, 
+    res.status(201).json({
+        message: 'Order successfully done!',
+        order: saveOrder,
         estimatedWaitTime: totalWaitTime,
     });
 });
@@ -84,7 +84,7 @@ export const getUserOrders = asyncHandler(async (req, res) => {
         .populate('restaurant', 'name')
         .populate('items.meal', 'strMeal strMealThumb');
 
-        res.status(200).json(orders);
+    res.status(200).json(orders);
 });
 
 /**
@@ -105,34 +105,40 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: 'Order not found' });
     }
 
-    if (userType === 'restaurateur' && (status === 'preparing' || status === 'delivering')) {
-        if (order.restaurant.toString() !== userId) { 
-            return res.status(403).json({ message: 'Unauthorized updating this order.' });
-        }
-        order.status = status;
-    } 
-        
-    else if (userType === 'customer' && status === 'delivered') {
-        if (order.customer.toString() !== userId) {
-            return res.status(403).json({ message: 'Unauthorized updating this order.' });
-        }
-        order.status = status;
-    } 
-    else {
-        if (userType === 'restaurateur' && 
-            status === 'delivered' && 
-            order.deliveryType === 'pickup' && 
-            order.restaurant.toString() === userId) {
-            
-            if (order.status === 'preparing') {
-                order.status = status;
+    const isRestaurateur = userType === 'restaurateur';
+    const isOwner = order.restaurant.toString() === userId;
+    const isCustomer = order.customer.toString() === userId;
+
+    if (isRestaurateur && !isOwner) {
+        return res.status(403).json({ message: 'Unauthorized: You do not own this order\'s restaurant.' });
+    }
+    if (!isRestaurateur && !isCustomer) {
+        return res.status(403).json({ message: 'Unauthorized: You are not the customer of this order.' });
+    }
+
+    let isValidTransition = false;
+
+    if (isRestaurateur) {
+        if (['preparing', 'delivering'].includes(status)) {
+            isValidTransition = true;
+        } else if (status === 'delivered') {
+            if (order.deliveryType === 'pickup' && order.status === 'preparing') {
+                isValidTransition = true;
             } else {
-                return res.status(400).json({ message: 'Pickup order can only be marked as delivered when it is in preparing status' });
+                return res.status(400).json({ message: 'Pickup orders must be "preparing" before being marked "delivered" (ready).' });
             }
-        } else {
-            return res.status(400).json({ message: 'Unvalid or unauthorized updating status.' });
+        }
+    } else {
+        if (status === 'delivered') {
+            isValidTransition = true;
         }
     }
+
+    if (!isValidTransition) {
+        return res.status(400).json({ message: 'Invalid status transition or unauthorized action.' });
+    }
+
+    order.status = status;
     const updatedOrder = await order.save();
     res.status(200).json(updatedOrder);
 });
@@ -145,7 +151,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 
 export const deleteOrder = asyncHandler(async (req, res) => {
     const order = await Order.findByIdAndDelete(req.params.id);
-    if(!order){
+    if (!order) {
         return res.status(404).json({ message: 'Order not found.' });
     }
     res.status(200).json({ message: 'Order deleted successfully.' });

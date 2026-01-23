@@ -90,13 +90,7 @@ const createOrderCard = (order, isActive) => {
             </button>
         `;
     } else if (isActive && order.deliveryType === 'pickup' && order.status === 'preparing') {
-        // Maybe restaurateur marks it as ready? The requirements say:
-        // "Quando un ordine è pronto, il ristoratore segnala che esso è stato preparato... e passa direttamente nello stato di consegnato"
-        // Wait, the requirement says: "Quando un ordine è ready... passa direttamente nello stato di consegnato" for pickup?
-        // Quote: "Il ritiro dell’ordine deve essere fatto presso il ristorante... Quando un ordine è pronto, il ristoratore segnala che esso è stato preparato e viene rimosso dalla coda... e passa direttamente nello stato di consegnato."
-        // So for Pickup, the RESTAURATEUR sets it to delivered (or ready then delivered). 
-        // But the requirement also says: "L’ultimo scenario (Gestione delle consegne) prevede che l’utente finale quando riceve l’ordine lo segnala". This applies to Delivery type usually.
-        // Let's assume Customer confirms delivery only for 'delivery' type or if it's explicitly 'delivering'.
+
     }
 
     const itemsList = order.items.map(item => `

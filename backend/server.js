@@ -5,8 +5,10 @@ import connectDB from "./config/database.js";
 import dotenv from "dotenv";
 import cors from "cors";
 
+import Meal from './models/Meal.js';
+
 import swaggerUI from 'swagger-ui-express';
-import swaggerDOC from './swagger.json' with { type:'json' }
+import swaggerDOC from './swagger.json' with { type: 'json' }
 
 import authRoutes from './routes/authRoutes.js';
 import mealRoutes from './routes/mealRoutes.js';
@@ -20,7 +22,7 @@ dotenv.config();
 const app = express();
 connectDB();
 app.use(cookieParser());
-const PORT = process.env.PORT ;
+const PORT = process.env.PORT;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
@@ -36,7 +38,7 @@ app.use(express.static(path.resolve(__dirname, '../frontend'), { index: 'index.h
 
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
-app.get("/", (req,res) => {
+app.get("/", (req, res) => {
     res.sendFile(path.resolve(__dirname, '../frontend', 'index.html'));
 });
 
@@ -49,15 +51,21 @@ app.use('/api/statistics', statisticsRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/user', userRoutes);
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-    res.status(200).json({ 
-        status: 'OK', 
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime()
-    });
-});
+import { importData } from './utils/importMeals.js';
 
-app.listen(PORT, () => {
+const checkAndImportData = async () => {
+    try {
+        const count = await Meal.countDocuments();
+        if (count === 0) {
+            console.log('DB empty, importing initial data...');
+            await importData();
+        }
+    } catch (error) {
+        console.error('Error checking/importing data:', error);
+    }
+};
+
+app.listen(PORT, async () => {
+    await checkAndImportData();
     console.log(`Server is running on port ${PORT}`)
 })

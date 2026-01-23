@@ -62,6 +62,7 @@ const displayResults = (restaurants) => {
     container.innerHTML = '';
 
     restaurants.forEach(restaurant => {
+
         const searchTerm = dishSearchInput.value.toLowerCase();
         const matchingMeals = restaurant.menu.filter(item =>
             item.meal && item.meal.strMeal && item.meal.strMeal.toLowerCase().includes(searchTerm)

@@ -22,120 +22,87 @@ export const getRestaurantStats = asyncHandler(async (req, res) => {
         throw new Error('Non autorizzato');
     }
 
-    // Last 7 days for simple chart
-    const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 7);
 
-    // Basic counts
-    const totalOrders = await Order.countDocuments({
-        restaurant: restaurantId,
+    const commonFilter = {
+        restaurant: new mongoose.Types.ObjectId(restaurantId),
         createdAt: { $gte: startDate }
-    });
+    };
+
+    const totalOrders = await Order.countDocuments(commonFilter);
 
     const completedOrders = await Order.countDocuments({
-        restaurant: restaurantId,
-        status: 'delivered',
-        createdAt: { $gte: startDate }
+        ...commonFilter,
+        status: 'delivered'
     });
 
-    // Total revenue
-    const revenueResult = await Order.aggregate([
+    const stats = await Order.aggregate([
+        { $match: commonFilter },
         {
-            $match: {
-                restaurant: restaurantId,
-                status: 'delivered',
-                createdAt: { $gte: startDate }
-            }
-        },
-        {
-            $group: {
-                _id: null,
-                total: { $sum: '$totalAmount' }
-            }
-        }
-    ]);
-
-    const totalRevenue = revenueResult.length > 0 ? revenueResult[0].total : 0;
-
-    const dailyOrders = await Order.aggregate([
-        {
-            $match: {
-                restaurant: restaurantId,
-                createdAt: { $gte: startDate }
-            }
-        },
-        {
-            $group: {
-                _id: {
-                    $dateToString: { format: "%d-%m-%Y", date: "$createdAt" }
-                },
-                count: { $sum: 1 }
-            }
-        },
-        { $sort: { _id: 1 } }
-    ]);
-
-    // Status distribution for pie chart
-    const statusDistribution = await Order.aggregate([
-        {
-            $match: {
-                restaurant: restaurantId,
-                createdAt: { $gte: startDate }
-            }
-        },
-        {
-            $group: {
-                _id: '$status',
-                count: { $sum: 1 }
-            }
-        }
-    ]);
-
-    // Top 3 meals (simple)
-    // Correzione suggerita
-    const topMeals = await Order.aggregate([
-        {
-            $match: {
-                restaurant: new mongoose.Types.ObjectId(restaurantId), // È buona norma castare l'ID
-                createdAt: { $gte: startDate }
-            }
-        },
-        { $unwind: '$items' },
-        {
-            $lookup: {
-                from: 'meals',
-                localField: 'items.meal',
-                foreignField: '_id',
-                as: 'mealInfo'
-            }
-        },
-        { $unwind: '$mealInfo' },
-        {
-            $group: {
-                _id: '$mealInfo.strMeal',
-                count: { $sum: '$items.quantity' }
-            }
-        },
-        { $sort: { count: -1 } },
-        { $limit: 3 },
-        {
-            $project: {
-                _id: 0,
-                mealName: '$_id',
-                quantitySold: '$count'
+            $facet: {
+                totalRevenue: [
+                    { $match: { status: 'delivered' } },
+                    { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+                ],
+                dailyOrders: [
+                    {
+                        $group: {
+                            _id: { $dateToString: { format: "%d-%m-%Y", date: "$createdAt" } },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    { $sort: { _id: 1 } }
+                ],
+                statusDistribution: [
+                    {
+                        $group: {
+                            _id: '$status',
+                            count: { $sum: 1 }
+                        }
+                    }
+                ],
+                topMeals: [
+                    { $unwind: '$items' },
+                    {
+                        $group: {
+                            _id: '$items.meal',
+                            count: { $sum: '$items.quantity' }
+                        }
+                    },
+                    { $sort: { count: -1 } },
+                    { $limit: 3 },
+                    {
+                        $lookup: {
+                            from: 'meals',
+                            localField: '_id',
+                            foreignField: '_id',
+                            as: 'mealInfo'
+                        }
+                    },
+                    { $unwind: '$mealInfo' },
+                    {
+                        $project: {
+                            _id: 0,
+                            mealName: '$mealInfo.strMeal',
+                            quantitySold: '$count'
+                        }
+                    }
+                ]
             }
         }
     ]);
+
+    const result = stats[0];
 
     res.json({
         restaurant: restaurant.name,
         totalOrders,
         completedOrders,
-        totalRevenue,
-        dailyOrders,
-        statusDistribution,
-        topMeals,
+        totalRevenue: result.totalRevenue[0] ? result.totalRevenue[0].total : 0,
+        dailyOrders: result.dailyOrders,
+        statusDistribution: result.statusDistribution,
+        topMeals: result.topMeals,
         period: 'Last 7 days'
     });
 });

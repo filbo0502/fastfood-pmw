@@ -1,17 +1,30 @@
-import { checkAuth, apiFetch, getUserID, showToast } from "./utils.js";
+import CONFIG from "./config.js";
+const API_BASE_URL = CONFIG.API_BASE_URL;
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (checkAuth('restaurateur')) {
-        loadRestaurantOrders();
-    }
+    checkAuth();
+    loadRestaurantOrders();
 });
+
+const checkAuth = () => {
+    const token = localStorage.getItem('jwtToken');
+    const userType = localStorage.getItem('userType');
+
+    if (!token || userType !== 'restaurateur') {
+        window.location.href = './login.html';
+        return;
+    }
+}
 
 window.loadRestaurantOrders = async () => {
     try {
-        const userId = getUserID();
+        const token = localStorage.getItem('jwtToken');
+        const userId = localStorage.getItem('userID');
         if (!userId) throw new Error("User ID not found");
 
-        const resResponse = await apiFetch(`/restaurants`);
+        const resResponse = await fetch(`${API_BASE_URL}/restaurants`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         const restaurants = await resResponse.json();
         const myRestaurant = restaurants.find(r => r.owner === userId);
 
@@ -21,7 +34,12 @@ window.loadRestaurantOrders = async () => {
         }
 
         const restaurantId = myRestaurant._id;
-        const response = await apiFetch(`/restaurants/${restaurantId}/orders`);
+
+        const response = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}/orders`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
 
         if (!response.ok) throw new Error('Failed to fetch orders');
 
@@ -117,8 +135,13 @@ const createOrderCard = (order) => {
 
 const updateStatus = async (orderId, newStatus) => {
     try {
-        const response = await apiFetch(`/orders/${orderId}/status`, {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
             method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify({ status: newStatus })
         });
 
@@ -127,11 +150,19 @@ const updateStatus = async (orderId, newStatus) => {
             throw new Error(data.message || 'Error updating status');
         }
 
-        showToast("Status updated successfully!", "success");
+        Toastify({
+            text: "Status updated successfully!",
+            backgroundColor: "#28a745",
+            duration: 3000
+        }).showToast();
 
     } catch (error) {
         console.error('Error:', error);
-        showToast(error.message, "error");
+        Toastify({
+            text: error.message,
+            backgroundColor: "#dc3545",
+            duration: 3000
+        }).showToast();
     }
 }
 

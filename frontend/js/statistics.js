@@ -6,7 +6,7 @@ let restaurantData = null;
 let dailyChart = null;
 let statusChart = null;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     checkAuth();
     loadRestaurantData();
     document.getElementById('logoutBtn').addEventListener('click', logout);
@@ -24,7 +24,7 @@ async function loadRestaurantData() {
 
         if (response.ok) {
             restaurantData = await response.json();
-            document.getElementById('restaurantName').innerHTML = 
+            document.getElementById('restaurantName').innerHTML =
                 `<i class="fas fa-store"></i> Statistics - ${restaurantData.name}`;
             loadStatistics();
         } else {
@@ -38,10 +38,10 @@ async function loadRestaurantData() {
 
 async function loadStatistics() {
     if (!restaurantData) return;
-    
+
     try {
         document.getElementById('loading').style.display = 'block';
-        
+
         const token = localStorage.getItem('token');
         const response = await fetch(`${API_BASE_URL}/api/statistics/restaurant/${restaurantData._id}`, {
             headers: {
@@ -70,8 +70,8 @@ function updateStats(stats) {
     document.getElementById('totalOrders').textContent = stats.totalOrders || 0;
     document.getElementById('completedOrders').textContent = stats.completedOrders || 0;
     document.getElementById('totalRevenue').textContent = `€${(stats.totalRevenue || 0).toFixed(2)}`;
-    
-    const successRate = stats.totalOrders > 0 ? 
+
+    const successRate = stats.totalOrders > 0 ?
         ((stats.completedOrders / stats.totalOrders) * 100).toFixed(1) : 0;
     document.getElementById('successRate').textContent = `${successRate}%`;
 }
@@ -83,43 +83,20 @@ function createCharts(stats) {
 
 function createDailyOrdersChart(dailyData) {
     const ctx = document.getElementById('dailyOrdersChart').getContext('2d');
-    
+
     if (dailyChart) {
         dailyChart.destroy();
     }
-    
-    // Prepare data for last 7 days
-    const last7Days = [];
-    const orderCounts = [];
-    
-    for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        
-        const displayDate = date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric' 
-        });
-        last7Days.push(displayDate);
-        
-        // Backend format (dd-mm-yyyy)
-        const backendDate = date.toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: '2-digit', 
-            year: 'numeric'
-        });
-        
-        const dayData = dailyData.find(d => d._id === backendDate);
-        orderCounts.push(dayData ? dayData.count : 0);
-    }
-    
+
+    const { labels, data } = prepareChartData(dailyData);
+
     dailyChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: last7Days,
+            labels: labels,
             datasets: [{
                 label: 'Orders',
-                data: orderCounts,
+                data: data,
                 borderColor: '#667eea',
                 backgroundColor: 'rgba(102, 126, 234, 0.1)',
                 borderWidth: 3,
@@ -145,38 +122,38 @@ function createDailyOrdersChart(dailyData) {
 
 function createStatusChart(statusData) {
     const ctx = document.getElementById('statusChart').getContext('2d');
-    
+
     if (statusChart) {
         statusChart.destroy();
     }
-    
+
     if (!statusData || statusData.length === 0) {
         ctx.fillStyle = '#6c757d';
         ctx.font = '16px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('No data available', ctx.canvas.width/2, ctx.canvas.height/2);
+        ctx.fillText('No data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
         return;
     }
-    
-    
-const statusColors = {
-    'ordered': '#ffc107',    
-    'preparing': '#20c997',   
-    'delivering': '#17a2b8', 
-    'delivered': '#28a745',   
-};
 
-const statusNames = {
-    'ordered': 'Ordered',
-    'preparing': 'Preparing', 
-    'delivering': 'Delivering',
-    'delivered': 'Delivered',
-};
-    
+
+    const statusColors = {
+        'ordered': '#ffc107',
+        'preparing': '#20c997',
+        'delivering': '#17a2b8',
+        'delivered': '#28a745',
+    };
+
+    const statusNames = {
+        'ordered': 'Ordered',
+        'preparing': 'Preparing',
+        'delivering': 'Delivering',
+        'delivered': 'Delivered',
+    };
+
     const labels = statusData.map(item => statusNames[item._id] || item._id);
     const data = statusData.map(item => item.count);
     const colors = statusData.map(item => statusColors[item._id] || '#6c757d');
-    
+
     statusChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -202,12 +179,12 @@ const statusNames = {
 
 function updateTopMeals(topMeals) {
     const container = document.getElementById('topMealsList');
-    
+
     if (!topMeals || topMeals.length === 0) {
         container.innerHTML = '<p class="text-center text-muted">No meals sold yet</p>';
         return;
     }
-    
+
     container.innerHTML = topMeals.map((meal, index) => `
         <div class="top-meals-item">
             <div class="d-flex justify-content-between align-items-center">
@@ -221,4 +198,22 @@ function updateTopMeals(topMeals) {
             </div>
         </div>
     `).join('');
+}
+
+function prepareChartData(dailyData) {
+    const labels = [];
+    const data = [];
+
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+
+        const dateKey = date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+
+        const dayData = dailyData.find(d => d._id === dateKey);
+        data.push(dayData ? dayData.count : 0);
+    }
+    return { labels, data };
 }

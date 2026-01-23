@@ -9,13 +9,13 @@ import Meal from '../models/Meal.js';
  */
 export const searchRestaurants = asyncHandler(async (req, res) => {
     const { name, location } = req.query;
-    
+
     let query = {};
-    
+
     if (name) {
         query.name = { $regex: name, $options: 'i' };
     }
-    
+
     if (location) {
         query.$or = [
             { 'address.street': { $regex: location, $options: 'i' } },
@@ -27,7 +27,7 @@ export const searchRestaurants = asyncHandler(async (req, res) => {
     const restaurants = await Restaurant.find(query)
         .select('name address phone image')
         .limit(20);
-    
+
     res.json({ restaurants });
 });
 
@@ -36,12 +36,11 @@ export const searchRestaurants = asyncHandler(async (req, res) => {
  * @route GET /api/search/meals
  * @access Public
  */
-// Correzione suggerita (con Aggregation Pipeline)
 export const searchMeals = asyncHandler(async (req, res) => {
     const { name, category, minPrice, maxPrice } = req.query;
 
     let matchConditions = {
-        'menu.isAvailable': true 
+        'menu.isAvailable': true
     };
 
     if (name) {
@@ -61,13 +60,13 @@ export const searchMeals = asyncHandler(async (req, res) => {
         { $unwind: '$menu' },
         {
             $lookup: {
-                from: 'meals', 
+                from: 'meals',
                 localField: 'menu.meal',
                 foreignField: '_id',
                 as: 'mealDetails'
             }
         },
-        
+
         { $unwind: '$mealDetails' },
 
         { $match: matchConditions },
@@ -99,7 +98,7 @@ export const searchMeals = asyncHandler(async (req, res) => {
  * @access Public
  */
 export const getMealCategories = asyncHandler(async (req, res) => {
-    const categories = await Meal.distinct('strCategory'); // Corretto da 'category'
+    const categories = await Meal.distinct('strCategory');
     res.json({ categories });
 });
 

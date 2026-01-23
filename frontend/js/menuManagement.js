@@ -1,4 +1,5 @@
-import { checkAuth, apiFetch, getUserID, showToast } from "./utils.js";
+import CONFIG from "./config.js";
+const API_BASE_URL = CONFIG.API_BASE_URL;
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -16,10 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let availableMealsData = [];
     let customMealsData = [];
 
-    const isRestaurateur = checkAuth('restaurateur', false);
+    const token = localStorage.getItem('jwtToken');
+    const userID = localStorage.getItem('userID');
 
-    if (!checkAuth(null, false)) {
-        const loginRequiredAlert = `
+    const loginRequiredAlert = `
         <div class="col-12 text-center">
             <div class="alert alert-info" role="alert">
                 <h4 class="alert-heading">Login Required</h4>
@@ -27,55 +28,108 @@ document.addEventListener('DOMContentLoaded', () => {
                 <a href="../pages/login.html" class="btn btn-primary">Go to Login</a>
             </div>
         </div>`;
-        if (availableMealsContainer) availableMealsContainer.innerHTML = loginRequiredAlert;
-        if (customMenuContainer) customMenuContainer.innerHTML = loginRequiredAlert;
-        return;
+
+    const sessionExpiredAlert = `
+        <div class="col-12 text-center">
+            <div class="alert alert-warning" role="alert">
+                <h4 class="alert-heading">Session Expired</h4>
+                <p>Your session has expired. Please log in again.</p>
+                <a href="../pages/login.html" class="btn btn-primary">Go to Login</a>
+            </div>
+        </div>`;
+
+    const genericErrorAlert = (message) => `
+        <div class="col-12 text-center">
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">Error</h4>
+                <p>${message}</p>
+            </div>
+        </div>`;
+
+    const noAvailableMealsAlert = `
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                <p class="mb-0">No meals found in the database matching your search.</p>
+            </div>
+        </div>`;
+
+    const noCustomMealsAlert = `
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                <p class="mb-0">You have not created any custom meals, or none match your search.</p>
+            </div>
+        </div>`;
+
+    if (!token || !userID) {
+        console.warn('User not authenticated.');
+        availableMealsContainer.innerHTML = loginRequiredAlert;
+        customMenuContainer.innerHTML = loginRequiredAlert;
+    } else {
+        fetchAvailableMeals();
+        fetchCustomMeals();
     }
 
-    const userID = getUserID();
-
-    fetchAvailableMeals();
-    fetchCustomMeals();
-
     async function fetchAvailableMeals(searchTerm = '') {
-        try {
-            const url = searchTerm
-                ? `/meals/search?name=${encodeURIComponent(searchTerm)}&custom=false`
-                : `/meals?custom=false`;
+        if (!token) return;
 
-            const res = await apiFetch(url);
+        let url = searchTerm
+            ? `${API_BASE_URL}/meals/search?name=${encodeURIComponent(searchTerm)}&custom=false`
+            : `${API_BASE_URL}/meals?custom=false`;
+
+        try {
+            const res = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
             if (!res.ok) {
+                if (res.status === 401) {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userID');
+                    availableMealsContainer.innerHTML = sessionExpiredAlert;
+                    return;
+                }
                 if (res.status === 404) {
                     availableMealsData = [];
                     renderAvailableMeals();
                     return;
                 }
-                throw new Error(`Error fetching available meals`);
+                throw new Error(`Error fetching available meals: ${res.statusText}`);
             }
 
             availableMealsData = await res.json();
-            renderAvailableMeals();
+            renderAvailableMeals(); // Update UI
 
         } catch (error) {
             console.error(error);
-            availableMealsContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+            availableMealsContainer.innerHTML = genericErrorAlert(error.message);
         }
     }
 
     async function fetchCustomMeals(searchTerm = '') {
-        try {
-            const url = searchTerm
-                ? `/meals/search?name=${encodeURIComponent(searchTerm)}&custom=true&userId=${userID}`
-                : `/meals?custom=true&userId=${userID}`;
+        if (!token || !userID) return;
 
-            const res = await apiFetch(url);
+        let url = searchTerm
+            ? `${API_BASE_URL}/meals/search?name=${encodeURIComponent(searchTerm)}&custom=true&userId=${userID}`
+            : `${API_BASE_URL}/meals?custom=true&userId=${userID}`;
+
+        try {
+            const res = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
             if (!res.ok) {
+                if (res.status === 401) {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userID');
+                    customMenuContainer.innerHTML = sessionExpiredAlert;
+                    return;
+                }
                 if (res.status === 404) {
                     customMealsData = [];
                     renderCustomMeals();
                     return;
                 }
-                throw new Error(`Error fetching custom meals`);
+                throw new Error(`Error fetching custom meals: ${res.statusText}`);
             }
 
             customMealsData = await res.json();
@@ -83,32 +137,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error(error);
-            customMenuContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+            customMenuContainer.innerHTML = genericErrorAlert(error.message);
         }
     }
 
     function renderAvailableMeals() {
         availableMealsContainer.innerHTML = '';
         if (availableMealsData.length === 0) {
-            availableMealsContainer.innerHTML = `<div class="alert alert-info">No meals found.</div>`;
+            availableMealsContainer.innerHTML = noAvailableMealsAlert;
             return;
         }
         availableMealsData.forEach(meal => {
-            availableMealsContainer.appendChild(renderMealCard(meal, false));
+            const card = renderMealCard(meal, false);
+            availableMealsContainer.appendChild(card);
         });
     }
 
     function renderCustomMeals() {
         customMenuContainer.innerHTML = '';
         if (customMealsData.length === 0) {
-            customMenuContainer.innerHTML = `<div class="alert alert-info">You have not created any custom meals.</div>`;
+            customMenuContainer.innerHTML = noCustomMealsAlert;
             return;
         }
         customMealsData.forEach(meal => {
-            customMenuContainer.appendChild(renderMealCard(meal, true));
+            const card = renderMealCard(meal, true);
+            customMenuContainer.appendChild(card);
         });
     }
 
+    /**
+     * Creates a meal card element based on the style of searchRestaurant.js
+     * @param {object} meal - The meal data object
+     * @param {boolean} isCustom - True if it's a custom meal (for styling)
+     * @returns {HTMLElement} The card element
+     */
     function renderMealCard(meal, isCustom) {
         const card = document.createElement('div');
         card.className = 'card meal-card-item h-100 shadow-sm';
@@ -149,6 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <i class="fa-solid fa-tag me-2"></i>${meal.strCategory || 'No Category'}
                 </p>
                 ${customInfo}
+                
                 <div class="flex-grow-1"></div> 
             </div>
 
@@ -158,7 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         return card;
     }
-
 
     function openModal() { modal.style.display = 'block'; }
     function closeModal() {
@@ -205,11 +267,9 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal();
     }
 
-    // --- Event Handlers ---
-
     async function handleFormSubmit(e) {
         e.preventDefault();
-
+        if (!token) return;
         const mealId = form.dataset.editingId;
         const isEditing = !!mealId;
 
@@ -227,64 +287,105 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!mealData.strMeal || !mealData.price || mealData.price <= 0) {
-            showToast('Please fill in the Meal Name and a valid Price.', 'warning');
+            showAlert('Please fill in the Meal Name and a valid Price.', 'warning');
             return;
         }
 
-        const url = isEditing ? `/meals/${mealId}` : `/meals`;
+        const url = isEditing ? `${API_BASE_URL}/meals/${mealId}` : `${API_BASE_URL}/meals`;
         const method = 'POST';
 
         try {
-            const res = await apiFetch(url, {
+            const res = await fetch(url, {
                 method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(mealData)
             });
 
+            const data = await res.json();
             if (!res.ok) {
-                const data = await res.json();
                 throw new Error(data.message || 'Error saving the meal.');
             }
 
             closeModal();
-            showToast(isEditing ? 'Meal updated!' : 'Meal created successfully!', 'success');
+            showAlert(isEditing ? 'Meal updated!' : 'Meal created successfully!', 'success');
             fetchCustomMeals();
 
         } catch (error) {
             console.error(error);
-            showToast(error.message, 'error');
+            showAlert(error.message, 'danger');
         }
     }
 
     async function handleDeleteMeal(mealId) {
-        if (!confirm('Are you sure you want to delete this meal?')) return;
+        if (!token) return;
+        if (!confirm('Are you sure you want to delete this meal?')) {
+            return;
+        }
 
         try {
-            const res = await apiFetch(`/meals/${mealId}`, {
-                method: 'DELETE'
+            const res = await fetch(`${API_BASE_URL}/meals/${mealId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
             });
 
+            const data = await res.json();
             if (!res.ok) {
-                const data = await res.json();
                 throw new Error(data.message || 'Error deleting the meal.');
             }
 
-            showToast('Meal deleted successfully.', 'success');
+            showAlert('Meal deleted successfully.', 'success');
             fetchCustomMeals();
 
         } catch (error) {
             console.error(error);
-            showToast(error.message, 'error');
+            showAlert(error.message, 'danger');
         }
     }
 
     function handleSearch() {
+        if (!token) return;
         const searchTerm = searchInput.value.trim();
         fetchAvailableMeals(searchTerm);
         fetchCustomMeals(searchTerm);
     }
 
+    function showAlert(message, type = 'danger') {
+        const container = document.querySelector('.main-content .container');
+        if (!container) return;
+
+        const existingAlert = container.querySelector('.alert.global-alert');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show mt-3 global-alert`;
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+
+        container.prepend(alertDiv);
+
+        setTimeout(() => {
+            const alertInstance = bootstrap.Alert.getOrCreateInstance(alertDiv);
+            if (alertInstance) {
+                alertInstance.close();
+            } else if (alertDiv) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+
+
+
     addMealBtn.addEventListener('click', () => {
-        openModalForCreate();
+        if (token) openModalForCreate();
+        else alert('Please log in to create meals.');
     });
 
     modalCloseBtn.addEventListener('click', closeModal);
@@ -303,6 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (meal) openModalForAdd(meal);
         }
     });
+
 
     customMenuContainer.addEventListener('click', (e) => {
         const card = e.target.closest('.meal-card-item');

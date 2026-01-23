@@ -197,11 +197,6 @@ export const searchRestaurantsByDish = asyncHandler(async (req, res) => {
 export const getRestaurantOrders = asyncHandler(async (req, res) => {
     const restaurantId = req.params.id;
 
-    // Authorization check: Ensure the user owns this restaurant
-    // Note: This assumes authRestaurateurMiddleware is used and req.user is set
-    // But we should verify if the user actually owns the restaurant if strictly needed
-    // The middleware checks userType, but logic here should check ownership if we want to be strict.
-    // However, usually we might just trust the middleware + ID, or check:
     const restaurant = await Restaurant.findById(restaurantId);
     if (!restaurant) {
         return res.status(404).json({ message: 'Restaurant not found' });
