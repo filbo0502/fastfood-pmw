@@ -11,10 +11,6 @@ const MealSchema = new mongoose.Schema({
     required: [true, 'Meal name is mandatory.'],
     trim: true,
   },
-  strMealAlternate: {
-    type: String,
-    default: null,
-  },
   strCategory: {
     type: String,
     trim: true,
@@ -26,14 +22,6 @@ const MealSchema = new mongoose.Schema({
   strMealThumb: {
     type: String,
     trim: true,
-  },
-  strCreativeCommonsConfirmed: {
-    type: String, 
-    default: null,
-  },
-  dateModified: {
-    type: Date,
-    default: null,
   },
   ingredients: [{
     type: String,

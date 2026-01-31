@@ -309,7 +309,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Password toggle
             const togglePasswordButton = document.getElementById('togglePassword');
             const passwordInput = document.getElementById('password');
 
@@ -330,13 +329,11 @@
             const imagePreview = document.getElementById('imagePreview');
             const removeImageBtn = document.getElementById('removeImageBtn');
 
-            // Click to upload
             imageUploadContainer.addEventListener('click', function (e) {
                 if (e.target === removeImageBtn || removeImageBtn.contains(e.target)) return;
                 restaurantImageInput.click();
             });
 
-            // Drag and drop
             imageUploadContainer.addEventListener('dragover', function (e) {
                 e.preventDefault();
                 this.classList.add('drag-over');
@@ -356,14 +353,12 @@
                 }
             });
 
-            // File input change
             restaurantImageInput.addEventListener('change', function (e) {
                 if (e.target.files.length > 0) {
                     handleImageFile(e.target.files[0]);
                 }
             });
 
-            // Remove image
             removeImageBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 restaurantImageInput.value = '';
@@ -372,19 +367,16 @@
             });
 
             function handleImageFile(file) {
-                // Validate file type
                 if (!file.type.startsWith('image/')) {
                     alert('Please select a valid image file.');
                     return;
                 }
 
-                // Validate file size (5MB max)
                 if (file.size > 5 * 1024 * 1024) {
                     alert('File size must be less than 5MB.');
                     return;
                 }
 
-                // Show preview
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     imagePreview.src = e.target.result;
@@ -393,7 +385,6 @@
                 };
                 reader.readAsDataURL(file);
 
-                // Set the file to the input
                 const dt = new DataTransfer();
                 dt.items.add(file);
                 restaurantImageInput.files = dt.files;

@@ -9,9 +9,9 @@ import asyncHandler from 'express-async-handler';
  * @access Public
  */
 
-export const getUser = asyncHandler(async(req, res) => {
+export const getUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
-    if(!user){
+    if (!user) {
         return res.status(404).json({ message: 'User not found.' });
     }
     res.status(200).json(user);
@@ -23,7 +23,7 @@ export const getUser = asyncHandler(async(req, res) => {
  * @access Private
  */
 
-export const updateUser = asyncHandler(async(req, res) => {
+export const updateUser = asyncHandler(async (req, res) => {
     const updateFields = {
         name: req.body.name,
         surname: req.body.surname,
@@ -38,7 +38,7 @@ export const updateUser = asyncHandler(async(req, res) => {
         updateFields.password = hashedPassword;
     };
 
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, updateFields, {new: true});
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, updateFields, { new: true });
 
     if (!updatedUser) {
         return res.status(404).json({ success: false, message: "User not found" });
@@ -53,13 +53,13 @@ export const updateUser = asyncHandler(async(req, res) => {
  * @access Private
  */
 
-export const deleteUser = asyncHandler(async(req, res) => {
+export const deleteUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
-    if(!user){
-        return res.status(404).json({ message:'User not found' });
+    if (!user) {
+        return res.status(404).json({ message: 'User not found' });
     }
     await User.findByIdAndDelete(user._id);
-    res.status(200).json({message:'User deleted!'});
+    res.status(200).json({ message: 'User deleted!' });
 });
 
 /**
@@ -68,69 +68,25 @@ export const deleteUser = asyncHandler(async(req, res) => {
  * @access Private
  */
 
-export const updatePassword = asyncHandler(async(req, res) => {
+export const updatePassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword, confirmNewPassword } = req.body;
 
-    if(newPassword !== confirmNewPassword){
-        return res.status(400).json({ message: 'Passord do not match'});
+    if (newPassword !== confirmNewPassword) {
+        return res.status(400).json({ message: 'Passord do not match' });
     }
 
     const user = await User.findById(req.params.id);
-    if(!user){
-        return res.status(404).json({ message: 'User not found.'});
-    }
-
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if(!isMatch){
-        return res.status(400).json({ message: 'Incorrect password.'});
-    }
-
-    user.password = newPassword; 
-    await user.save(); 
-
-    res.status(200).json({ message: 'Password successfully updated.'})
-});
-/**
- * @desc Update user preferences
- * @route PUT /api/users/:id/preferences
- * @access Private
- */
-export const updateUserPreferences = asyncHandler(async(req, res) => {
-    const { favouriteCategories } = req.body;
-    
-    const user = await User.findById(req.params.id);
-    if(!user){
+    if (!user) {
         return res.status(404).json({ message: 'User not found.' });
     }
 
-    if(user._id.toString() !== req.user.id){
-        return res.status(403).json({ message: 'Not authorized to update this user.' });
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+        return res.status(400).json({ message: 'Incorrect password.' });
     }
 
-    user.preferences = { favouriteCategories };
+    user.password = newPassword;
     await user.save();
 
-    res.status(200).json({ 
-        success: true, 
-        message: 'Preferences updated successfully', 
-        preferences: user.preferences 
-    });
-});
-
-/**
- * @desc Get user preferences
- * @route GET /api/users/:id/preferences
- * @access Private
- */
-export const getUserPreferences = asyncHandler(async(req, res) => {
-    const user = await User.findById(req.params.id);
-    if(!user){
-        return res.status(404).json({ message: 'User not found.' });
-    }
-
-    if(user._id.toString() !== req.user.id){
-        return res.status(403).json({ message: 'Not authorized to view this user.' });
-    }
-
-    res.status(200).json({ preferences: user.preferences });
+    res.status(200).json({ message: 'Password successfully updated.' })
 });

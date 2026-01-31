@@ -12,6 +12,21 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('logoutBtn').addEventListener('click', logout);
 });
 
+const checkAuth = () => {
+    const token = localStorage.getItem('jwtToken');
+    const userType = localStorage.getItem('userType');
+
+    if (!token || userType !== 'restaurateur') {
+        window.location.href = '../pages/login.html';
+        return;
+    }
+};
+
+const logout = () => {
+    localStorage.clear();
+    window.location.href = '../pages/login.html';
+};
+
 async function loadRestaurantData() {
     try {
         const token = localStorage.getItem('token');
@@ -81,6 +96,7 @@ function createCharts(stats) {
     createStatusChart(stats.statusDistribution);
 }
 
+//Chart.js
 function createDailyOrdersChart(dailyData) {
     const ctx = document.getElementById('dailyOrdersChart').getContext('2d');
 

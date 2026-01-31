@@ -1,79 +1,76 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import Restaurant from "./Restaurant.js";
-import { nameRegex, surnameRegex,emailRegex,passwordRegex } from "../utils/regex.js";
+import { nameRegex, surnameRegex, emailRegex, passwordRegex } from "../utils/regex.js";
 
 const UserSchema = new mongoose.Schema({
-    name:{
+    name: {
         type: String,
         required: true,
         match: nameRegex
     },
-    surname:{
+    surname: {
         type: String,
         required: true,
         match: surnameRegex
     },
-    email:{
+    email: {
         type: String,
         required: true,
         unique: true,
         match: emailRegex
     },
-    password:{
+    password: {
         type: String,
         required: true,
         match: passwordRegex,
         minLength: 8,
         maxLength: 128
     },
-    userType:{
+    userType: {
         type: String,
         enum: ['customer', 'restaurateur'],
         required: true
     },
-    restaurant:{
+    restaurant: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Restaurant'
     },
-    paymentInfo:{
+    paymentInfo: {
         cardType: String,
         cardNumb: String,
         CVC: Number,
         expiryDate: Date
     },
-    address:{
+    address: {
         street: String,
         city: String,
         zipCode: String,
     },
-    preferences:{
-        favouriteCategories: [String],
-    },
-    createdAt:{
+    createdAt: {
         type: Date,
         default: Date.now
     }
-},{
+}, {
     timestamps: true
 });
 
-UserSchema.pre('save', async function(next) {
-    if(!this.isModified('password')){
+UserSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
         return next();
     }
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
 });
 
-UserSchema.pre('findOneAndDelete', async function(next){
-    try{
+UserSchema.pre('findOneAndDelete', async function (next) {
+    try {
         const user = await this.model.findOne(this.getQuery());
-        if(user && user.userType === 'restaurateur'){
+        if (user && user.userType === 'restaurateur') {
             await Restaurant.deleteMany({ owner: user._id });
         }
         next();
-    }catch(error){
+    } catch (error) {
         next(error);
     }
 });

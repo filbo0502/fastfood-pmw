@@ -1,4 +1,6 @@
 import CONFIG from "./config.js";
+import { getImageUrl } from "./utils.js";
+
 const API_BASE_URL = CONFIG.API_BASE_URL;
 
 let allRestaurants = [];
@@ -7,9 +9,9 @@ let filteredRestaurants = [];
 let searchInput;
 
 const getRestaurant = async () => {
-    try{
+    try {
         const token = localStorage.getItem('jwtToken');
-        
+
         if (!token) {
             const container = document.getElementById('restaurant-container');
             container.innerHTML = `
@@ -31,8 +33,8 @@ const getRestaurant = async () => {
                 'Authorization': `Bearer ${token}`
             }
         });
-        
-        if(!response.ok){
+
+        if (!response.ok) {
             if (response.status === 401) {
                 localStorage.removeItem('jwtToken');
                 localStorage.removeItem('userID');
@@ -50,16 +52,16 @@ const getRestaurant = async () => {
             }
             throw new Error('Error during server call.');
         }
-        
+
         allRestaurants = await response.json();
         console.log('Restaurants data: ', allRestaurants);
-        
+
         initializeSearch();
-    
+
         filteredRestaurants = [...allRestaurants];
         showRestaurant(filteredRestaurants);
-        
-    }catch(error){
+
+    } catch (error) {
         console.error('Error fetching restaurants:', error);
         const container = document.getElementById('restaurant-container');
         container.innerHTML = `
@@ -81,7 +83,7 @@ const initializeSearch = () => {
 
 const performSearch = () => {
     const searchTerm = searchInput.value.toLowerCase().trim();
-    
+
     if (!searchTerm) {
         filteredRestaurants = [...allRestaurants];
     } else {
@@ -90,13 +92,13 @@ const performSearch = () => {
             const matchesDescription = restaurant.description && restaurant.description.toLowerCase().includes(searchTerm);
             const matchesCity = restaurant.addressCity && restaurant.addressCity.toLowerCase().includes(searchTerm);
             const matchesStreet = restaurant.addressStreet && restaurant.addressStreet.toLowerCase().includes(searchTerm);
-            
+
             return matchesName || matchesDescription || matchesCity || matchesStreet;
         });
     }
-    
+
     updateSearchResultsInfo(searchTerm);
-    
+
     showRestaurant(filteredRestaurants);
 }
 
@@ -113,13 +115,9 @@ const updateSearchResultsInfo = (searchTerm) => {
 
 const debounce = (func, wait) => {
     let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
+    return (...args) => {
         clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+        timeout = setTimeout(() => func(...args), wait);
     };
 }
 
@@ -143,28 +141,19 @@ const showRestaurant = (restaurants) => {
     restaurants.forEach(restaurant => {
         const card = document.createElement('div');
         card.className = 'col-md-6 col-lg-4 mb-4';
-        
-        let imageUrl = '../images/hamburger.png';
-        if (restaurant.image) {
-            if (restaurant.image.startsWith('http')) {
-                imageUrl = restaurant.image;
-            } else if (restaurant.image.startsWith('/uploads/')) {
-                imageUrl = `http://localhost:3001${restaurant.image}`;
-            } else {
-                imageUrl = `http://localhost:3001/uploads/restaurants/${restaurant.image}`;
-            }
-        }
-        
+
+        const imageUrl = getImageUrl(restaurant.image);
+
         const cuisineType = restaurant.cuisine || 'Various';
-        
-        const ratingDisplay = restaurant.rating ? 
+
+        const ratingDisplay = restaurant.rating ?
             `<div class="mb-2">
                 <span class="text-warning">
                     ${'★'.repeat(Math.floor(restaurant.rating))}${'☆'.repeat(5 - Math.floor(restaurant.rating))}
                 </span>
                 <small class="text-muted ms-1">${restaurant.rating}/5</small>
              </div>` : '';
-        
+
         let addressDisplay = '';
         if (restaurant.addressStreet || restaurant.addressCity) {
             addressDisplay = `
@@ -176,7 +165,7 @@ const showRestaurant = (restaurants) => {
                 </p>
             `;
         }
-        
+
         card.innerHTML = `
             <div class="card custom-card h-100 shadow-sm">
                 <img src="${imageUrl}" 
@@ -200,7 +189,7 @@ const showRestaurant = (restaurants) => {
                 </div>
             </div>
         `;
-        
+
         container.appendChild(card);
     })
 }

@@ -1,4 +1,6 @@
 import CONFIG from "./config.js";
+import { getImageUrl } from "./utils.js";
+
 const API_BASE_URL = CONFIG.API_BASE_URL;
 
 let dishSearchInput;
@@ -71,16 +73,7 @@ const displayResults = (restaurants) => {
         const card = document.createElement('div');
         card.className = 'col-md-6 col-lg-4 mb-4';
 
-        let imageUrl = '../images/hamburger.png';
-        if (restaurant.image) {
-            if (restaurant.image.startsWith('http')) {
-                imageUrl = restaurant.image;
-            } else if (restaurant.image.startsWith('/uploads/')) {
-                imageUrl = `http://localhost:3001${restaurant.image}`;
-            } else {
-                imageUrl = `http://localhost:3001/uploads/restaurants/${restaurant.image}`;
-            }
-        }
+        const imageUrl = getImageUrl(restaurant.image);
 
         const matchingMealsHtml = matchingMeals.map(item =>
             `<span class="badge bg-success me-1">${item.meal.strMeal} (€${item.price})</span>`
