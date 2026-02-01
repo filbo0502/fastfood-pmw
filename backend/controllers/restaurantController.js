@@ -4,7 +4,7 @@ import asyncHandler from 'express-async-handler';
 import Order from '../models/Order.js';
 
 /**
- * @desc Get all restaurants
+ * @desc Ottiene tutti i ristoranti
  * @route GET /api/restaurant
  * @access Public
  */
@@ -14,7 +14,7 @@ export const getAllRestaurants = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc Get restaurant 
+ * @desc Ottiene un ristorante
  * @route GET /api/restaurant
  * @access Public
  */
@@ -28,10 +28,10 @@ export const getRestaurant = asyncHandler(async (req, res) => {
 });
 
 /**
-* @desc Get restaurant menu
- * @route GET /api/restaurant/:id/menu
- * @access Public
- */
+* @desc Ottiene il menu di un ristorante
+* @route GET /api/restaurant/:id/menu
+* @access Public
+*/
 
 export const getRestaurantMenu = asyncHandler(async (req, res) => {
     const restaurant = await Restaurant.findById(req.params.id);
@@ -43,7 +43,7 @@ export const getRestaurantMenu = asyncHandler(async (req, res) => {
 
 
 /**
- * @desc Update restaurant data
+ * @desc Aggiorna i dati di un ristorante
  * @route PUT /api/restaurant
  * @access Private
  */
@@ -57,7 +57,7 @@ export const updateRestaurant = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc Delete restaurant data
+ * @desc  Elimina un ristorante
  * @route DELETE /api/restaurant/:id
  * @access Private
  */
@@ -71,7 +71,7 @@ export const deleteRestaurant = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc Search for restaurants
+ * @desc Cerca ristoranti
  * @route GET /api/restaurant/search
  * @access Public
  */
@@ -82,6 +82,7 @@ export const searchRestaurant = asyncHandler(async (req, res) => {
     let query = {};
     if (q) {
         const SearchTerm = String(q);
+        // Cerca in nome, città e descrizione
         query = {
             $or: [
                 { name: { $regex: SearchTerm, $options: 'i' } },
@@ -100,7 +101,7 @@ export const searchRestaurant = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc   Add or update a meal in the restaurant's menu
+ * @desc   Aggiungi o aggiorna un piatto al menu di un ristorante
  * @route  POST /api/restaurant/:id/menu
  * @access Private (Owner only)
  */
@@ -138,7 +139,7 @@ export const addOrUpdateMealInMenu = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc   Delete a meal from the restaurant's menu (if it exists)
+ * @desc   Elimina un piatto dal menu di un ristorante (se esiste)
  * @route  DELETE /api/restaurant/:id/menu/:idMeal
  * @access Private (Owner only)
  */
@@ -157,7 +158,7 @@ export const deleteMealFromMenu = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc   Search restaurants by dish
+ * @desc   Cerca ristoranti per piatto
  * @route  GET /api/restaurant/search/dish
  * @access Public
  */
@@ -190,7 +191,7 @@ export const searchRestaurantsByDish = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc   Get orders for a specific restaurant
+ * @desc   Ottieni gli ordini per un ristorante specifico
  * @route  GET /api/restaurants/:id/orders
  * @access Private (Restaurateur only)
  */

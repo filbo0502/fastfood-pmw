@@ -4,7 +4,7 @@ import Restaurant from '../models/Restaurant.js';
 import mongoose from 'mongoose';
 
 /**
- * @desc Get restaurant statistics with chart data
+ * @desc Ottiene le statistiche di un ristorante con i dati per i grafici
  * @route GET /api/statistics/restaurant/:id
  * @access Private (Restaurant owner)
  */

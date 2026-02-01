@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentUserData = null;
 
+    // Restituisce la classe icona corretta in base al tipo di carta
     function getCardIconClass(cardType) {
         if (!cardType) return 'fas fa-credit-card';
         switch (cardType.toLowerCase()) {
@@ -105,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
             savedCardIcon.className = `${getCardIconClass(cardType)} fa-2x me-3 text-primary`;
             savedCardDetails.textContent = `${cardType || 'Card'}----${lastFour}`;
 
+            // Formatta la data di scadenza
             let expiryText = 'Expire in: --/--';
             if (expiryDate) {
                 try {
@@ -112,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const month = String(date.getMonth() + 1).padStart(2, '0');
                     const year = String(date.getFullYear()).slice(-2);
                     expiryText = `Expire in ${month}/${year}`;
-                    
+
                     const formYear = date.getFullYear();
                     expiryDateInput.value = `${formYear}/${month}`;
                 } catch (e) {
@@ -128,10 +130,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             paymentDisplayView.classList.add('d-none');
             paymentFormView.classList.remove('d-none');
-            cancelEditBtn.classList.add('d-none'); 
+            cancelEditBtn.classList.add('d-none');
             paymentFormIntro.textContent = 'You don\'t have any payment method saved.';
             savePaymentBtn.textContent = 'Save Payment method';
-            
+
             paymentForm.reset();
         }
     }
@@ -139,8 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
     editPaymentBtn.addEventListener('click', () => {
         paymentDisplayView.classList.add('d-none');
         paymentFormView.classList.remove('d-none');
-        
-        cancelEditBtn.classList.remove('d-none'); 
+
+        cancelEditBtn.classList.remove('d-none');
         paymentFormIntro.textContent = 'Modify your payment method.';
         savePaymentBtn.textContent = 'Save Edit';
     });
@@ -162,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             email: currentUserData.email,
             address: currentUserData.address,
             userType: currentUserData.userType,
-            paymentInfo: null 
+            paymentInfo: null
         };
 
         try {
@@ -181,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             currentUserData = data.user;
-            populateForms(currentUserData); 
+            populateForms(currentUserData);
             showAlert('Payment method removed successfully!', 'success');
 
         } catch (error) {
@@ -217,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 throw new Error(data.message || 'Error updating details.');
             }
-            
+
             currentUserData = data.user;
             populateForms(currentUserData);
             showAlert('Profile details updated!', 'success');
@@ -276,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (expiryDateInput.value) {
             try {
                 const [year, month] = expiryDateInput.value.split('/').map(Number);
-                expiryDateObj = new Date(year, month, 0); 
+                expiryDateObj = new Date(year, month, 0);
             } catch (e) {
                 console.error('Invalid date format');
                 showAlert('Expiry date not valid.', 'danger');
@@ -314,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             currentUserData = data.user;
-            populateForms(currentUserData); 
+            populateForms(currentUserData);
             showAlert('Payment info updated successfully!', 'success');
 
         } catch (error) {
@@ -402,9 +404,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
-        
+
         container.prepend(alertDiv);
-        
+
         setTimeout(() => {
             const alertInstance = bootstrap.Alert.getOrCreateInstance(alertDiv);
             if (alertInstance) {

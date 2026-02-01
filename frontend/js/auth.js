@@ -1,6 +1,10 @@
 import CONFIG from "./config.js";
 const API_BASE_URL = CONFIG.API_BASE_URL;
 
+/* Funzione che gestisce il login e il logout, 
+mostrando e nascondendo elementi del navbar a seconda 
+che l'utente sia loggato o meno 
+*/
 document.addEventListener('DOMContentLoaded', () => {
     const loginItem = document.querySelector('.login-btn');
     const logoutItem = document.querySelector('.logout-btn');
@@ -31,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (logoutItem) {
-        logoutItem.addEventListener('click', async (e) => { 
+        logoutItem.addEventListener('click', async (e) => {
             e.preventDefault();
             try {
                 await fetch(`${API_BASE_URL}/auth/logout`, {
@@ -45,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.removeItem('userID');
                 localStorage.removeItem('userType');
                 localStorage.removeItem('restaurantId');
-                window.location.href = '../pages/login.html'; 
+                window.location.href = '../pages/login.html';
             }
         });
     }

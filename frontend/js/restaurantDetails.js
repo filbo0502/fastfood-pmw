@@ -12,14 +12,14 @@ const getRestaurantIdFromUrl = () => {
 
 const loadRestaurantDetails = async () => {
     const restaurantId = getRestaurantIdFromUrl();
-    
+
     if (!restaurantId) {
         document.getElementById('restaurant-info').innerHTML = '<p class="text-danger">Restaurant ID not found</p>';
         return;
     }
 
     const token = localStorage.getItem('jwtToken');
-    
+
     if (!token) {
         document.getElementById('restaurant-info').innerHTML = `
             <div class="alert alert-info" role="alert">
@@ -61,7 +61,7 @@ const loadRestaurantDetails = async () => {
 
         const restaurant = await response.json();
         displayRestaurantInfo(restaurant);
-        loadRestaurantMenu(restaurantId); 
+        loadRestaurantMenu(restaurantId);
     } catch (error) {
         console.error('Error loading restaurant details:', error);
         document.getElementById('restaurant-info').innerHTML = `
@@ -75,18 +75,18 @@ const loadRestaurantDetails = async () => {
 
 const displayRestaurantInfo = (restaurant) => {
     const restaurantInfo = document.getElementById('restaurant-info');
-    
+
     let imageUrl = '../images/hamburger.png';
     if (restaurant.image) {
         if (restaurant.image.startsWith('http')) {
             imageUrl = restaurant.image;
         } else {
-
+            // Rimuove lo slash iniziale se presente
             const imagePath = restaurant.image.startsWith('/') ? restaurant.image.substring(1) : restaurant.image;
             imageUrl = `${SERVER_BASE_URL}/${imagePath}`;
         }
     }
-    
+
     restaurantInfo.innerHTML = `
         <div class="row">
             <div class="col-md-4">
@@ -114,7 +114,7 @@ const loadRestaurantMenu = async (restaurantId) => {
     const menuContainer = document.getElementById('menu-items');
     try {
         const token = localStorage.getItem('jwtToken');
-        
+
         if (!token) {
             menuContainer.innerHTML = `<p class="text-info">Please log in to view the menu.</p>`;
             return;
@@ -146,7 +146,7 @@ const loadRestaurantMenu = async (restaurantId) => {
  */
 const displayMenuItems = (menuItems) => {
     const menuContainer = document.getElementById('menu-items');
-    
+
     if (!menuItems || menuItems.length === 0) {
         menuContainer.innerHTML = '<p class="text-muted">No menu items available for this restaurant.</p>';
         return;
@@ -185,8 +185,8 @@ const displayMenuItems = (menuItems) => {
 const updateCartCount = () => {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
     const count = cart.reduce((acc, item) => acc + item.quantity, 0);
-    
-    const cartCountElement = document.getElementById('cart-count'); 
+
+    const cartCountElement = document.getElementById('cart-count');
     if (cartCountElement) {
         cartCountElement.textContent = count;
         cartCountElement.style.display = count > 0 ? 'inline-block' : 'none';
@@ -212,13 +212,14 @@ window.addToCart = (mealId, mealName, price) => {
 
     if (cartRestaurantId && cartRestaurantId !== currentRestaurantId) {
         if (!confirm("You have items from another restaurant in your cart. Would you like to clear it and start a new order here?")) {
-            return; 
+            return;
         }
         cart = [];
     }
 
     localStorage.setItem('restaurantId', currentRestaurantId);
 
+    // Cerca se il piatto è già nel carrello
     const existingItem = cart.find(item => item._id === mealId);
 
     if (existingItem) {
@@ -248,5 +249,5 @@ window.addToCart = (mealId, mealName, price) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadRestaurantDetails();
-    updateCartCount(); 
+    updateCartCount();
 });

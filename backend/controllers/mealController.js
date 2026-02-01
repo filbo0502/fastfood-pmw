@@ -11,6 +11,7 @@ export const getMeals = asyncHandler(async (req, res) => {
 
     let query = {};
 
+    // Filtra i piatti in base ai parametri
     if (custom === 'true' && userId) {
         query = {
             isCustom: true,
@@ -72,6 +73,7 @@ export const createMeal = asyncHandler(async (req, res) => {
 
     let finalIdMeal = idMeal;
     if (!finalIdMeal) {
+        // Genera un ID univoco se non fornito
         finalIdMeal = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
 
@@ -93,7 +95,6 @@ export const createMeal = asyncHandler(async (req, res) => {
             isAvailable: isAvailable !== false,
             preparationTime
         };
-
 
         if (isCustom) {
             mealData.isCustom = true;
@@ -136,9 +137,8 @@ export const deleteMeal = asyncHandler(async (req, res) => {
         throw new Error("You can only delete your own custom meals.");
     }
 
-    const deletedMeal = await Meal.findByIdAndDelete(req.params.id);
-
-    res.status(200).json({ message: "Meal deleted successfully." }, deletedMeal);
+    await meal.deleteOne();
+    res.status(200).json({ message: "Meal deleted successfully." });
 });
 
 /**
@@ -166,4 +166,3 @@ export const updateMeal = asyncHandler(async (req, res) => {
 
     res.status(200).json(updatedMeal);
 });
-

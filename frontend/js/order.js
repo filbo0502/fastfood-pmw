@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = './searchRestaurant.html';
         return;
     }
- 
+
     function renderCart() {
         if (cart.length === 0) {
             cartSummary.innerHTML = '<p class="text-muted text-center py-4">Your cart is empty.</p>';
@@ -60,27 +60,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updatePrices() {
         const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-        
+
         subtotalPrice.textContent = `${cartTotal.toFixed(2)}€`;
-        deliveryCostDisplay.textContent = '0.00€'; 
+        deliveryCostDisplay.textContent = '0.00€';
         finalPriceEl.textContent = `${cartTotal.toFixed(2)}€`;
     }
 
-  
+
     async function handleConfirmOrder() {
         const items = cart.map(item => ({
-            idMeal: item._id || item.idMeal, 
+            idMeal: item._id || item.idMeal, // Supporta entrambi i formati
             quantity: item.quantity
         }));
 
         const orderData = {
             restaurantId,
             items,
-            deliveryType: 'pickup', 
-            deliveryAddress: null  
+            deliveryType: 'pickup', // Per ora solo pickup
+            deliveryAddress: null
         };
 
-    
+
         confirmOrderBtn.disabled = true;
         confirmOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
 
@@ -95,17 +95,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                const errorData = await response.json(); 
+                const errorData = await response.json();
                 throw new Error(errorData.message || 'Error creating order');
             }
 
-            const data = await response.json(); 
+            const data = await response.json();
 
             waitTimeValue.textContent = data.estimatedWaitTime;
             waitTimeDisplay.classList.remove('d-none');
-                
+
             alert(`Order confirmed successfully!\n\nEstimated wait time: ${data.estimatedWaitTime} minutes\n\nYou can pick up your order at the restaurant.`);
-                
+
 
             localStorage.removeItem('cart');
             localStorage.removeItem('restaurantId');

@@ -20,50 +20,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('jwtToken');
     const userID = localStorage.getItem('userID');
 
-    const loginRequiredAlert = `
-        <div class="col-12 text-center">
-            <div class="alert alert-info" role="alert">
-                <h4 class="alert-heading">Login Required</h4>
-                <p>Please log in to view and manage meals.</p>
-                <a href="../pages/login.html" class="btn btn-primary">Go to Login</a>
-            </div>
-        </div>`;
-
-    const sessionExpiredAlert = `
-        <div class="col-12 text-center">
-            <div class="alert alert-warning" role="alert">
-                <h4 class="alert-heading">Session Expired</h4>
-                <p>Your session has expired. Please log in again.</p>
-                <a href="../pages/login.html" class="btn btn-primary">Go to Login</a>
-            </div>
-        </div>`;
-
-    const genericErrorAlert = (message) => `
-        <div class="col-12 text-center">
-            <div class="alert alert-danger" role="alert">
-                <h4 class="alert-heading">Error</h4>
-                <p>${message}</p>
-            </div>
-        </div>`;
-
-    const noAvailableMealsAlert = `
-        <div class="col-12">
-            <div class="alert alert-info" role="alert">
-                <p class="mb-0">No meals found in the database matching your search.</p>
-            </div>
-        </div>`;
-
-    const noCustomMealsAlert = `
-        <div class="col-12">
-            <div class="alert alert-info" role="alert">
-                <p class="mb-0">You have not created any custom meals, or none match your search.</p>
-            </div>
-        </div>`;
-
     if (!token || !userID) {
         console.warn('User not authenticated.');
-        availableMealsContainer.innerHTML = loginRequiredAlert;
-        customMenuContainer.innerHTML = loginRequiredAlert;
+        // Mostra un alert per chiedere il login
+        const loginAlert = `
+            <div class="col-12 text-center">
+                <div class="alert alert-info" role="alert">
+                    <h4 class="alert-heading">Login Required</h4>
+                    <p>Please log in to view and manage meals.</p>
+                    <a href="../pages/login.html" class="btn btn-primary">Go to Login</a>
+                </div>
+            </div>`;
+        availableMealsContainer.innerHTML = loginAlert;
+        customMenuContainer.innerHTML = loginAlert;
     } else {
         fetchAvailableMeals();
         fetchCustomMeals();
@@ -72,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchAvailableMeals(searchTerm = '') {
         if (!token) return;
 
+        // Costruisce l'URL con o senza filtro di ricerca (searchTerm)
         let url = searchTerm
             ? `${API_BASE_URL}/meals/search?name=${encodeURIComponent(searchTerm)}&custom=false`
             : `${API_BASE_URL}/meals?custom=false`;
@@ -85,7 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (res.status === 401) {
                     localStorage.removeItem('jwtToken');
                     localStorage.removeItem('userID');
-                    availableMealsContainer.innerHTML = sessionExpiredAlert;
+                    availableMealsContainer.innerHTML = `
+                        <div class="col-12 text-center">
+                            <div class="alert alert-warning" role="alert">
+                                <h4 class="alert-heading">Session Expired</h4>
+                                <p>Your session has expired. Please log in again.</p>
+                                <a href="../pages/login.html" class="btn btn-primary">Go to Login</a>
+                            </div>
+                        </div>`;
                     return;
                 }
                 if (res.status === 404) {
@@ -97,11 +74,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             availableMealsData = await res.json();
-            renderAvailableMeals(); // Update UI
+            renderAvailableMeals(); // Aggiorna l'interfaccia
 
         } catch (error) {
             console.error(error);
-            availableMealsContainer.innerHTML = genericErrorAlert(error.message);
+            availableMealsContainer.innerHTML = `
+                <div class="col-12 text-center">
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                </div>`;
         }
     }
 
@@ -121,7 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (res.status === 401) {
                     localStorage.removeItem('jwtToken');
                     localStorage.removeItem('userID');
-                    customMenuContainer.innerHTML = sessionExpiredAlert;
+                    customMenuContainer.innerHTML = `
+                        <div class="col-12 text-center">
+                            <div class="alert alert-warning" role="alert">
+                                <h4 class="alert-heading">Session Expired</h4>
+                                <p>Your session has expired. Please log in again.</p>
+                                <a href="../pages/login.html" class="btn btn-primary">Go to Login</a>
+                            </div>
+                        </div>`;
                     return;
                 }
                 if (res.status === 404) {
@@ -137,14 +127,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error(error);
-            customMenuContainer.innerHTML = genericErrorAlert(error.message);
+            customMenuContainer.innerHTML = `
+                <div class="col-12 text-center">
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                </div>`;
         }
     }
 
     function renderAvailableMeals() {
         availableMealsContainer.innerHTML = '';
         if (availableMealsData.length === 0) {
-            availableMealsContainer.innerHTML = noAvailableMealsAlert;
+            availableMealsContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        <p class="mb-0">No meals found in the database matching your search.</p>
+                    </div>
+                </div>`;
             return;
         }
         availableMealsData.forEach(meal => {
@@ -156,7 +157,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCustomMeals() {
         customMenuContainer.innerHTML = '';
         if (customMealsData.length === 0) {
-            customMenuContainer.innerHTML = noCustomMealsAlert;
+            customMenuContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        <p class="mb-0">You have not created any custom meals, or none match your search.</p>
+                    </div>
+                </div>`;
             return;
         }
         customMealsData.forEach(meal => {
@@ -165,12 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /**
-     * Creates a meal card element based on the style of searchRestaurant.js
-     * @param {object} meal - The meal data object
-     * @param {boolean} isCustom - True if it's a custom meal (for styling)
-     * @returns {HTMLElement} The card element
-     */
     function renderMealCard(meal, isCustom) {
         const card = document.createElement('div');
         card.className = 'card meal-card-item h-100 shadow-sm';
@@ -179,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const defaultImage = '../images/logo.png';
         const imageSrc = meal.strMealThumb || defaultImage;
 
+        // Info aggiuntive solo per i piatti custom
         let customInfo = '';
         if (isCustom) {
             const price = parseFloat(meal.price).toFixed(2);
@@ -212,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </p>
                 ${customInfo}
                 
-                <div class="flex-grow-1"></div> 
+                <div class="flex-grow-1"></div> <!-- Spacer per allineare il footer in basso -->
             </div>
 
             <div class="card-footer text-center">
@@ -222,7 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return card;
     }
 
-    function openModal() { modal.style.display = 'block'; }
     function closeModal() {
         modal.style.display = 'none';
         form.reset();
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('meal-available').checked = true;
         modalTitle.textContent = 'Create Custom Meal';
         submitBtn.textContent = 'Create Meal';
-        openModal();
+        modal.style.display = 'block';
     }
 
     function openModalForAdd(meal) {
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         modalTitle.textContent = 'Add to My Menu';
         submitBtn.textContent = 'Add Meal';
-        openModal();
+        modal.style.display = 'block';
     }
 
     function openModalForEdit(meal) {
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         modalTitle.textContent = 'Edit Meal';
         submitBtn.textContent = 'Update Meal';
-        openModal();
+        modal.style.display = 'block';
     }
 
     async function handleFormSubmit(e) {
@@ -282,6 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         if (!isEditing && form.dataset.baseMealId) {
+            // Genera un ID custom basato sul piatto originale
             mealData.idMeal = `${form.dataset.baseMealId}_custom_${Date.now()}`;
             mealData.strMealThumb = form.dataset.baseMealThumb;
         }
@@ -404,7 +405,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (meal) openModalForAdd(meal);
         }
     });
-
 
     customMenuContainer.addEventListener('click', (e) => {
         const card = e.target.closest('.meal-card-item');

@@ -10,6 +10,7 @@ let searchInput;
 
 const getRestaurant = async () => {
     try {
+        //Qui controlla che l'utente sia loggato
         const token = localStorage.getItem('jwtToken');
 
         if (!token) {
@@ -54,7 +55,7 @@ const getRestaurant = async () => {
         }
 
         allRestaurants = await response.json();
-        console.log('Restaurants data: ', allRestaurants);
+        console.log('Restaurants data: ', allRestaurants); // utile per debugging
 
         initializeSearch();
 

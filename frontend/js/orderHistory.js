@@ -22,7 +22,7 @@ const loadOrders = async () => {
             }
         });
 
-        if (!response.ok){
+        if (!response.ok) {
             throw new Error('Failed to fetch orders');
         }
 
@@ -31,7 +31,8 @@ const loadOrders = async () => {
 
     } catch (error) {
         console.error('Error:', error);
-        showError(error.message);
+        document.getElementById('active-orders-container').innerHTML =
+            `<div class="col-12 text-center text-danger">Error: ${error.message}</div>`;
     }
 }
 
@@ -48,6 +49,7 @@ const renderOrders = (orders) => {
         return;
     }
 
+    // Ordina per data più recente
     orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     const activeOrders = orders.filter(o => o.status !== 'delivered');
@@ -74,6 +76,7 @@ const createOrderCard = (order, isActive) => {
     const col = document.createElement('div');
     col.className = 'col-md-6 col-lg-6';
 
+    // Formatta la data in italiano
     const date = new Date(order.createdAt).toLocaleDateString('it-IT', {
         day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
@@ -81,7 +84,7 @@ const createOrderCard = (order, isActive) => {
     const restaurantName = order.restaurant?.name || 'Unknown Restaurant';
     const statusBadge = getStatusBadge(order.status);
 
-
+    // Mostra il pulsante solo per ordini in consegna
     let actionButton = '';
     if (isActive && order.status === 'delivering') {
         actionButton = `
@@ -89,8 +92,6 @@ const createOrderCard = (order, isActive) => {
                 <i class="fas fa-check-circle me-2"></i>Confirm Delivery
             </button>
         `;
-    } else if (isActive && order.deliveryType === 'pickup' && order.status === 'preparing') {
-
     }
 
     const itemsList = order.items.map(item => `
@@ -183,9 +184,4 @@ const confirmDelivery = async (orderId) => {
             duration: 3000
         }).showToast();
     }
-}
-
-const showError = (message) => {
-    document.getElementById('active-orders-container').innerHTML =
-        `<div class="col-12 text-center text-danger">Error: ${message}</div>`;
 }

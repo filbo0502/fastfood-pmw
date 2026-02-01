@@ -28,6 +28,7 @@ async function handleLogin(event) {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
+    // Validazione email base prima di inviare al server
     if (!validateEmail(email)) {
         showGenericError('Invalid email format. Please enter a valid email address.');
         return;
@@ -50,8 +51,10 @@ async function handleLogin(event) {
         });
 
         const data = await response.json();
+        // console.log('Risposta login:', data); // debug
 
         if (response.ok) {
+            // Salva il token di autenticazione
             localStorage.setItem('jwtToken', data.token);
             if (data.user && data.user.id) {
                 localStorage.setItem('userID', data.user.id);
@@ -73,6 +76,7 @@ async function handleLogin(event) {
                 }
             }).showToast();
 
+            // Aspetta un po' prima del redirect così l'utente vede il messaggio di successo
             setTimeout(() => {
                 window.location.href = '../index.html';
             }, 3000);

@@ -19,9 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const restaurantFields = document.getElementById('restaurantFields');
     if (userTypeSelect && restaurantFields) {
         const restaurantInputs = restaurantFields.querySelectorAll('input');
+        // Mostra/nascondi campi ristorante in base alla selezione del tipo utente
         userTypeSelect.addEventListener('change', (e) => {
             const isRestaurateur = e.target.value === 'restaurateur';
             restaurantFields.style.display = isRestaurateur ? 'block' : 'none';
+            // Rende i campi obbligatori solo per i ristoratori
             restaurantInputs.forEach(input => {
                 input.required = isRestaurateur;
             });
@@ -89,6 +91,7 @@ async function handleRegistration(event) {
         return;
     }
 
+    // Costruisce i dati del form - usa FormData per supportare l'upload di file
     const formData = new FormData();
     formData.append('name', name);
     formData.append('surname', surname);
@@ -122,6 +125,7 @@ async function handleRegistration(event) {
         if (restaurantImageInput && restaurantImageInput.files.length > 0) {
             formData.append('restaurantImage', restaurantImageInput.files[0]);
         }
+        // TODO: magari aggiungere anteprima immagine prima dell'upload?
     }
 
     try {
@@ -147,7 +151,7 @@ async function handleRegistration(event) {
             } else {
                 showValidationError(data.message || 'The data provided is invalid.');
             }
-            enableButton(); 
+            enableButton();
         }
     } catch (error) {
         console.error('Registration error', error);

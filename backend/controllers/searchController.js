@@ -3,7 +3,7 @@ import Restaurant from '../models/Restaurant.js';
 import Meal from '../models/Meal.js';
 
 /**
- * @desc Search restaurants by location and name
+ * @desc Cerca ristoranti per città e nome
  * @route GET /api/search/restaurants
  * @access Public
  */
@@ -32,7 +32,7 @@ export const searchRestaurants = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc Search meals by name, type, and price
+ * @desc Cerca piatti per nome, tipo e prezzo
  * @route GET /api/search/meals
  * @access Public
  */
@@ -93,7 +93,7 @@ export const searchMeals = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc Get meal categories
+ * @desc Ottiene le categorie dei piatti
  * @route GET /api/search/categories
  * @access Public
  */

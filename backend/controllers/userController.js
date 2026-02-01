@@ -4,11 +4,10 @@ import bcrypt from 'bcryptjs';
 import asyncHandler from 'express-async-handler';
 
 /**
- * @desc Get user
+ * @desc Ottiene un utente
  * @route GET /api/user
  * @access Public
  */
-
 export const getUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -18,11 +17,10 @@ export const getUser = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc Update user
+ * @desc Aggiorna un utente
  * @route PUT /api/user
  * @access Private
  */
-
 export const updateUser = asyncHandler(async (req, res) => {
     const updateFields = {
         name: req.body.name,
@@ -48,11 +46,10 @@ export const updateUser = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc Delete user
+ * @desc  Elimina un utente
  * @route DELETE /api/user
  * @access Private
  */
-
 export const deleteUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -63,16 +60,15 @@ export const deleteUser = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc Update password
+ * @desc Aggiorna la password di un utente
  * @route PUT /api/user/password
  * @access Private
  */
-
 export const updatePassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword, confirmNewPassword } = req.body;
 
     if (newPassword !== confirmNewPassword) {
-        return res.status(400).json({ message: 'Passord do not match' });
+        return res.status(400).json({ message: 'Passwords do not match' });
     }
 
     const user = await User.findById(req.params.id);

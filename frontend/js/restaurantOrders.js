@@ -70,6 +70,7 @@ const createOrderCard = (order) => {
     const col = document.createElement('div');
     col.className = 'col-md-6 col-lg-4';
 
+    // Formattazione della data in italiano
     const date = new Date(order.createdAt).toLocaleDateString('it-IT', {
         day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
     });

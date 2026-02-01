@@ -55,6 +55,8 @@ const UserSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Hash della password prima di salvare nel database
+// Esegue l'hash solo se la password è stata modificata (importante per gli aggiornamenti)
 UserSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
@@ -63,6 +65,8 @@ UserSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
 });
 
+// Quando un ristoratore viene eliminato, elimina anche il suo ristorante
+// Questo previene ristoranti orfani nel database
 UserSchema.pre('findOneAndDelete', async function (next) {
     try {
         const user = await this.model.findOne(this.getQuery());

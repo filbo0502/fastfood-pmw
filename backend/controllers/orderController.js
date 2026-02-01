@@ -4,7 +4,7 @@ import asyncHandler from 'express-async-handler';
 import { calculateWaitTime } from '../utils/waitTime.js';
 
 /**
- * @desc Get all orders
+ * @desc Ottiene tutti gli ordini
  * @route GET /api/orders
  * @access Private
  */
@@ -17,11 +17,10 @@ export const getAllOrders = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc Create new order
+ * @desc Crea un nuovo ordine
  * @route POST /api/orders
  * @access Private
  */
-
 export const createOrder = asyncHandler(async (req, res) => {
     const { restaurantId, items, deliveryType, deliveryAddress } = req.body;
 
@@ -78,6 +77,11 @@ export const createOrder = asyncHandler(async (req, res) => {
     });
 });
 
+/**
+ * @desc   Ottiene gli ordini di un utente
+ * @route  GET /api/orders/:id
+ * @access Private
+ */
 export const getUserOrders = asyncHandler(async (req, res) => {
     const customerId = req.user.id;
     const orders = await Order.find({ customer: customerId })
@@ -88,11 +92,10 @@ export const getUserOrders = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc   Update an order status
+ * @desc   Modifica lo stato di un ordine
  * @route  PUT /api/orders/:id/status
  * @access Private
  */
-
 export const updateOrderStatus = asyncHandler(async (req, res) => {
     const { status } = req.body;
     const orderId = req.params.id;
@@ -144,11 +147,10 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc delete a single order
+ * @desc Elimina un ordine
  * @route DELETE /api/orders/:id
  * @access Private
  */
-
 export const deleteOrder = asyncHandler(async (req, res) => {
     const order = await Order.findByIdAndDelete(req.params.id);
     if (!order) {

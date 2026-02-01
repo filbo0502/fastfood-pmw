@@ -31,8 +31,8 @@ const fileFilter = (req, file, cb) => {
 };
 
 /**
- * @desc    Upload an image with multer library
- * @route   POST /api/auth/login
+ * @desc    Carica un'immagine con la libreria multer
+ * @route   POST /api/auth/register
  * @access  Public
  */
 export const upload = multer({
@@ -62,8 +62,10 @@ export const register = asyncHandler(async (req, res) => {
 
     const userExists = await User.findOne({ email });
     if (userExists) {
-        return res.status(409).json({ message: "Un utente con questa email è già registrato." });
+        return res.status(409).json({ message: "User with this email already exists." });
     }
+
+    // Crea nuovo utente - la password verrà hashata automaticamente dal pre-save fatto in User.js
 
     const user = new User({
         name,
@@ -110,6 +112,7 @@ export const register = asyncHandler(async (req, res) => {
             await user.save();
         }
 
+        // Il token scade dopo 2 ore
         const tokenDuration = 2 * 3600;
         const token = jwt.sign({ id: user._id, userType: user.userType }, process.env.JWT_SECRET, { expiresIn: tokenDuration });
 
@@ -128,10 +131,12 @@ export const register = asyncHandler(async (req, res) => {
     } catch (error) {
         console.error("Error during the registration:", error);
 
+        // Se c'è errore, rimuove l'utente appena creato
         if (user && user._id) {
             await User.findByIdAndDelete(user._id);
         }
 
+        // Rimuove anche il file caricato se esiste
         if (req.file && fs.existsSync(req.file.path)) {
             fs.unlinkSync(req.file.path);
         }
@@ -168,6 +173,7 @@ export const login = asyncHandler(async (req, res) => {
     const tokenDuration = 2 * 3600;
     const token = jwt.sign({ id: user._id, userType: user.userType }, process.env.JWT_SECRET, { expiresIn: tokenDuration });
 
+    // Per i ristoratori, si deve inviare anche l'ID del ristorante
     let restaurantId = null;
     if (user.userType === 'restaurateur') {
         const restaurant = await Restaurant.findOne({ owner: user._id });
