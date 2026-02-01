@@ -23,13 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (cart.length === 0) {
         alert('Your cart is empty.');
-        window.location.href = 'searchRestaurant.html';
+        window.location.href = './searchRestaurant.html';
         return;
     }
 
     if (!restaurantId) {
         alert('Restaurant information is missing.');
-        window.location.href = 'searchRestaurant.html';
+        window.location.href = './searchRestaurant.html';
         return;
     }
  

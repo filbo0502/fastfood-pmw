@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js",
+    "swagger": "node backend/swagger.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "import-data": "node backend/utils/importMeals.js -i",
     "delete-data": "node backend/utils/importMeals.js -d"
