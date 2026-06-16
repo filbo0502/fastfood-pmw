@@ -9,38 +9,9 @@
     <link rel="icon" type="image/x-icon" href="../images/logo.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link href="../css/styles.css" rel="stylesheet">
 
-    <style>
-        .profile-tabs .nav-link {
-            color: var(--primary-color);
-            border: 1px solid transparent;
-        }
-
-        .profile-tabs .nav-link.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .profile-tabs .nav-link:hover {
-            color: var(--secondary-color);
-        }
-
-        .form-floating label {
-            color: #6c757d;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
-        }
-    </style>
 </head>
 
 <body>
@@ -72,12 +43,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="./searchDish.html">Dishes</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./profile.html">Profile</a>
-                    </li>
                     <li class="nav-item cart-link d-none">
                         <a class="nav-link" href="./order.html">
                             <i class="fas fa-shopping-cart"></i> Cart
@@ -105,38 +70,34 @@
                         Update your personal details, change your address, or manage your account security.
                     </p>
 
-                    <ul class="nav nav-pills profile-tabs nav-fill mb-4" id="profileTab" role="tablist">
-                        <li class="nav-item" role="presentation">
+                    <ul class="nav nav-pills profile-tabs nav-fill mb-4" id="profileTab">
+                        <li class="nav-item">
                             <button class="nav-link active" id="details-tab" data-bs-toggle="tab"
-                                data-bs-target="#details-pane" type="button" role="tab" aria-controls="details-pane"
-                                aria-selected="true">
+                                data-bs-target="#details-pane" type="button">
                                 <i class="fas fa-user-edit me-2"></i>Profile Details
                             </button>
                         </li>
-                        <li class="nav-item" role="presentation">
+                        <li class="nav-item">
                             <button class="nav-link" id="address-tab" data-bs-toggle="tab"
-                                data-bs-target="#address-pane" type="button" role="tab" aria-controls="address-pane"
-                                aria-selected="false">
+                                data-bs-target="#address-pane" type="button">
                                 <i class="fas fa-map-marker-alt me-2"></i>Address
                             </button>
                         </li>
-                        <li class="nav-item" role="presentation">
+                        <li class="nav-item">
                             <button class="nav-link" id="payment-tab" data-bs-toggle="tab"
-                                data-bs-target="#payment-pane" type="button" role="tab" aria-controls="payment-pane"
-                                aria-selected="false">
+                                data-bs-target="#payment-pane" type="button">
                                 <i class="fas fa-credit-card me-2"></i>Payment Info
                             </button>
                         </li>
-                        <li class="nav-item" role="presentation">
+                        <li class="nav-item">
                             <button class="nav-link" id="security-tab" data-bs-toggle="tab"
-                                data-bs-target="#security-pane" type="button" role="tab" aria-controls="security-pane"
-                                aria-selected="false">
+                                data-bs-target="#security-pane" type="button">
                                 <i class="fas fa-key me-2"></i>Change Password
                             </button>
                         </li>
-                        <li class="nav-item" role="presentation">
+                        <li class="nav-item">
                             <button class="nav-link" id="delete-tab" data-bs-toggle="tab" data-bs-target="#delete-pane"
-                                type="button" role="tab" aria-controls="delete-pane" aria-selected="false">
+                                type="button">
                                 <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
                             </button>
                         </li>
@@ -144,8 +105,7 @@
 
                     <div class="tab-content" id="profileTabContent">
 
-                        <div class="tab-pane fade show active" id="details-pane" role="tabpanel"
-                            aria-labelledby="details-tab">
+                        <div class="tab-pane fade show active" id="details-pane">
                             <div class="card service-card p-4 p-md-5">
                                 <form id="profile-details-form">
                                     <h3 class="service-title text-start mb-4">Personal Information</h3>
@@ -170,38 +130,60 @@
                                             placeholder="name@example.com" value="john.doe@example.com" required>
                                         <label for="email">Email Address</label>
                                     </div>
-                                    <div class="form-floating mb-3">
+                                    <div class="form-floating mb-4">
                                         <input type="tel" class="form-control" id="phone" placeholder="+1234567890"
                                             value="+1 555 123 4567">
-                                        <label for="phone">Phone Number (Optional)</label>
+                                        <label for="phone">Phone Number</label>
                                     </div>
-                                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Save
+                                    
+                                    <hr class="mb-4">
+                                    <h4 class="service-title text-start mb-3" style="font-size: 1.2rem;">Account Preferences</h4>
+                                    
+                                    <div class="mb-3">
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="wantsSpecialOffers" value="true">
+                                            <label class="form-check-label text-muted" for="wantsSpecialOffers">
+                                                I want to receive special offers and updates
+                                            </label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <select class="form-select" id="favoriteCategory">
+                                                <option value="">No preference</option>
+                                                <option value="Burger">Burger</option>
+                                                <option value="Pizza">Pizza</option>
+                                                <option value="Chicken">Chicken</option>
+                                                <option value="Vegan">Vegan</option>
+                                                <option value="Dessert">Dessert</option>
+                                            </select>
+                                            <label for="favoriteCategory">Favorite Food Category</label>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">Save
                                         Changes</button>
                                 </form>
                             </div>
                         </div>
 
-                        <div class="tab-pane fade" id="address-pane" role="tabpanel" aria-labelledby="address-tab">
+                        <div class="tab-pane fade" id="address-pane">
                             <div class="card service-card p-4 p-md-5">
                                 <form id="address-form">
                                     <h3 class="service-title text-start mb-4">Delivery Address</h3>
                                     <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="street" placeholder="123 Main St"
-                                            value="123 Main St">
+                                        <input type="text" class="form-control" id="street" placeholder="Street">
                                         <label for="street">Street</label>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-8">
                                             <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="city" placeholder="New York"
-                                                    value="New York">
+                                                <input type="text" class="form-control" id="city" placeholder="City">
                                                 <label for="city">City</label>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="zipCode" placeholder="10001"
-                                                    value="10001">
+                                                <input type="text" class="form-control" id="zipCode"
+                                                    placeholder="Zip Code">
                                                 <label for="zipCode">Zip Code</label>
                                             </div>
                                         </div>
@@ -212,7 +194,7 @@
                             </div>
                         </div>
 
-                        <div class="tab-pane fade" id="payment-pane" role="tabpanel" aria-labelledby="payment-tab">
+                        <div class="tab-pane fade" id="payment-pane">
                             <div class="card service-card p-4 p-md-5">
                                 <h3 class="service-title text-start mb-4">Payment Information</h3>
                                 <div id="payment-display-view" class="d-none">
@@ -284,7 +266,7 @@
                             </div>
                         </div>
 
-                        <div class="tab-pane fade" id="security-pane" role="tabpanel" aria-labelledby="security-tab">
+                        <div class="tab-pane fade" id="security-pane">
                             <div class="card service-card p-4 p-md-5">
                                 <form id="password-form">
                                     <h3 class="service-title text-start mb-4">Change Password</h3>
@@ -311,7 +293,7 @@
                             </div>
                         </div>
 
-                        <div class="tab-pane fade" id="delete-pane" role="tabpanel" aria-labelledby="delete-tab">
+                        <div class="tab-pane fade" id="delete-pane">
                             <div class="card service-card p-4 p-md-5 border-danger">
                                 <h3 class="service-title text-start mb-3 text-danger"><i
                                         class="fas fa-exclamation-triangle me-2"></i>Delete Account</h3>
@@ -377,42 +359,31 @@
         </div>
     </footer>
 
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Are you absolutely sure?</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel"><i class="fas fa-exclamation-triangle me-2"></i>Delete
+                        Account?</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>This action cannot be undone. This will permanently delete your account.</p>
-                    <p>Please type <strong>DELETE</strong> to confirm.</p>
-                    <input type="text" class="form-control" id="deleteConfirmInput" placeholder="DELETE">
+                    <p class="mb-2"><strong>This action cannot be undone.</strong></p>
+                    <p class="mb-0">Are you sure you want to permanently delete your account and all associated data?
+                    </p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>Delete Account</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete</button>
                 </div>
             </div>
         </div>
     </div>
 
 
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        const deleteConfirmInput = document.getElementById('deleteConfirmInput');
-        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-
-        deleteConfirmInput.addEventListener('input', () => {
-            if (deleteConfirmInput.value === 'DELETE') {
-                confirmDeleteBtn.disabled = false;
-            } else {
-                confirmDeleteBtn.disabled = true;
-            }
-        });
-
-    </script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script type="module" src="../js/profile.js"></script>
     <script type="module" src="../js/auth.js"></script>

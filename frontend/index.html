@@ -39,9 +39,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="./pages/searchDish.html">Dishes</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
-                    </li>
                     <li class="nav-item cart-link d-none">
                         <a class="nav-link" href="./pages/order.html">
                             <i class="fas fa-shopping-cart"></i> Cart
@@ -70,27 +67,20 @@
                         fast.
                     </p>
                     <div class="d-flex gap-3 flex-wrap">
-                                <a href="./pages/searchRestaurant.html" class="btn btn-primary btn-lg"
-                            role="button">Order Now</a>
-                                <a href="./pages/about.html" class="btn btn-outline-secondary btn-lg"
-                            role="button">Learn More</a>
+                        <a href="./pages/searchRestaurant.html" class="btn btn-primary btn-lg">Order
+                            Now</a>
+                        <a href="./pages/about.html" class="btn btn-outline-secondary btn-lg">Learn
+                            More</a>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="food-illustration text-center">
                         <div class="delivery-icon">
                             <i class="fas fa-shopping-cart"></i>
-                            <div style="position: absolute; top: -20px; right: -20px;">
-                                <i class="fas fa-pizza-slice"
-                                    style="font-size: 3rem; color: var(--secondary-color);"></i>
-                            </div>
-                            <div style="position: absolute; top: 20px; left: -30px;">
-                                <i class="fas fa-utensils"
-                                    style="font-size: 2.5rem; color: var(--secondary-color);"></i>
-                            </div>
                         </div>
                         <div style="margin-top: 1rem;">
-                            <h3 style="color: var(--primary-color); font-weight: bold;">CodeBite</h3>
+                            <h3 style="color: #E67E22; font-weight: bold; font-family: 'Poppins', sans-serif;">CodeBite
+                            </h3>
                         </div>
                     </div>
                 </div>
@@ -183,30 +173,6 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script>
-
-        document.querySelectorAll('.service-card').forEach(card => {
-            card.addEventListener('mouseenter', function () {
-                this.style.transform = 'translateY(-10px) scale(1.02)';
-            });
-
-            card.addEventListener('mouseleave', function () {
-                this.style.transform = 'translateY(0) scale(1)';
-            });
-        });
-
-        window.addEventListener('scroll', function () {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-                navbar.style.backdropFilter = 'blur(10px)';
-            } else {
-                navbar.style.backgroundColor = 'white';
-                navbar.style.backdropFilter = 'none';
-            }
-        });
-
-    </script>
     <script type="module" src="./js/auth.js"></script>
 
 </body>

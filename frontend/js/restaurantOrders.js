@@ -1,49 +1,37 @@
-import CONFIG from "./config.js";
-const API_BASE_URL = CONFIG.API_BASE_URL;
+import { showToast, formatStatus } from "./utils.js";
+import { requireRestaurateurAuth } from "./auth.js";
+
+const token = localStorage.getItem('jwtToken');
 
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
+    requireRestaurateurAuth();
     loadRestaurantOrders();
 });
 
-const checkAuth = () => {
-    const token = localStorage.getItem('jwtToken');
-    const userType = localStorage.getItem('userType');
-
-    if (!token || userType !== 'restaurateur') {
-        window.location.href = './login.html';
-        return;
-    }
-}
-
 window.loadRestaurantOrders = async () => {
     try {
-        const token = localStorage.getItem('jwtToken');
-        const userId = localStorage.getItem('userID');
-        if (!userId) throw new Error("User ID not found");
-
-        const resResponse = await fetch(`${API_BASE_URL}/restaurants`, {
+        const response = await fetch(`/api/restaurants/my-restaurant`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const restaurants = await resResponse.json();
-        const myRestaurant = restaurants.find(r => r.owner === userId);
 
-        if (!myRestaurant) {
-            document.getElementById('orders-container').innerHTML = '<div class="alert alert-warning">You do not have a restaurant associated yet.</div>';
+        if (!response.ok) {
+            document.getElementById('active-orders-container').innerHTML = '<div class="alert alert-warning">You do not have a restaurant associated yet.</div>';
+            document.getElementById('delivered-orders-container').innerHTML = '';
             return;
         }
 
+        const myRestaurant = await response.json();
         const restaurantId = myRestaurant._id;
 
-        const response = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}/orders`, {
+        const response2 = await fetch(`/api/restaurants/${restaurantId}/orders`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
 
-        if (!response.ok) throw new Error('Failed to fetch orders');
+        if (!response2.ok) throw new Error('Failed to fetch orders');
 
-        const orders = await response.json();
+        const orders = await response2.json();
         renderOrders(orders);
 
     } catch (error) {
@@ -53,20 +41,39 @@ window.loadRestaurantOrders = async () => {
 }
 
 const renderOrders = (orders) => {
-    const container = document.getElementById('orders-container');
-    container.innerHTML = '';
+    const activeContainer = document.getElementById('active-orders-container');
+    const deliveredContainer = document.getElementById('delivered-orders-container');
+
+    activeContainer.innerHTML = '';
+    deliveredContainer.innerHTML = '';
 
     if (orders.length === 0) {
-        container.innerHTML = '<div class="col-12 text-center text-muted">No incoming orders.</div>';
+        activeContainer.innerHTML = '<div class="col-12 text-center text-muted">No orders found.</div>';
+        deliveredContainer.innerHTML = '<div class="col-12 text-center text-muted">No delivered orders.</div>';
         return;
     }
 
-    orders.forEach(order => {
-        container.appendChild(createOrderCard(order));
-    });
+    const activeOrders = orders.filter(o => o.status !== 'delivered');
+    const deliveredOrders = orders.filter(o => o.status === 'delivered');
+
+    if (activeOrders.length === 0) {
+        activeContainer.innerHTML = '<div class="col-12 text-center text-muted py-4">No active orders</div>';
+    } else {
+        activeOrders.forEach(order => {
+            activeContainer.appendChild(createOrderCard(order, true));
+        });
+    }
+
+    if (deliveredOrders.length === 0) {
+        deliveredContainer.innerHTML = '<div class="col-12 text-center text-muted py-4">No delivered orders</div>';
+    } else {
+        deliveredOrders.forEach(order => {
+            deliveredContainer.appendChild(createOrderCard(order, false));
+        });
+    }
 }
 
-const createOrderCard = (order) => {
+const createOrderCard = (order, isActive = true) => {
     const col = document.createElement('div');
     col.className = 'col-md-6 col-lg-4';
 
@@ -82,8 +89,12 @@ const createOrderCard = (order) => {
         </li>
     `).join('');
 
-    const statusOptions = ['ordered', 'preparing', 'delivering', 'delivered']
-        .map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status.charAt(0).toUpperCase() + status.slice(1)}</option>`)
+    let availableStatuses = [order.status];
+    if (order.status === 'ordered') availableStatuses.push('preparing');
+    if (order.status === 'preparing') availableStatuses.push('delivered');
+
+    const statusOptions = availableStatuses
+        .map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${formatStatus(status)}</option>`)
         .join('');
 
     col.innerHTML = `
@@ -103,13 +114,8 @@ const createOrderCard = (order) => {
                         <span>€${order.totalAmount.toFixed(2)}</span>
                    </div>
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label small text-muted">Delivery Type</label>
-                    <div><span class="badge bg-secondary">${order.deliveryType}</span></div>
-                     ${order.deliveryType === 'delivery' && order.deliveryAddress ? `<small class="text-muted d-block mt-1"><i class="fas fa-map-marker-alt me-1"></i>${order.deliveryAddress}</small>` : ''}
-                </div>
 
+                ${isActive ? `
                 <div class="alert alert-light border p-2 mb-0">
                     <label class="form-label small fw-bold">Update Status:</label>
                     <div class="d-flex gap-2">
@@ -121,23 +127,31 @@ const createOrderCard = (order) => {
                         </button>
                     </div>
                 </div>
+                ` : `
+                <div class="alert alert-success border p-2 mb-0">
+                    <i class="fas fa-check-circle me-2"></i><strong>Status:</strong> <span class="badge bg-success">Delivered</span>
+                </div>
+                `}
             </div>
         </div>
     `;
 
-    const btn = col.querySelector('.update-status-btn');
-    btn.addEventListener('click', () => {
-        const select = col.querySelector(`.status-select`);
-        updateStatus(order._id, select.value);
-    });
+    if (isActive) {
+        const btn = col.querySelector('.update-status-btn');
+        btn.addEventListener('click', () => {
+            const select = col.querySelector(`.status-select`);
+            updateStatus(order._id, select.value);
+        });
+    }
 
     return col;
 }
 
+
+
 const updateStatus = async (orderId, newStatus) => {
     try {
-        const token = localStorage.getItem('jwtToken');
-        const response = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
+        const response = await fetch(`/api/orders/${orderId}/status`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -151,23 +165,17 @@ const updateStatus = async (orderId, newStatus) => {
             throw new Error(data.message || 'Error updating status');
         }
 
-        Toastify({
-            text: "Status updated successfully!",
-            backgroundColor: "#28a745",
-            duration: 3000
-        }).showToast();
+        showToast("Status updated successfully!", "success");
+        loadRestaurantOrders();
 
     } catch (error) {
         console.error('Error:', error);
-        Toastify({
-            text: error.message,
-            backgroundColor: "#dc3545",
-            duration: 3000
-        }).showToast();
+        showToast(error.message, "danger");
     }
 }
 
 const showError = (message) => {
-    document.getElementById('orders-container').innerHTML =
-        `<div class="col-12 text-center text-danger">Error: ${message}</div>`;
+    const errorHtml = `<div class="col-12 text-center text-danger">Error: ${message}</div>`;
+    document.getElementById('active-orders-container').innerHTML = errorHtml;
+    document.getElementById('delivered-orders-container').innerHTML = errorHtml;
 }

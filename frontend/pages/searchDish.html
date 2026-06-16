@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="../css/styles.css" rel="stylesheet">
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
@@ -44,7 +46,8 @@
                 </ul>
                 <a href="../pages/login.html" class="btn login-btn btn-primary">Log In</a>
                 <a href="./profile.html" class="btn my-profile-btn btn-outline-primary me-2 d-none">My Profile</a>
-                <a href="./restaurantDashboard.html" class="btn my-restaurant-btn btn-outline-primary me-2 d-none">My Restaurant</a>
+                <a href="./restaurantDashboard.html" class="btn my-restaurant-btn btn-outline-primary me-2 d-none">My
+                    Restaurant</a>
                 <a href="./orderHistory.html" class="btn my-orders-btn btn-outline-primary me-2 d-none">My Orders</a>
                 <a href="#" class="btn logout-btn btn-primary d-none">Log Out</a>
             </div>
@@ -54,19 +57,36 @@
     <section id="search" class="main-section" style="margin-top: 80px;">
         <div class="search-container">
             <h4 class="mb-4 text-center">Find Your Favorite Dish</h4>
-            
-            <div class="position-relative mb-4">
-                <input type="text" 
-                       class="form-control search-input" 
-                       id="dishSearchInput"
-                       placeholder="Search for a dish (e.g., Pizza, Pasta)..."
-                       autocomplete="off">
-                <i class="fa-solid fa-utensils position-absolute top-50 end-0 translate-middle-y me-3"></i>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="dishNameInput"
+                            placeholder="Dish name..." autocomplete="off">
+                        <i class="fa-solid fa-utensils position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="dishCategorySelect">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" class="form-control" id="dishMinPrice" placeholder="Min €" min="0" step="0.5">
+                </div>
+                <div class="col-md-2">
+                    <input type="number" class="form-control" id="dishMaxPrice" placeholder="Max €" min="0" step="0.5">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100" id="searchDishBtn">
+                        <i class="fas fa-search me-1"></i> Search
+                    </button>
+                </div>
             </div>
-            
+
             <div class="text-center mb-3">
                 <small class="text-muted" id="searchDishResultsInfo">
-                    Enter a dish name to start searching
+                    Use the filters above to search for dishes
                 </small>
             </div>
         </div>
@@ -79,11 +99,54 @@
         </div>
     </section>
 
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="logo-icon me-2">
+                            <i class="fa-solid fa-burger text-white"></i>
+                        </div>
+                        <h5 class="mb-0">CodeBite</h5>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <h5>Useful Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="../index.html" class="text-white-50 text-decoration-none">Home</a></li>
+                        <li><a href="./login.html" class="text-white-50 text-decoration-none">Login</a></li>
+                        <li><a href="./registration.html" class="text-white-50 text-decoration-none">Register</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-12 text-lg-end">
+                    <h5>Powered By</h5>
+                    <div class="d-flex gap-3 justify-content-lg-end">
+                        <img src="../images/nodejs.png" alt="Node.js Logo" style="height: 30px;">
+                        <img src="../images/express.png" alt="Express Logo" style="height: 30px;">
+                        <img src="../images/mongo.png" alt="MongoDB Logo" style="height: 50px;">
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-white-50 mb-0">&copy; 2025 Fast Food. All rights reserved</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.css">
-    
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.css">
+
     <script type="module" src="../js/auth.js"></script>
     <script type="module" src="../js/searchDish.js"></script>
 </body>
+
 </html>

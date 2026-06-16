@@ -3,12 +3,12 @@ import swaggerAutogen from 'swagger-autogen';
 const document = {
     info: {
         title: 'FastFood PMW API',
-        description: 'API REST per la piattaforma FastFood PMW - Sistema di gestione ordini per ristoranti fast food',
+        description: 'Documentazione API REST per il progetto FastFood PMW 2025/2026 (CodeBite)',
         version: '1.0.0'
     },
-    host: 'localhost:3001',
+    host: 'localhost:3000',
     basePath: '/',
-    schemes: ['http', 'https'],
+    schemes: ['http'],
     consumes: ['application/json'],
     produces: ['application/json'],
     tags: [
@@ -194,11 +194,7 @@ const document = {
                     items: { type: 'string' },
                     example: ['Pane', 'Carne di manzo', 'Formaggio cheddar', 'Lattuga', 'Pomodoro']
                 },
-                allergies: {
-                    type: 'array',
-                    items: { type: 'string' },
-                    example: ['Glutine', 'Lattosio']
-                },
+
                 isCustom: {
                     type: 'boolean',
                     example: false
@@ -249,27 +245,7 @@ const document = {
                     enum: ['ordered', 'preparing', 'delivering', 'delivered'],
                     example: 'ordered'
                 },
-                deliveryType: {
-                    type: 'string',
-                    enum: ['pickup', 'delivery'],
-                    example: 'delivery'
-                },
-                deliveryAddress: {
-                    type: 'object',
-                    properties: {
-                        street: { type: 'string', example: 'Via Roma 123' },
-                        city: { type: 'string', example: 'Milano' },
-                        zipCode: { type: 'string', example: '20100' },
-                        country: { type: 'string', example: 'Italia' },
-                        coordinates: {
-                            type: 'object',
-                            properties: {
-                                latitude: { type: 'number', example: 45.4642 },
-                                longitude: { type: 'number', example: 9.1900 }
-                            }
-                        }
-                    }
-                },
+
                 estimatedPreparationTime: {
                     type: 'number',
                     example: 30
@@ -301,7 +277,7 @@ const document = {
             properties: {
                 token: {
                     type: 'string',
-                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+                    example: 'il_tuo_token_jwt_qui'
                 },
                 user: {
                     $ref: '#/definitions/User'

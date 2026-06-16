@@ -4,25 +4,15 @@ import asyncHandler from 'express-async-handler';
 import { calculateWaitTime } from '../utils/waitTime.js';
 
 /**
- * @desc Ottiene tutti gli ordini
- * @route GET /api/orders
- * @access Private
- */
-export const getAllOrders = asyncHandler(async (req, res) => {
-    const orders = await Order.find()
-        .populate('customer', 'name')
-        .populate('restaurant', 'name')
-        .populate('items.meal', 'strMeal strMealThumb');
-    res.status(200).json(orders);
-});
-
-/**
  * @desc Crea un nuovo ordine
  * @route POST /api/orders
  * @access Private
  */
 export const createOrder = asyncHandler(async (req, res) => {
-    const { restaurantId, items, deliveryType, deliveryAddress } = req.body;
+    /*  #swagger.tags = ['Orders']
+        #swagger.description = 'Endpoint per creare un nuovo ordine.' 
+    */
+    const { restaurantId, items } = req.body;
 
     const restaurant = await Restaurant.findById(restaurantId);
     if (!restaurant) {
@@ -50,13 +40,7 @@ export const createOrder = asyncHandler(async (req, res) => {
         });
     }
 
-    let totalWaitTime = currentPrepTime;
-
-    if (deliveryType === 'pickup') {
-        totalWaitTime = await calculateWaitTime(restaurantId, currentPrepTime);
-    } else if (deliveryType === 'delivery') {
-        totalWaitTime = currentPrepTime;
-    }
+    const totalWaitTime = await calculateWaitTime(restaurantId, currentPrepTime);
 
     const newOrder = new Order({
         customer: req.user.id,
@@ -64,8 +48,6 @@ export const createOrder = asyncHandler(async (req, res) => {
         items: orderItems,
         totalAmount,
         status: 'ordered',
-        deliveryType,
-        deliveryAddress: deliveryType === 'delivery' ? deliveryAddress : null,
         estimatedPreparationTime: currentPrepTime,
     });
 
@@ -79,10 +61,13 @@ export const createOrder = asyncHandler(async (req, res) => {
 
 /**
  * @desc   Ottiene gli ordini di un utente
- * @route  GET /api/orders/:id
+ * @route  GET /api/orders/user
  * @access Private
  */
 export const getUserOrders = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Orders']
+        #swagger.description = 'Endpoint per ottenere tutti gli ordini di un utente.' 
+    */
     const customerId = req.user.id;
     const orders = await Order.find({ customer: customerId })
         .populate('restaurant', 'name')
@@ -97,19 +82,22 @@ export const getUserOrders = asyncHandler(async (req, res) => {
  * @access Private
  */
 export const updateOrderStatus = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Orders']
+        #swagger.description = 'Endpoint per modificare lo stato di un ordine.' 
+    */
     const { status } = req.body;
     const orderId = req.params.id;
     const userId = req.user.id;
     const userType = req.user.userType;
 
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate('restaurant');
 
     if (!order) {
         return res.status(404).json({ message: 'Order not found' });
     }
 
     const isRestaurateur = userType === 'restaurateur';
-    const isOwner = order.restaurant.toString() === userId;
+    const isOwner = order.restaurant.owner.toString() === userId;
     const isCustomer = order.customer.toString() === userId;
 
     if (isRestaurateur && !isOwner) {
@@ -122,17 +110,15 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     let isValidTransition = false;
 
     if (isRestaurateur) {
-        if (['preparing', 'delivering'].includes(status)) {
+        if (status === 'preparing' && order.status === 'ordered') {
             isValidTransition = true;
-        } else if (status === 'delivered') {
-            if (order.deliveryType === 'pickup' && order.status === 'preparing') {
-                isValidTransition = true;
-            } else {
-                return res.status(400).json({ message: 'Pickup orders must be "preparing" before being marked "delivered" (ready).' });
-            }
+        } else if (status === 'ready' && order.status === 'preparing') {
+            isValidTransition = true;
+        } else if (status === 'delivered' && order.status === 'preparing') {
+            isValidTransition = true;
         }
     } else {
-        if (status === 'delivered') {
+        if (status === 'delivered' && order.status === 'ready') {
             isValidTransition = true;
         }
     }
@@ -144,17 +130,4 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     order.status = status;
     const updatedOrder = await order.save();
     res.status(200).json(updatedOrder);
-});
-
-/**
- * @desc Elimina un ordine
- * @route DELETE /api/orders/:id
- * @access Private
- */
-export const deleteOrder = asyncHandler(async (req, res) => {
-    const order = await Order.findByIdAndDelete(req.params.id);
-    if (!order) {
-        return res.status(404).json({ message: 'Order not found.' });
-    }
-    res.status(200).json({ message: 'Order deleted successfully.' });
 });

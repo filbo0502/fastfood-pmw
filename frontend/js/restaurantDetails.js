@@ -1,7 +1,6 @@
-import CONFIG from "../config.js";
+import { showToast } from "./utils.js";
+import { logout } from "./auth.js";
 
-const API_BASE_URL = CONFIG.API_BASE_URL;
-const SERVER_BASE_URL = API_BASE_URL.replace('/api', '');
 
 
 const getRestaurantIdFromUrl = () => {
@@ -33,27 +32,14 @@ const loadRestaurantDetails = async () => {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetch(`/api/restaurants/${restaurantId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (!response.ok) {
             if (response.status === 401) {
-                localStorage.removeItem('jwtToken');
-                localStorage.removeItem('userID');
-                localStorage.removeItem('userType');
-                document.getElementById('restaurant-info').innerHTML = `
-                    <div class="alert alert-warning" role="alert">
-                        <h4 class="alert-heading">Session Expired</h4>
-                        <p>Your session has expired. Please log in again.</p>
-                        <a href="./login.html" class="btn btn-primary">Go to Login</a>
-                    </div>
-                `;
-                document.getElementById('menu-section').classList.add('d-none');
+                showToast('Your session has expired. Logging out...', 'warning');
+                setTimeout(() => { logout(); }, 2000);
                 return;
             }
             throw new Error('Error fetching restaurant details');
@@ -83,7 +69,7 @@ const displayRestaurantInfo = (restaurant) => {
         } else {
             // Rimuove lo slash iniziale se presente
             const imagePath = restaurant.image.startsWith('/') ? restaurant.image.substring(1) : restaurant.image;
-            imageUrl = `${SERVER_BASE_URL}/${imagePath}`;
+            imageUrl = `/${imagePath}`;
         }
     }
 
@@ -115,17 +101,8 @@ const loadRestaurantMenu = async (restaurantId) => {
     try {
         const token = localStorage.getItem('jwtToken');
 
-        if (!token) {
-            menuContainer.innerHTML = `<p class="text-info">Please log in to view the menu.</p>`;
-            return;
-        }
-
-        const response = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}/menu`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetch(`/api/restaurants/${restaurantId}/menu`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (!response.ok) {
@@ -207,7 +184,7 @@ window.addToCart = (mealId, mealName, price) => {
     }
 
     const currentRestaurantId = getRestaurantIdFromUrl();
-    const cartRestaurantId = localStorage.getItem('restaurantId');
+    const cartRestaurantId = localStorage.getItem('cartRestaurantId');
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
     if (cartRestaurantId && cartRestaurantId !== currentRestaurantId) {
@@ -217,7 +194,7 @@ window.addToCart = (mealId, mealName, price) => {
         cart = [];
     }
 
-    localStorage.setItem('restaurantId', currentRestaurantId);
+    localStorage.setItem('cartRestaurantId', currentRestaurantId);
 
     // Cerca se il piatto è già nel carrello
     const existingItem = cart.find(item => item._id === mealId);
@@ -235,14 +212,7 @@ window.addToCart = (mealId, mealName, price) => {
 
     localStorage.setItem('cart', JSON.stringify(cart));
 
-    Toastify({
-        text: `${mealName} added to cart!`,
-        duration: 3000,
-        gravity: "bottom",
-        position: "right",
-        backgroundColor: "#0d6efd",
-        stopOnFocus: true
-    }).showToast();
+    showToast(`${mealName} added to cart!`, "info");
 
     updateCartCount();
 };

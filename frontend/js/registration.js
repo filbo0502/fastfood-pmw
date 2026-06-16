@@ -1,6 +1,5 @@
-import CONFIG from "./config.js";
+import { showToast } from "./utils.js";
 
-const API_BASE_URL = CONFIG.API_BASE_URL;
 
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('userExistsModal')) {
@@ -16,22 +15,44 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeRegistrationForm();
 
     const userTypeSelect = document.getElementById('userType');
+    const customerFields = document.getElementById('customerFields');
     const restaurantFields = document.getElementById('restaurantFields');
-    if (userTypeSelect && restaurantFields) {
-        const restaurantInputs = restaurantFields.querySelectorAll('input');
-        // Mostra/nascondi campi ristorante in base alla selezione del tipo utente
+
+    if (userTypeSelect && customerFields && restaurantFields) {
+        const customerInputs = customerFields.querySelectorAll('input');
+        const restaurantInputs = restaurantFields.querySelectorAll('input:not([type="file"]):not([id="restaurantImage"])');
+
+        // Mostra/nascondi campi in base al tipo di utente selezionato
         userTypeSelect.addEventListener('change', (e) => {
-            const isRestaurateur = e.target.value === 'restaurateur';
+            const userType = e.target.value;
+            const isCustomer = userType === 'customer';
+            const isRestaurateur = userType === 'restaurateur';
+
+            customerFields.style.display = isCustomer ? 'block' : 'none';
             restaurantFields.style.display = isRestaurateur ? 'block' : 'none';
-            // Rende i campi obbligatori solo per i ristoratori
+
+            const commonFields = document.getElementById('commonFields');
+            if (commonFields) {
+                commonFields.style.display = (isCustomer || isRestaurateur) ? 'block' : 'none';
+            }
+
+            // Imposta l'attributo required in base alla selezione
+            customerInputs.forEach(input => {
+                if (input.type !== 'file') {
+                    input.required = isCustomer;
+                }
+            });
+
             restaurantInputs.forEach(input => {
-                input.required = isRestaurateur;
+                if (input.type !== 'file') {
+                    input.required = isRestaurateur;
+                }
             });
         });
     }
 });
 
-function showValidationError(message) {
+const showValidationError = (message) => {
     if (window.validationErrorModal) {
         const modalText = document.getElementById('validationErrorText');
         if (modalText) {
@@ -52,7 +73,7 @@ const initializeRegistrationForm = () => {
     }
 }
 
-async function handleRegistration(event) {
+const handleRegistration = async (event) => {
     event.preventDefault();
     const registrationForm = document.getElementById('registrationForm');
     const registerButton = registrationForm.querySelector('button[type="submit"]');
@@ -66,15 +87,34 @@ async function handleRegistration(event) {
         if (spinner) spinner.classList.add('d-none');
     };
 
-    const name = document.getElementById('name').value.trim();
-    const surname = document.getElementById('surname').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
     const userType = document.getElementById('userType').value;
 
-    if (!name || !surname || !email || !password || !confirmPassword || !userType) {
-        showValidationError("All user fields are mandatory.");
+    if (!userType) {
+        showValidationError("Please select a user type.");
+        enableButton();
+        return;
+    }
+
+    let name, surname, email, phone, password, confirmPassword;
+
+    if (userType === 'customer') {
+        name = document.getElementById('customerName').value.trim();
+        surname = document.getElementById('customerSurname').value.trim();
+        email = document.getElementById('customerEmail').value.trim();
+        phone = document.getElementById('customerPhone').value.trim();
+        password = document.getElementById('customerPassword').value;
+        confirmPassword = document.getElementById('customerConfirmPassword').value;
+    } else {
+        name = document.getElementById('restaurantUserName').value.trim();
+        surname = document.getElementById('restaurantUserSurname').value.trim();
+        email = document.getElementById('restaurantUserEmail').value.trim();
+        phone = document.getElementById('phone').value.trim();
+        password = document.getElementById('restaurantUserPassword').value;
+        confirmPassword = document.getElementById('restaurantUserConfirmPassword').value;
+    }
+
+    if (!name || !surname || !email || !phone || !password || !confirmPassword) {
+        showValidationError("All fields are mandatory.");
         enableButton();
         return;
     }
@@ -91,45 +131,56 @@ async function handleRegistration(event) {
         return;
     }
 
-    // Costruisce i dati del form - usa FormData per supportare l'upload di file
+    const addressStreet = document.getElementById('addressStreet').value.trim();
+    const addressCity = document.getElementById('addressCity').value.trim();
+    const addressZip = document.getElementById('addressZip').value.trim();
+    const wantsSpecialOffers = document.getElementById('wantsSpecialOffers').checked;
+    const favoriteCategory = document.getElementById('favoriteCategory').value;
+
+    if (!addressStreet || !addressCity || !addressZip) {
+        showValidationError("Address fields are required.");
+        enableButton();
+        return;
+    }
+
+    // Costruisce i dati del form - uso FormData per supportare l'upload di immagini
     const formData = new FormData();
     formData.append('name', name);
     formData.append('surname', surname);
     formData.append('email', email);
+    formData.append('phone', phone);
     formData.append('password', password);
     formData.append('confirmPassword', confirmPassword);
     formData.append('userType', userType);
+    formData.append('addressStreet', addressStreet);
+    formData.append('addressCity', addressCity);
+    formData.append('addressZip', addressZip);
+    formData.append('wantsSpecialOffers', wantsSpecialOffers);
+    if (favoriteCategory) {
+        formData.append('favoriteCategory', favoriteCategory);
+    }
 
     if (userType === 'restaurateur') {
         const restaurantName = document.getElementById('restaurantName').value.trim();
         const vatNumber = document.getElementById('vatNumber').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const addressStreet = document.getElementById('addressStreet').value.trim();
-        const addressCity = document.getElementById('addressCity').value.trim();
-        const addressZip = document.getElementById('addressZip').value.trim();
 
-        if (!restaurantName || !vatNumber || !phone || !addressStreet || !addressCity || !addressZip) {
-            showValidationError("For restaurateurs, all restaurant data is required.");
+        if (!restaurantName || !vatNumber) {
+            showValidationError("For restaurateurs, restaurant name and VAT number are required.");
             enableButton();
             return;
         }
 
         formData.append('restaurantName', restaurantName);
         formData.append('vatNumber', vatNumber);
-        formData.append('phone', phone);
-        formData.append('addressStreet', addressStreet);
-        formData.append('addressCity', addressCity);
-        formData.append('addressZip', addressZip);
 
         const restaurantImageInput = document.getElementById('restaurantImage');
         if (restaurantImageInput && restaurantImageInput.files.length > 0) {
             formData.append('restaurantImage', restaurantImageInput.files[0]);
         }
-        // TODO: magari aggiungere anteprima immagine prima dell'upload?
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        const response = await fetch(`/api/auth/register`, {
             method: 'POST',
             body: formData
         });
@@ -137,13 +188,7 @@ async function handleRegistration(event) {
         const data = await response.json();
 
         if (response.ok) {
-            Toastify({
-                text: "Registration successful! You will be redirected to the login page.",
-                duration: 3000,
-                gravity: "top",
-                position: "center",
-                style: { background: "linear-gradient(to right, #4caf50, #81c784)" }
-            }).showToast();
+            showToast("Registration successful! You will be redirected to the login page.", "success");
             setTimeout(() => { window.location.href = './login.html'; }, 3000);
         } else {
             if (response.status === 409) {

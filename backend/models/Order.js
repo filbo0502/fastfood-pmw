@@ -1,69 +1,52 @@
 import mongoose from 'mongoose';
 
 const OrderSchema = new mongoose.Schema({
-    customer:{
+    customer: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
+        ref: 'User',
         required: true
     },
-    restaurant:{
+    restaurant: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Restaurant',
         required: true
     },
     items: [{
-        meal:{
+        meal: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Meal',
             required: true
         },
-        quantity:{
+        quantity: {
             type: Number,
             required: true,
             default: 1
         },
-        price:{
+        price: {
             type: Number,
             required: true
         },
-        preparationTime:{
+        preparationTime: {
             type: Number,
             required: true
         }
     }],
-    totalAmount:{
+    totalAmount: {
         type: Number,
         required: true
     },
-    status:{
+    status: {
         type: String,
-        enum: ['ordered', 'preparing', 'delivering', 'delivered'],
+        enum: ['ordered', 'preparing', 'ready', 'delivered'],
         default: 'ordered',
         required: true
     },
-    deliveryType: {
-        type: String,
-        enum: ['pickup', 'delivery'],
-        required: true
-    },
-    deliveryAddress: {
-        street: String,
-        city: String,
-        zipCode: String,
-        country: String,
-        coordinates: {
-            latitude: Number,
-            longitude: Number
-        }
-    },
     estimatedPreparationTime: {
-    type: Number,
-    required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+        type: Number,
+        required: true
+    }
+}, {
+    timestamps: true
 });
 
 const Order = mongoose.model('Order', OrderSchema);

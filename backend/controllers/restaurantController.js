@@ -9,6 +9,9 @@ import Order from '../models/Order.js';
  * @access Public
  */
 export const getAllRestaurants = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Restaurants']
+        #swagger.description = 'Endpoint per ottenere tutti i ristoranti.' 
+    */
     const restaurants = await Restaurant.find();
     res.status(200).json(restaurants);
 });
@@ -18,8 +21,10 @@ export const getAllRestaurants = asyncHandler(async (req, res) => {
  * @route GET /api/restaurant
  * @access Public
  */
-
 export const getRestaurant = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Restaurants']
+        #swagger.description = 'Endpoint per ottenere un ristorante.' 
+    */
     const restaurant = await Restaurant.findById(req.params.id);
     if (!restaurant) {
         return res.status(404).json({ message: 'Restaurant not found.' });
@@ -28,13 +33,34 @@ export const getRestaurant = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc Ottiene il ristorante del proprietario
+ * @route GET /api/restaurant/my-restaurant
+ * @access Private
+ */
+export const getMyRestaurant = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Restaurants']
+        #swagger.description = 'Endpoint per ottenere il ristorante del proprietario.' 
+    */
+    const userId = req.user.id;
+    const restaurant = await Restaurant.findOne({ owner: userId });
+
+    if (!restaurant) {
+        return res.status(404).json({ message: 'No restaurant found for this user.' });
+    }
+
+    res.status(200).json(restaurant);
+});
+
+/**
 * @desc Ottiene il menu di un ristorante
 * @route GET /api/restaurant/:id/menu
 * @access Public
 */
-
 export const getRestaurantMenu = asyncHandler(async (req, res) => {
-    const restaurant = await Restaurant.findById(req.params.id);
+    /*  #swagger.tags = ['Restaurants']
+        #swagger.description = 'Endpoint per ottenere il menu di un ristorante.' 
+    */
+    const restaurant = await Restaurant.findById(req.params.id).populate('menu.meal');
     if (!restaurant || !restaurant.menu) {
         return res.status(404).json({ message: 'Restaurant or menu not found.' });
     }
@@ -47,8 +73,10 @@ export const getRestaurantMenu = asyncHandler(async (req, res) => {
  * @route PUT /api/restaurant
  * @access Private
  */
-
 export const updateRestaurant = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Restaurants']
+        #swagger.description = 'Endpoint per aggiornare i dati di un ristorante.' 
+    */
     const udpdatedRestaurant = await Restaurant.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!udpdatedRestaurant) {
         return res.status(404).json({ message: 'Restaurant not found.' });
@@ -61,8 +89,10 @@ export const updateRestaurant = asyncHandler(async (req, res) => {
  * @route DELETE /api/restaurant/:id
  * @access Private
  */
-
 export const deleteRestaurant = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Restaurants']
+        #swagger.description = 'Endpoint per eliminare un ristorante.' 
+    */
     const deletedRestaurant = await Restaurant.findByIdAndDelete(req.params.id);
     if (!deletedRestaurant) {
         return res.status(404).json({ message: 'Restaurant not found.' });
@@ -75,8 +105,10 @@ export const deleteRestaurant = asyncHandler(async (req, res) => {
  * @route GET /api/restaurant/search
  * @access Public
  */
-
 export const searchRestaurant = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Restaurants']
+        #swagger.description = 'Endpoint per cercare ristoranti.' 
+    */
     const { q } = req.query;
 
     let query = {};
@@ -93,12 +125,9 @@ export const searchRestaurant = asyncHandler(async (req, res) => {
     }
 
     const restaurants = await Restaurant.find(query);
-    if (!restaurants.length) {
-        return res.status(200).json([]);
-    }
     res.status(200).json(restaurants);
-
 });
+
 
 /**
  * @desc   Aggiungi o aggiorna un piatto al menu di un ristorante
@@ -106,6 +135,9 @@ export const searchRestaurant = asyncHandler(async (req, res) => {
  * @access Private (Owner only)
  */
 export const addOrUpdateMealInMenu = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Restaurants']
+        #swagger.description = 'Endpoint per aggiungere o aggiornare un piatto al menu di un ristorante.' 
+    */
     const { idMeal, price, preparationTime, isAvailable } = req.body;
     const restaurantId = req.params.id;
 
@@ -144,6 +176,9 @@ export const addOrUpdateMealInMenu = asyncHandler(async (req, res) => {
  * @access Private (Owner only)
  */
 export const deleteMealFromMenu = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Restaurants']
+        #swagger.description = 'Endpoint per eliminare un piatto dal menu di un ristorante (se esiste).'
+    */
     const restaurantId = req.params.id;
     const idMeal = req.params.idMeal;
 
@@ -158,44 +193,14 @@ export const deleteMealFromMenu = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc   Cerca ristoranti per piatto
- * @route  GET /api/restaurant/search/dish
- * @access Public
- */
-export const searchRestaurantsByDish = asyncHandler(async (req, res) => {
-    const { dishName } = req.query;
-
-    if (!dishName) {
-        return res.status(400).json({ message: 'Dish name parameter is required.' });
-    }
-
-    const meals = await Meal.find({
-        strMeal: { $regex: dishName, $options: 'i' }
-    });
-
-    if (meals.length === 0) {
-        return res.status(404).json({ message: 'No dishes found with this name.' });
-    }
-
-    const mealIds = meals.map(meal => meal._id);
-
-    const restaurants = await Restaurant.find({
-        'menu.meal': { $in: mealIds }
-    }).populate('menu.meal', 'strMeal strMealThumb');
-
-    if (restaurants.length === 0) {
-        return res.status(404).json({ message: 'No restaurants found serving this dish.' });
-    }
-
-    res.status(200).json(restaurants);
-});
-
-/**
  * @desc   Ottieni gli ordini per un ristorante specifico
  * @route  GET /api/restaurants/:id/orders
  * @access Private (Restaurateur only)
  */
 export const getRestaurantOrders = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Restaurants']
+        #swagger.description = 'Endpoint per ottenere gli ordini per un ristorante specifico.'
+    */
     const restaurantId = req.params.id;
 
     const restaurant = await Restaurant.findById(restaurantId);

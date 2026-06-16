@@ -2,14 +2,10 @@
   "swagger": "2.0",
   "info": {
     "title": "FastFood PMW API",
-    "description": "API REST per la piattaforma FastFood PMW - Sistema di gestione ordini per ristoranti fast food",
-    "version": "1.0.0",
-    "contact": {
-      "name": "FastFood PMW Team",
-      "email": "support@fastfoodpmw.com"
-    }
+    "description": "Documentazione API REST per il progetto FastFood PMW 2025/2026 (CodeBite)",
+    "version": "1.0.0"
   },
-  "host": "localhost:3001",
+  "host": "localhost:3000",
   "basePath": "/",
   "tags": [
     {
@@ -38,8 +34,7 @@
     }
   ],
   "schemes": [
-    "http",
-    "https"
+    "http"
   ],
   "securityDefinitions": {
     "bearerAuth": {
@@ -68,7 +63,10 @@
     },
     "/api/auth/login": {
       "post": {
-        "description": "",
+        "tags": [
+          "Authentication"
+        ],
+        "description": "Endpoint per il login di un utente.",
         "parameters": [
           {
             "name": "body",
@@ -104,7 +102,10 @@
     },
     "/api/auth/register": {
       "post": {
-        "description": "",
+        "tags": [
+          "Authentication"
+        ],
+        "description": "Endpoint per la registrazione di un utente.",
         "parameters": [
           {
             "name": "body",
@@ -173,7 +174,10 @@
     },
     "/api/auth/logout": {
       "post": {
-        "description": "",
+        "tags": [
+          "Authentication"
+        ],
+        "description": "Endpoint per il logout di un utente.",
         "responses": {
           "200": {
             "description": "OK"
@@ -183,7 +187,10 @@
     },
     "/api/meals/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Meals"
+        ],
+        "description": "Endpoint per ottenere tutti i piatti nel DB.",
         "parameters": [
           {
             "name": "authorization",
@@ -285,7 +292,10 @@
     },
     "/api/meals/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Meals"
+        ],
+        "description": "Endpoint per ottenere un piatto specifico.",
         "parameters": [
           {
             "name": "id",
@@ -315,7 +325,10 @@
         }
       },
       "delete": {
-        "description": "",
+        "tags": [
+          "Meals"
+        ],
+        "description": "Endpoint per eliminare un piatto.",
         "parameters": [
           {
             "name": "id",
@@ -345,7 +358,10 @@
         }
       },
       "post": {
-        "description": "",
+        "tags": [
+          "Meals"
+        ],
+        "description": "Endpoint per aggiornare un piatto.",
         "parameters": [
           {
             "name": "id",
@@ -377,7 +393,10 @@
     },
     "/api/restaurants/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Restaurants"
+        ],
+        "description": "Endpoint per ottenere tutti i ristoranti.",
         "parameters": [
           {
             "name": "authorization",
@@ -400,7 +419,10 @@
     },
     "/api/restaurants/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Restaurants"
+        ],
+        "description": "Endpoint per ottenere un ristorante.",
         "parameters": [
           {
             "name": "id",
@@ -430,7 +452,10 @@
         }
       },
       "put": {
-        "description": "",
+        "tags": [
+          "Restaurants"
+        ],
+        "description": "Endpoint per aggiornare i dati di un ristorante.",
         "parameters": [
           {
             "name": "id",
@@ -460,7 +485,10 @@
         }
       },
       "delete": {
-        "description": "",
+        "tags": [
+          "Restaurants"
+        ],
+        "description": "Endpoint per eliminare un ristorante.",
         "parameters": [
           {
             "name": "id",
@@ -492,7 +520,10 @@
     },
     "/api/restaurants/{id}/menu": {
       "get": {
-        "description": "",
+        "tags": [
+          "Restaurants"
+        ],
+        "description": "Endpoint per ottenere il menu di un ristorante.",
         "parameters": [
           {
             "name": "id",
@@ -522,7 +553,10 @@
         }
       },
       "post": {
-        "description": "",
+        "tags": [
+          "Restaurants"
+        ],
+        "description": "Endpoint per aggiungere o aggiornare un piatto al menu di un ristorante.",
         "parameters": [
           {
             "name": "id",
@@ -575,7 +609,10 @@
     },
     "/api/restaurants/search": {
       "get": {
-        "description": "",
+        "tags": [
+          "Restaurants"
+        ],
+        "description": "Endpoint per cercare ristoranti.",
         "parameters": [
           {
             "name": "authorization",
@@ -671,7 +708,10 @@
     },
     "/api/statistics/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Statistics"
+        ],
+        "description": "Endpoint per ottenere le statistiche di un ristorante con i dati per i grafici.",
         "parameters": [
           {
             "name": "id",
@@ -703,7 +743,10 @@
     },
     "/api/orders/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Orders"
+        ],
+        "description": "Endpoint per ottenere tutti gli ordini.",
         "parameters": [
           {
             "name": "authorization",
@@ -724,7 +767,10 @@
         }
       },
       "post": {
-        "description": "",
+        "tags": [
+          "Orders"
+        ],
+        "description": "Endpoint per creare un nuovo ordine.",
         "parameters": [
           {
             "name": "authorization",
@@ -774,7 +820,10 @@
     },
     "/api/orders/user": {
       "get": {
-        "description": "",
+        "tags": [
+          "Orders"
+        ],
+        "description": "Endpoint per ottenere tutti gli ordini di un utente.",
         "parameters": [
           {
             "name": "authorization",
@@ -797,7 +846,10 @@
     },
     "/api/orders/{id}/status": {
       "put": {
-        "description": "",
+        "tags": [
+          "Orders"
+        ],
+        "description": "Endpoint per modificare lo stato di un ordine.",
         "parameters": [
           {
             "name": "id",
@@ -844,7 +896,10 @@
     },
     "/api/orders/{id}": {
       "delete": {
-        "description": "",
+        "tags": [
+          "Orders"
+        ],
+        "description": "Endpoint per eliminare un ordine.",
         "parameters": [
           {
             "name": "id",
@@ -876,7 +931,10 @@
     },
     "/api/user/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "description": "Endpoint per ottenere un utente.",
         "parameters": [
           {
             "name": "id",
@@ -906,7 +964,10 @@
         }
       },
       "put": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "description": "Endpoint per aggiornare un utente.",
         "parameters": [
           {
             "name": "id",
@@ -966,7 +1027,10 @@
         }
       },
       "delete": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "description": "Endpoint per eliminare un utente.",
         "parameters": [
           {
             "name": "id",
@@ -998,7 +1062,10 @@
     },
     "/api/user/{id}/password": {
       "put": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "description": "Endpoint per aggiornare la password di un utente.",
         "parameters": [
           {
             "name": "id",

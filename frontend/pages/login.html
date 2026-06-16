@@ -27,23 +27,22 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto me-4">
                     <li class="nav-item">
-                        <a class="nav-link" href="../index.html#home">Home</a>
+                        <a class="nav-link" href="../index.html">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../index.html#about">About</a>
+                        <a class="nav-link" href="../pages/about.html">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./searchRestaurant.html">Restaurants</a>
+                        <a class="nav-link" href="../pages/searchRestaurant.html">Restaurants</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./searchDish.html">Dishes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../index.html#contact">Contacts</a>
+                        <a class="nav-link" href="../pages/searchDish.html">Dishes</a>
                     </li>
                 </ul>
-                <a href="./profile.html" class="btn my-profile-btn btn-outline-primary me-2 d-none">My Profile</a>
-                <a href="./orderHistory.html" class="btn my-orders-btn btn-outline-primary me-2 d-none">My Orders</a>
+                <a href="../pages/profile.html" class="btn my-profile-btn btn-outline-primary me-2 d-none">My
+                    Profile</a>
+                <a href="../pages/orderHistory.html" class="btn my-orders-btn btn-outline-primary me-2 d-none">My
+                    Orders</a>
                 <a href="#" class="btn logout-btn btn-primary d-none">Log Out</a>
             </div>
         </div>
@@ -51,60 +50,47 @@
 
     <main class="main-content">
         <div class="container d-flex justify-content-center align-items-center min-vh-100 py-5">
-
-            <div class="col-lg-8 col-xl-7">
-                <div class="row border rounded-5 p-3 bg-white shadow box-area">
-                    <div
-                        class="col-md-6 rounded-4 d-none d-md-flex justify-content-center align-items-center flex-column left-box">
-                        <img src="../images/emptyplate.png" class="img-fluid" alt="Immagine illustrativa login"
-                            style="border-radius: 1rem;">
+            <div class="col-lg-5 col-md-7 col-sm-9">
+                <div class="border rounded-3 p-4 bg-white shadow">
+                    <div class="header-text mb-4 text-center">
+                        <h2>Login</h2>
                     </div>
 
-                    <div class="col-md-6 p-4">
-                        <div class="row align-items-center">
-                            <div class="header-text mb-4 text-center">
-                                <h2>Login</h2>
-                            </div>
-
-                            <form id="login_form">
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                                    <input type="email" class="form-control bg-light fs-6" id="email" name="email"
-                                        placeholder="Email" aria-label="Email" required>
-                                </div>
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                                    <input type="password" class="form-control bg-light fs-6" id="password"
-                                        name="password" placeholder="Password" aria-label="Password" required>
-                                </div>
-                                <div class="input-group mb-4">
-                                    <button class="btn btn-primary w-100 fs-6" type="submit">
-                                        Login
-                                        <span class="spinner-border spinner-border-sm ms-2 d-none" role="status"
-                                            aria-hidden="true"></span>
-                                    </button>
-                                </div>
-                            </form>
-
-                            <div class="d-flex justify-content-center mt-2">
-                                <p class="me-2">Don't you have an acccount?</p>
-                                <a href="registration.html">Sign Up</a>
-                            </div>
+                    <form id="login_form">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                            <input type="email" class="form-control bg-light fs-6" id="email" name="email"
+                                placeholder="Email" required>
                         </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" class="form-control bg-light fs-6" id="password" name="password"
+                                placeholder="Password" required>
+                        </div>
+                        <div class="input-group mb-4">
+                            <button class="btn btn-primary w-100 fs-6" type="submit">
+                                Login
+                                <span class="spinner-border spinner-border-sm ms-2 d-none"></span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="d-flex justify-content-center mt-2">
+                        <p class="me-2">Don't you have an acccount?</p>
+                        <a href="registration.html">Sign Up</a>
                     </div>
                 </div>
             </div>
-
         </div>
     </main>
 
     <!-- Modals -->
-    <div class="modal fade" id="credentialsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="credentialsModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Login Failed</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <p class="text-danger">Invalid email or password.</p>
@@ -116,12 +102,12 @@
         </div>
     </div>
 
-    <div class="modal fade" id="userNotFoundModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="userNotFoundModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">User Not Found</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <p class="text-warning">No user found with this email.</p>
@@ -133,12 +119,12 @@
         </div>
     </div>
 
-    <div class="modal fade" id="genericErrorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="genericErrorModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Error</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <p class="text-danger">An error occurred.</p>
@@ -166,9 +152,9 @@
                 <div class="col-lg-4 col-md-6">
                     <h5>Useful Links</h5>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-white-50 text-decoration-none">Home</a></li>
-                        <li><a href="./pages/login.html" class="text-white-50 text-decoration-none">Login</a></li>
-                        <li><a href="./pages/registration.html" class="text-white-50 text-decoration-none">Register</a>
+                        <li><a href="../index.html" class="text-white-50 text-decoration-none">Home</a></li>
+                        <li><a href="./login.html" class="text-white-50 text-decoration-none">Login</a></li>
+                        <li><a href="./registration.html" class="text-white-50 text-decoration-none">Register</a>
                         </li>
                     </ul>
                 </div>

@@ -1,5 +1,4 @@
-import CONFIG from "./config.js";
-const API_BASE_URL = CONFIG.API_BASE_URL;
+import { getImageUrl, showToast } from "./utils.js";
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -19,159 +18,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const token = localStorage.getItem('jwtToken');
     const userID = localStorage.getItem('userID');
+    let restaurantId = null;
 
-    if (!token || !userID) {
-        console.warn('User not authenticated.');
-        // Mostra un alert per chiedere il login
-        const loginAlert = `
-            <div class="col-12 text-center">
-                <div class="alert alert-info" role="alert">
-                    <h4 class="alert-heading">Login Required</h4>
-                    <p>Please log in to view and manage meals.</p>
-                    <a href="../pages/login.html" class="btn btn-primary">Go to Login</a>
-                </div>
-            </div>`;
-        availableMealsContainer.innerHTML = loginAlert;
-        customMenuContainer.innerHTML = loginAlert;
-    } else {
-        fetchAvailableMeals();
-        fetchCustomMeals();
-    }
-
-    async function fetchAvailableMeals(searchTerm = '') {
-        if (!token) return;
-
-        // Costruisce l'URL con o senza filtro di ricerca (searchTerm)
-        let url = searchTerm
-            ? `${API_BASE_URL}/meals/search?name=${encodeURIComponent(searchTerm)}&custom=false`
-            : `${API_BASE_URL}/meals?custom=false`;
-
+    if (token) {
         try {
-            const res = await fetch(url, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (!res.ok) {
-                if (res.status === 401) {
-                    localStorage.removeItem('jwtToken');
-                    localStorage.removeItem('userID');
-                    availableMealsContainer.innerHTML = `
-                        <div class="col-12 text-center">
-                            <div class="alert alert-warning" role="alert">
-                                <h4 class="alert-heading">Session Expired</h4>
-                                <p>Your session has expired. Please log in again.</p>
-                                <a href="../pages/login.html" class="btn btn-primary">Go to Login</a>
-                            </div>
-                        </div>`;
-                    return;
-                }
-                if (res.status === 404) {
-                    availableMealsData = [];
-                    renderAvailableMeals();
-                    return;
-                }
-                throw new Error(`Error fetching available meals: ${res.statusText}`);
-            }
-
-            availableMealsData = await res.json();
-            renderAvailableMeals(); // Aggiorna l'interfaccia
-
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            restaurantId = payload.restaurantId;
         } catch (error) {
-            console.error(error);
-            availableMealsContainer.innerHTML = `
-                <div class="col-12 text-center">
-                    <div class="alert alert-danger" role="alert">
-                        <h4 class="alert-heading">Error</h4>
-                        <p>${error.message}</p>
-                    </div>
-                </div>`;
+            console.error('Error decoding JWT:', error);
         }
     }
 
-    async function fetchCustomMeals(searchTerm = '') {
-        if (!token || !userID) return;
-
-        let url = searchTerm
-            ? `${API_BASE_URL}/meals/search?name=${encodeURIComponent(searchTerm)}&custom=true&userId=${userID}`
-            : `${API_BASE_URL}/meals?custom=true&userId=${userID}`;
-
-        try {
-            const res = await fetch(url, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (!res.ok) {
-                if (res.status === 401) {
-                    localStorage.removeItem('jwtToken');
-                    localStorage.removeItem('userID');
-                    customMenuContainer.innerHTML = `
-                        <div class="col-12 text-center">
-                            <div class="alert alert-warning" role="alert">
-                                <h4 class="alert-heading">Session Expired</h4>
-                                <p>Your session has expired. Please log in again.</p>
-                                <a href="../pages/login.html" class="btn btn-primary">Go to Login</a>
-                            </div>
-                        </div>`;
-                    return;
-                }
-                if (res.status === 404) {
-                    customMealsData = [];
-                    renderCustomMeals();
-                    return;
-                }
-                throw new Error(`Error fetching custom meals: ${res.statusText}`);
-            }
-
-            customMealsData = await res.json();
-            renderCustomMeals();
-
-        } catch (error) {
-            console.error(error);
-            customMenuContainer.innerHTML = `
-                <div class="col-12 text-center">
-                    <div class="alert alert-danger" role="alert">
-                        <h4 class="alert-heading">Error</h4>
-                        <p>${error.message}</p>
-                    </div>
-                </div>`;
-        }
-    }
-
-    function renderAvailableMeals() {
-        availableMealsContainer.innerHTML = '';
-        if (availableMealsData.length === 0) {
-            availableMealsContainer.innerHTML = `
-                <div class="col-12">
-                    <div class="alert alert-info" role="alert">
-                        <p class="mb-0">No meals found in the database matching your search.</p>
-                    </div>
-                </div>`;
-            return;
-        }
-        availableMealsData.forEach(meal => {
-            const card = renderMealCard(meal, false);
-            availableMealsContainer.appendChild(card);
-        });
-    }
-
-    function renderCustomMeals() {
-        customMenuContainer.innerHTML = '';
-        if (customMealsData.length === 0) {
-            customMenuContainer.innerHTML = `
-                <div class="col-12">
-                    <div class="alert alert-info" role="alert">
-                        <p class="mb-0">You have not created any custom meals, or none match your search.</p>
-                    </div>
-                </div>`;
-            return;
-        }
-        customMealsData.forEach(meal => {
-            const card = renderMealCard(meal, true);
-            customMenuContainer.appendChild(card);
-        });
-    }
-
-    function renderMealCard(meal, isCustom) {
+    const renderMealCard = (meal, isCustom) => {
         const card = document.createElement('div');
         card.className = 'card meal-card-item h-100 shadow-sm';
         card.dataset.mealId = meal._id;
@@ -181,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Info aggiuntive solo per i piatti custom
         let customInfo = '';
-        if (isCustom) {
+        if (isCustom && meal.price != null) {
             const price = parseFloat(meal.price).toFixed(2);
             const statusClass = meal.isAvailable ? 'text-success' : 'text-danger';
             const statusText = meal.isAvailable ? 'Available' : 'Unavailable';
@@ -213,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </p>
                 ${customInfo}
                 
-                <div class="flex-grow-1"></div> <!-- Spacer per allineare il footer in basso -->
+                <div class="flex-grow-1"></div>
             </div>
 
             <div class="card-footer text-center">
@@ -223,27 +81,143 @@ document.addEventListener('DOMContentLoaded', () => {
         return card;
     }
 
-    function closeModal() {
+    const renderAvailableMeals = () => {
+        availableMealsContainer.innerHTML = '';
+        if (availableMealsData.length === 0) {
+            availableMealsContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        <p class="mb-0">No meals found in the database matching your search.</p>
+                    </div>
+                </div>`;
+            return;
+        }
+        availableMealsData.forEach(meal => {
+            const card = renderMealCard(meal, false);
+            availableMealsContainer.appendChild(card);
+        });
+    }
+
+    const renderCustomMeals = () => {
+        customMenuContainer.innerHTML = '';
+        if (customMealsData.length === 0) {
+            customMenuContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        <p class="mb-0">You have not created any custom meals, or none match your search.</p>
+                    </div>
+                </div>`;
+            return;
+        }
+        customMealsData.forEach(meal => {
+            const card = renderMealCard(meal, true);
+            customMenuContainer.appendChild(card);
+        });
+    }
+
+    const fetchMeals = async (isCustom, searchTerm = '') => {
+        if (!token) return;
+        if (isCustom && !userID) return;
+
+        const container = isCustom ? customMenuContainer : availableMealsContainer;
+        const renderFunction = isCustom ? renderCustomMeals : renderAvailableMeals;
+        const mealType = isCustom ? 'custom' : 'available';
+
+        try {
+            const url = isCustom
+                ? `/api/meals?custom=true&userId=${userID}`
+                : `/api/meals?custom=false`;
+
+            const res = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    if (isCustom) {
+                        customMealsData = [];
+                    } else {
+                        availableMealsData = [];
+                    }
+                    renderFunction();
+                    return;
+                }
+                throw new Error(`Error fetching ${mealType} meals: ${res.statusText}`);
+            }
+
+            const allMeals = await res.json();
+
+            // Filtra per search term se presente
+            const filteredMeals = searchTerm
+                ? allMeals.filter(meal => meal.strMeal.toLowerCase().includes(searchTerm.toLowerCase()))
+                : allMeals;
+
+            // Aggiorna lo stato appropriato
+            if (isCustom) {
+                customMealsData = filteredMeals;
+            } else {
+                availableMealsData = filteredMeals;
+            }
+
+            renderFunction();
+
+        } catch (error) {
+            console.error(error);
+            container.innerHTML = `
+                <div class="col-12 text-center">
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                </div>`;
+        }
+    }
+
+    if (!token || !userID) {
+        console.warn('User not authenticated.');
+        // Mostra un alert per chiedere il login
+        const loginAlert = `
+            <div class="col-12 text-center">
+                <div class="alert alert-info" role="alert">
+                    <h4 class="alert-heading">Login Required</h4>
+                    <p>Please log in to view and manage meals.</p>
+                    <a href="../pages/login.html" class="btn btn-primary">Go to Login</a>
+                </div>
+            </div>`;
+        availableMealsContainer.innerHTML = loginAlert;
+        customMenuContainer.innerHTML = loginAlert;
+    } else {
+        fetchMeals(false); // piatti disponibili nel DB
+        fetchMeals(true); // piatti personalizzati
+    }
+
+    const closeModal = () => {
         modal.style.display = 'none';
         form.reset();
         delete form.dataset.editingId;
         delete form.dataset.baseMealId;
     }
 
-    function openModalForCreate() {
+    const openModalForCreate = () => {
         form.reset();
         document.getElementById('meal-available').checked = true;
+        document.getElementById('meal-ingredients').value = '';
+        document.getElementById('meal-image').value = '';
+        document.getElementById('meal-image').required = true;
         modalTitle.textContent = 'Create Custom Meal';
         submitBtn.textContent = 'Create Meal';
         modal.style.display = 'block';
     }
 
-    function openModalForAdd(meal) {
+    const openModalForAdd = (meal) => {
         form.reset();
         document.getElementById('meal-name').value = meal.strMeal;
         document.getElementById('meal-category').value = meal.strCategory || '';
         document.getElementById('meal-price').value = '';
         document.getElementById('meal-available').checked = true;
+        document.getElementById('meal-ingredients').value = meal.ingredients ? meal.ingredients.join(', ') : '';
+        document.getElementById('meal-image').value = '';
+        document.getElementById('meal-image').required = false;
 
         form.dataset.baseMealId = meal.idMeal;
         form.dataset.baseMealThumb = meal.strMealThumb || '';
@@ -253,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.display = 'block';
     }
 
-    function openModalForEdit(meal) {
+    const openModalForEdit = (meal) => {
         form.reset();
         form.dataset.editingId = meal._id;
 
@@ -261,48 +235,57 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('meal-category').value = meal.strCategory || '';
         document.getElementById('meal-price').value = parseFloat(meal.price).toFixed(2);
         document.getElementById('meal-available').checked = meal.isAvailable;
+        document.getElementById('meal-ingredients').value = meal.ingredients ? meal.ingredients.join(', ') : '';
+        document.getElementById('meal-image').value = '';
+        document.getElementById('meal-image').required = false;
 
         modalTitle.textContent = 'Edit Meal';
         submitBtn.textContent = 'Update Meal';
         modal.style.display = 'block';
     }
 
-    async function handleFormSubmit(e) {
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
         if (!token) return;
         const mealId = form.dataset.editingId;
         const isEditing = !!mealId;
 
-        const mealData = {
-            strMeal: document.getElementById('meal-name').value,
-            strCategory: document.getElementById('meal-category').value,
-            price: parseFloat(document.getElementById('meal-price').value),
-            isAvailable: document.getElementById('meal-available').checked,
-            isCustom: true
-        };
+        const strMeal = document.getElementById('meal-name').value;
+        const price = parseFloat(document.getElementById('meal-price').value);
 
-        if (!isEditing && form.dataset.baseMealId) {
-            // Genera un ID custom basato sul piatto originale
-            mealData.idMeal = `${form.dataset.baseMealId}_custom_${Date.now()}`;
-            mealData.strMealThumb = form.dataset.baseMealThumb;
-        }
-
-        if (!mealData.strMeal || !mealData.price || mealData.price <= 0) {
-            showAlert('Please fill in the Meal Name and a valid Price.', 'warning');
+        if (!strMeal || !price || price <= 0) {
+            showToast('Please fill in the Meal Name and a valid Price.', 'warning');
             return;
         }
 
-        const url = isEditing ? `${API_BASE_URL}/meals/${mealId}` : `${API_BASE_URL}/meals`;
-        const method = 'POST';
+        const formData = new FormData();
+        formData.append('strMeal', strMeal);
+        formData.append('strCategory', document.getElementById('meal-category').value);
+        formData.append('price', price);
+        formData.append('isAvailable', document.getElementById('meal-available').checked);
+        formData.append('isCustom', true);
+        formData.append('ingredients', document.getElementById('meal-ingredients').value);
+
+        if (!isEditing && form.dataset.baseMealId) {
+            // Genera un ID custom basato sul piatto originale
+            formData.append('idMeal', `${form.dataset.baseMealId}_custom_${Date.now()}`);
+            formData.append('strMealThumb', form.dataset.baseMealThumb);
+        }
+
+        const mealImageInput = document.getElementById('meal-image');
+        if (mealImageInput.files.length > 0) {
+            formData.append('mealImage', mealImageInput.files[0]);
+        }
+
+        const url = isEditing ? `/api/meals/${mealId}` : `/api/meals`;
 
         try {
             const res = await fetch(url, {
-                method: method,
+                method: isEditing ? 'PUT' : 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(mealData)
+                body: formData
             });
 
             const data = await res.json();
@@ -310,24 +293,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.message || 'Error saving the meal.');
             }
 
+            if (!isEditing && restaurantId) {
+                // Ricostruisce mealData per il menu restaurant add
+                const summaryMealData = {
+                    price: price,
+                    isAvailable: document.getElementById('meal-available').checked
+                };
+                await addMealToRestaurantMenu(data.meal || data, summaryMealData);
+            }
+
             closeModal();
-            showAlert(isEditing ? 'Meal updated!' : 'Meal created successfully!', 'success');
-            fetchCustomMeals();
+            showToast(isEditing ? 'Meal updated!' : 'Meal created successfully!', 'success');
+            fetchMeals(true);
 
         } catch (error) {
             console.error(error);
-            showAlert(error.message, 'danger');
+            showToast(error.message, 'danger');
         }
     }
 
-    async function handleDeleteMeal(mealId) {
+    const addMealToRestaurantMenu = async (createdMeal, mealData) => {
+        try {
+            const menuItemData = {
+                idMeal: createdMeal._id,
+                price: mealData.price,
+                preparationTime: 15,
+                isAvailable: mealData.isAvailable
+            };
+
+            const menuRes = await fetch(`/api/restaurants/${restaurantId}/menu`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(menuItemData)
+            });
+
+            if (!menuRes.ok) {
+                console.warn('Meal created but failed to add to restaurant menu');
+            }
+        } catch (menuError) {
+            console.error('Error adding meal to restaurant menu:', menuError);
+        }
+    }
+
+    const handleDeleteMeal = async (mealId) => {
         if (!token) return;
         if (!confirm('Are you sure you want to delete this meal?')) {
             return;
         }
 
         try {
-            const res = await fetch(`${API_BASE_URL}/meals/${mealId}`, {
+            const res = await fetch(`/api/meals/${mealId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -337,56 +355,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.message || 'Error deleting the meal.');
             }
 
-            showAlert('Meal deleted successfully.', 'success');
-            fetchCustomMeals();
+            showToast('Meal deleted successfully.', 'success');
+            fetchMeals(true); // Ricarica piatti personalizzati
 
         } catch (error) {
             console.error(error);
-            showAlert(error.message, 'danger');
+            showToast(error.message, 'danger');
         }
     }
 
-    function handleSearch() {
+    const handleSearch = () => {
         if (!token) return;
         const searchTerm = searchInput.value.trim();
-        fetchAvailableMeals(searchTerm);
-        fetchCustomMeals(searchTerm);
+        fetchMeals(false, searchTerm); // piatti disponibili
+        fetchMeals(true, searchTerm);  // piatti personalizzati
     }
-
-    function showAlert(message, type = 'danger') {
-        const container = document.querySelector('.main-content .container');
-        if (!container) return;
-
-        const existingAlert = container.querySelector('.alert.global-alert');
-        if (existingAlert) {
-            existingAlert.remove();
-        }
-
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show mt-3 global-alert`;
-        alertDiv.role = 'alert';
-        alertDiv.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-
-        container.prepend(alertDiv);
-
-        setTimeout(() => {
-            const alertInstance = bootstrap.Alert.getOrCreateInstance(alertDiv);
-            if (alertInstance) {
-                alertInstance.close();
-            } else if (alertDiv) {
-                alertDiv.remove();
-            }
-        }, 5000);
-    }
-
-
 
     addMealBtn.addEventListener('click', () => {
         if (token) openModalForCreate();
-        else alert('Please log in to create meals.');
+        else showToast('Please log in to create meals.', 'warning');
     });
 
     modalCloseBtn.addEventListener('click', closeModal);

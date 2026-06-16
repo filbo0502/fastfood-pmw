@@ -1,5 +1,5 @@
-import CONFIG from "./config.js";
-const API_BASE_URL = CONFIG.API_BASE_URL;
+import { showToast } from "./utils.js";
+import { logout } from "./auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -12,16 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Selettori Form
     const profileForm = document.getElementById('profile-details-form');
     const addressForm = document.getElementById('address-form');
     const passwordForm = document.getElementById('password-form');
     const paymentForm = document.getElementById('payment-form');
 
-    // Selettori Campi
     const nameInput = document.getElementById('name');
     const surnameInput = document.getElementById('surname');
     const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+    
+    const wantsSpecialOffersInput = document.getElementById('wantsSpecialOffers');
+    const favoriteCategoryInput = document.getElementById('favoriteCategory');
 
     const streetInput = document.getElementById('street');
     const cityInput = document.getElementById('city');
@@ -52,61 +54,84 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentUserData = null;
 
-    // Restituisce la classe icona corretta in base al tipo di carta
+    // Funzione per ottenere l'icona giusta in base al tipo di carta
     function getCardIconClass(cardType) {
         if (!cardType) return 'fas fa-credit-card';
-        switch (cardType.toLowerCase()) {
-            case 'visa': return 'fab fa-cc-visa';
-            case 'mastercard': return 'fab fa-cc-mastercard';
-            case 'amex': return 'fab fa-cc-amex';
-            default: return 'fas fa-credit-card';
+
+        if (cardType.toLowerCase() === 'visa') {
+            return 'fab fa-cc-visa';
+        } else if (cardType.toLowerCase() === 'mastercard') {
+            return 'fab fa-cc-mastercard';
+        } else if (cardType.toLowerCase() === 'amex') {
+            return 'fab fa-cc-amex';
+        } else {
+            return 'fas fa-credit-card';
         }
     }
 
-    async function loadUserData() {
+    const loadUserData = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/user/${userID}`, {
+            const response = await fetch(`/api/user/${userID}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
             if (!response.ok) {
+                if (response.status === 404) {
+                    console.warn('User profile not found. Logging out...');
+                    showToast('Your session is invalid or your account was deleted. Logging out...', 'warning');
+                    setTimeout(() => { logout(); }, 2000);
+                    return;
+                }
                 throw new Error('Could not load profile data.');
             }
 
             const user = await response.json();
             currentUserData = user;
+            // Popolo i form con i dati
             populateForms(user);
 
         } catch (error) {
             console.error('Error loading data:', error);
-            showAlert(error.message, 'danger');
+            showToast(error.message, 'danger');
         }
     }
 
-    function populateForms(user) {
+    const populateForms = (user) => {
         if (!user) return;
 
+        // Riempio i campi del profilo
         nameInput.value = user.name || '';
         surnameInput.value = user.surname || '';
         emailInput.value = user.email || '';
+        phoneInput.value = user.phone || '';
 
+        // Preferenze
+        if (user.preferences) {
+            wantsSpecialOffersInput.checked = user.preferences.wantsSpecialOffers || false;
+            favoriteCategoryInput.value = user.preferences.favoriteCategory || '';
+        }
+
+        // Riempio i campi dell'indirizzo (se presenti)
         if (user.address) {
             streetInput.value = user.address.street || '';
             cityInput.value = user.address.city || '';
             zipInput.value = user.address.zipCode || '';
         }
 
+        // Gestione metodo di pagamento
         if (user.paymentInfo && user.paymentInfo.cardNumb) {
+            // Se ha un metodo di pagamento salvato, mostro la visualizzazione
             paymentDisplayView.classList.remove('d-none');
             paymentFormView.classList.add('d-none');
 
             const { cardType, cardNumb, CVC, expiryDate } = user.paymentInfo;
 
+            // Mostro solo le ultime 4 cifre della carta
             const lastFour = cardNumb.slice(-4);
             savedCardIcon.className = `${getCardIconClass(cardType)} fa-2x me-3 text-primary`;
             savedCardDetails.textContent = `${cardType || 'Card'}----${lastFour}`;
 
-            // Formatta la data di scadenza
+            // Formatto la data di scadenza
             let expiryText = 'Expire in: --/--';
             if (expiryDate) {
                 try {
@@ -128,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             CVCInput.value = CVC || '';
 
         } else {
+            // Se NON ha un metodo di pagamento, mostro il form vuoto
             paymentDisplayView.classList.add('d-none');
             paymentFormView.classList.remove('d-none');
             cancelEditBtn.classList.add('d-none');
@@ -162,13 +188,15 @@ document.addEventListener('DOMContentLoaded', () => {
             name: currentUserData.name,
             surname: currentUserData.surname,
             email: currentUserData.email,
+            phone: currentUserData.phone,
             address: currentUserData.address,
+            preferences: currentUserData.preferences,
             userType: currentUserData.userType,
             paymentInfo: null
         };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/user/${userID}`, {
+            const response = await fetch(`/api/user/${userID}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -184,29 +212,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
             currentUserData = data.user;
             populateForms(currentUserData);
-            showAlert('Payment method removed successfully!', 'success');
+            showToast('Payment method removed successfully!', 'success');
 
         } catch (error) {
-            showAlert(error.message, 'danger');
+            showToast(error.message, 'danger');
         }
     });
-
 
     profileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!currentUserData) return;
 
+        // Preparo i dati da inviare
         const payload = {
             name: nameInput.value,
             surname: surnameInput.value,
             email: emailInput.value,
+            phone: phoneInput.value,
             address: currentUserData.address,
             paymentInfo: currentUserData.paymentInfo,
+            preferences: {
+                wantsSpecialOffers: wantsSpecialOffersInput.checked,
+                favoriteCategory: favoriteCategoryInput.value
+            },
             userType: currentUserData.userType
         };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/user/${userID}`, {
+            const response = await fetch(`/api/user/${userID}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -222,10 +255,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             currentUserData = data.user;
             populateForms(currentUserData);
-            showAlert('Profile details updated!', 'success');
+            showToast('Profile details updated!', 'success');
 
         } catch (error) {
-            showAlert(error.message, 'danger');
+            showToast(error.message, 'danger');
         }
     });
 
@@ -237,7 +270,9 @@ document.addEventListener('DOMContentLoaded', () => {
             name: currentUserData.name,
             surname: currentUserData.surname,
             email: currentUserData.email,
+            phone: currentUserData.phone,
             paymentInfo: currentUserData.paymentInfo,
+            preferences: currentUserData.preferences,
             userType: currentUserData.userType,
             address: {
                 street: streetInput.value,
@@ -247,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/user/${userID}`, {
+            const response = await fetch(`/api/user/${userID}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -263,10 +298,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             currentUserData = data.user;
             populateForms(currentUserData);
-            showAlert('Address updated successfully!', 'success');
+            showToast('Address updated successfully!', 'success');
 
         } catch (error) {
-            showAlert(error.message, 'danger');
+            showToast(error.message, 'danger');
         }
     });
 
@@ -274,14 +309,17 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         if (!currentUserData) return;
 
+        // Converto la data di scadenza in un oggetto Date
         let expiryDateObj = null;
         if (expiryDateInput.value) {
             try {
-                const [year, month] = expiryDateInput.value.split('/').map(Number);
+                const parts = expiryDateInput.value.split('/');
+                const year = Number(parts[0]);
+                const month = Number(parts[1]);
                 expiryDateObj = new Date(year, month, 0);
             } catch (e) {
                 console.error('Invalid date format');
-                showAlert('Expiry date not valid.', 'danger');
+                showToast('Expiry date not valid.', 'danger');
                 return;
             }
         }
@@ -290,7 +328,9 @@ document.addEventListener('DOMContentLoaded', () => {
             name: currentUserData.name,
             surname: currentUserData.surname,
             email: currentUserData.email,
+            phone: currentUserData.phone,
             address: currentUserData.address,
+            preferences: currentUserData.preferences,
             userType: currentUserData.userType,
             paymentInfo: {
                 cardType: cardTypeInput.value,
@@ -301,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/user/${userID}`, {
+            const response = await fetch(`/api/user/${userID}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -317,10 +357,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             currentUserData = data.user;
             populateForms(currentUserData);
-            showAlert('Payment info updated successfully!', 'success');
+            showToast('Payment info updated successfully!', 'success');
 
         } catch (error) {
-            showAlert(error.message, 'danger');
+            showToast(error.message, 'danger');
         }
     });
 
@@ -332,12 +372,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const confirmNewPassword = confirmPassInput.value;
 
         if (newPassword !== confirmNewPassword) {
-            showAlert('The new passwords do not match.', 'danger');
+            showToast('The new passwords do not match.', 'danger');
             return;
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/user/${userID}/password`, {
+            const response = await fetch(`/api/user/${userID}/password`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -351,19 +391,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.message || 'Error updating password.');
             }
 
-            showAlert('Password updated successfully!', 'success');
+            showToast('Password updated successfully!', 'success');
+
+            // Pulisco i campi
             currentPassInput.value = '';
             newPassInput.value = '';
             confirmPassInput.value = '';
 
         } catch (error) {
-            showAlert(error.message, 'danger');
+            showToast(error.message, 'danger');
         }
     });
 
+    // Quando clicchi su "Yes, Delete" per eliminare l'account
     deleteBtn.addEventListener('click', async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/user/${userID}`, {
+            const response = await fetch(`/api/user/${userID}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -373,70 +416,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.message || 'Could not delete the account.');
             }
 
-            alert('Account deleted successfully. You will be logged out.');
-            logout();
+            showToast('Account deleted successfully. You will be logged out.', 'success');
+            setTimeout(() => { logout(); }, 2000);
 
         } catch (error) {
-            const modalEl = document.getElementById('deleteConfirmModal');
-            if (modalEl) {
-                const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            showToast(error.message, 'danger');
+        } finally {
+            const modal = document.getElementById('deleteConfirmModal');
+            if (modal) {
+                const modalInstance = bootstrap.Modal.getInstance(modal);
                 if (modalInstance) {
                     modalInstance.hide();
                 }
             }
-            showAlert(error.message, 'danger');
         }
     });
-
-    function showAlert(message, type) {
-        const container = document.querySelector('.main-section .container');
-        if (!container) return;
-
-        const existingAlert = container.querySelector('.alert');
-        if (existingAlert) {
-            existingAlert.remove();
-        }
-
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-        alertDiv.role = 'alert';
-        alertDiv.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-
-        container.prepend(alertDiv);
-
-        setTimeout(() => {
-            const alertInstance = bootstrap.Alert.getOrCreateInstance(alertDiv);
-            if (alertInstance) {
-                alertInstance.close();
-            } else if (alertDiv) {
-                alertDiv.remove();
-            }
-        }, 5000);
-    }
-
-    async function logout() {
-        try {
-            const token = localStorage.getItem('jwtToken');
-            await fetch(`${API_BASE_URL}/auth/logout`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-        } catch (error) {
-            console.error('Error calling server logout:', error);
-        } finally {
-            localStorage.removeItem('jwtToken');
-            localStorage.removeItem('userID');
-            localStorage.removeItem('userType');
-            localStorage.removeItem('restaurantId');
-            window.location.href = '../index.html';
-        }
-    }
 
     loadUserData();
 });

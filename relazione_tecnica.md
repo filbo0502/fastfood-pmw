@@ -1,862 +1,726 @@
-# Relazione Tecnica - FastFood PMW (CodeBite)
+# Relazione
 
-**Progetto**: Sistema di Gestione Ordini per Ristoranti Fast Food  
-**Nome Applicazione**: CodeBite  
-**Anno Accademico**: 2025/2026  
-**Corso**: Programmazione Web e Mobile
+Relazione del progetto _"FastFood PMW - CodeBite"_ per il corso _"Programmazione Web e Mobile"_ (a.a. 2025/2026).
 
----
+Realizzata da Filippo Maria Bottaro (matr: 24445A).
 
-<!--toc:start-->
-- [Introduzione](#introduzione)
-  - [Autore](#autore)
-  - [Link ed informazioni utili](#link-ed-informazioni-utili)
-  - [Panoramica del Progetto](#panoramica-del-progetto)
-- [Struttura dell'Applicazione](#struttura-dellapplicazione)
-  - [Front-End](#front-end)
-    - [Directory HTML](#directory-html)
-    - [Directory CSS](#directory-css)
-    - [Directory Scripts](#directory-scripts)
-  - [Back-End](#back-end)
-    - [NODEJS](#nodejs)
-    - [COS'È NODEJS ED EXPRESS](#cosè-nodejs-ed-express)
-    - [File NODEJS](#file-nodejs)
-  - [Database MONGODB](#database-mongodb)
-    - [USERS](#users)
-    - [RESTAURANTS](#restaurants)
-    - [MEALS](#meals)
-    - [ORDERS](#orders)
-- [Configurazione dell'applicazione](#configurazione-dellapplicazione)
-- [Scelte implementative e features](#scelte-implementative-e-features)
-  - [Swagger JS](#swagger-js)
-  - [File SWAGGER.JS](#file-swaggerjs)
-  - [Interfaccia grafica SWAGGER](#interfaccia-grafica-swagger)
+- [Testing e Deploy](#testing-e-deploy)
+- [Struttura del progetto](#struttura-del-progetto)
+  - [Stack tecnologico](#stack-tecnologico)
+  - [Motivazioni delle scelte tecnologiche](#motivazioni-delle-scelte-tecnologiche)
+  - [Organizzazione codice](#organizzazione-codice)
+  - [Database MongoDB](#database-mongodb)
+- [Struttura del sito web](#struttura-del-sito-web)
+- [Scelte implementative significative](#scelte-implementative-significative)
+  - [Autenticazione ed Autorizzazione (JWT)](#autenticazione-ed-autorizzazione-jwt)
+    - [Accesso endpoint API protetti (middleware `authMiddleware`)](#accesso-endpoint-api-protetti-middleware-authmiddleware)
+    - [Accesso pagine web protette (controllo client-side)](#accesso-pagine-web-protette-controllo-client-side)
+    - [Password hashing con bcrypt](#password-hashing-con-bcrypt)
+  - [Validazione richieste](#validazione-richieste)
+    - [Express Validator](#express-validator)
+  - [Upload immagini ristoranti](#upload-immagini-ristoranti)
+  - [Gestione stati ordini](#gestione-stati-ordini)
+  - [Calcolo tempi di attesa](#calcolo-tempi-di-attesa)
+  - [Debouncing ricerche](#debouncing-ricerche)
+  - [Notifiche utente standardizzate](#notifiche-utente-standardizzate)
   - [Gestione codici HTTP](#gestione-codici-http)
-  - [Autenticazione JWT](#autenticazione-jwt)
-  - [Validazione Input](#validazione-input)
-  - [Upload File](#upload-file)
-- [Esempi di Utilizzo](#esempi-di-utilizzo)
-  - [Homepage](#homepage)
-  - [Registrazione](#registrazione)
-  - [Login](#login)
-  - [Ricerca Ristoranti](#ricerca-ristoranti)
-  - [Ricerca Piatti](#ricerca-piatti)
-  - [Documentazione API](#documentazione-api)
-- [Lingua](#lingua)
-<!--toc:end-->
-
-# Introduzione
-
-Questo documento rappresenta la relazione del progetto "FastFood PMW - CodeBite", sviluppato nel contesto del corso "Programmazione Web e Mobile" durante l'anno accademico 2025/2026.
-
-**CodeBite** è una piattaforma web completa per la gestione di ordini di cibo da asporto e consegna a domicilio, che permette agli utenti di cercare ristoranti, sfogliare menu, effettuare ordini e tracciare lo stato delle consegne. I ristoratori possono gestire il proprio ristorante, creare e modificare menu, gestire ordini in arrivo e visualizzare statistiche.
-
-## Autore
-
-Il progetto è stato realizzato da:
-
-- **Filippo Bottaro** - [GitHub Profile](https://github.com/filbo0502)
-
-## Link ed informazioni utili
-
-- La pagina GitHub del progetto si trova a [questo link](https://github.com/filbo0502/fastfood-pmw)
-- Repository: `https://github.com/filbo0502/fastfood-pmw.git`
-- Versione: 1.0.0
-
-## Panoramica del Progetto
-
-### Obiettivi del Sistema
-
-- Fornire un'interfaccia intuitiva per l'ordinazione di cibo online
-- Permettere ai ristoratori di gestire autonomamente la propria attività
-- Garantire sicurezza nelle transazioni e nella gestione dei dati
-- Offrire un sistema scalabile e manutenibile
-
-### Stack Tecnologico
-
-```mermaid
-graph TB
-    subgraph Frontend
-        A[HTML5] --> D[Browser]
-        B[CSS3/Bootstrap] --> D
-        C[JavaScript ES6+] --> D
-    end
-    
-    subgraph Backend
-        E[Node.js] --> F[Express.js]
-        F --> G[API REST]
-    end
-    
-    subgraph Database
-        H[MongoDB]
-        I[Mongoose ODM]
-    end
-    
-    subgraph Authentication
-        J[JWT Tokens]
-        K[bcryptjs]
-    end
-    
-    D <--> G
-    G <--> I
-    I <--> H
-    G --> J
-    G --> K
-```
-
-**Tecnologie Principali**:
-- **Backend**: Node.js v18+, Express.js v5.1.0
-- **Database**: MongoDB con Mongoose ODM v8.15.1
-- **Frontend**: HTML5, CSS3, JavaScript vanilla, Bootstrap 5.3.0
-- **Autenticazione**: JWT (jsonwebtoken v9.0.2), bcryptjs v3.0.2
-- **Documentazione API**: Swagger UI Express v5.0.1
-- **Validazione**: Express Validator v7.2.1
-- **Upload File**: Multer v2.0.2
-
----
-
-# Struttura dell'Applicazione
-
-## Front-End
-
-> **Front End:**  
-> Il Front-End è la parte dell'applicazione che si occupa dell'interfaccia utente e dell'interazione con l'utente. Si concentra sulla progettazione e sull'implementazione dell'aspetto visivo dell'applicazione e sulla gestione delle interazioni utente.
-
-All'interno della directory `/frontend/`, sono presenti i seguenti elementi principali:
-
-### Directory HTML
-
-- `/pages/` - Questa directory contiene i file HTML che vengono renderizzati dal browser, determinando quindi l'interfaccia grafica dell'applicazione. Tutti i files sono stati validati per lo standard HTML5.
-
-I file principali includono:
-- `index.html` - _Pagina principale dell'applicazione_
-- `/pages/login.html` - _Pagina di login per autenticazione utenti_
-- `/pages/registration.html` - _Pagina di registrazione per nuovi utenti_
-- `/pages/searchRestaurant.html` - _Interfaccia per la ricerca di ristoranti_
-- `/pages/searchDish.html` - _Interfaccia per la ricerca di piatti_
-- `/pages/restaurantDetails.html` - _Dettagli ristorante e menu_
-- `/pages/order.html` - _Carrello e checkout ordini_
-- `/pages/orderHistory.html` - _Storico ordini cliente_
-- `/pages/profile.html` - _Profilo utente_
-- `/pages/restaurantDashboard.html` - _Dashboard ristoratore_
-- `/pages/menuManagement.html` - _Gestione menu ristorante_
-- `/pages/restaurantOrders.html` - _Gestione ordini ristorante_
-- `/pages/statistics.html` - _Statistiche ristorante_
-- `/pages/about.html` - _Informazioni sull'applicazione_
-
-### Directory CSS
-
-- `/css/` - Questa directory contiene i file di stile che definiscono l'aspetto visivo dell'applicazione. Tutti i files sono stati validati per lo standard CSS3. I file principali sono:
-  - `/frontend/css/styles.css` - _Questo file definisce lo stile generale dell'applicazione, inclusi colori, tipografia, layout responsive e componenti UI_
-
-**Caratteristiche design**:
-- **Responsive**: mobile-first design con Bootstrap 5.3.0
-- **Navbar fissa**: navigazione sempre accessibile
-- **Card moderne**: design pulito per ristoranti e piatti
-- **Colori brand**: palette coerente (marrone/arancio per food)
-- **Icone**: Font Awesome 6.4.0
-- **Animazioni**: transizioni smooth per hover e interazioni
-
-### Directory Scripts
-
-- `/scripts/` - Questa directory contiene file JavaScript che gestiscono la logica del Front-End. Alcuni dei file principali includono:
-  - `/frontend/js/auth.js` - _Questo file si occupa di verificare l'autenticazione dell'utente e aggiornare l'interfaccia in base allo stato di login_
-  - `/frontend/js/config.js` - _Configurazione delle URL delle API e parametri dell'applicazione_
-  - `/frontend/js/utils.js` - _Funzioni utility condivise tra tutti i moduli (API calls, toast notifications)_
-  - `/frontend/js/login.js` - _Questo file si occupa di tutte le operazioni necessarie al login dell'utente_
-  - `/frontend/js/registration.js` - _Questo file si occupa delle operazioni necessarie alla registrazione di un utente. Gestisce form dinamici per customer e restaurateur_
-  - `/frontend/js/search.js` - _Gestione ricerca ristoranti con filtri e visualizzazione risultati_
-  - `/frontend/js/searchDish.js` - _Gestione ricerca piatti per categoria e ingredienti_
-  - `/frontend/js/restaurantDetails.js` - _Visualizzazione dettagli ristorante, menu e aggiunta al carrello_
-  - `/frontend/js/order.js` - _Gestione carrello, checkout e creazione ordini_
-  - `/frontend/js/orderHistory.js` - _Visualizzazione storico ordini cliente_
-  - `/frontend/js/profile.js` - _Gestione profilo utente e modifica dati_
-  - `/frontend/js/menuManagement.js` - _Gestione menu ristorante (aggiunta, modifica, rimozione piatti)_
-  - `/frontend/js/restaurantOrders.js` - _Gestione ordini in arrivo per ristoratori_
-  - `/frontend/js/statistics.js` - _Visualizzazione statistiche vendite ristorante_
+  - [Documentazione API con Swagger](#documentazione-api-con-swagger)
 
-La suddivisione chiara tra file HTML, file CSS e file JavaScript consente una gestione efficiente del Front-End e garantisce un'esperienza utente di alta qualità.
+## Testing e Deploy
 
-## Back-End
+Il codice sorgente è disponibile all'indirizzo: [github.com/filbo0502/fastfood-pmw](https://github.com/filbo0502/fastfood-pmw).
 
-> **Back End:**  
-> Il Back-End è responsabile delle funzionalità e della logica dell'applicazione lato server. Esso comprende una serie di elementi chiave presenti nella nostra struttura di lavoro.
+Istruzioni per avviare l'applicazione - **fase di testing** (backend in modalità development con auto-reload):
 
-### NODEJS
+- Clonare il codice sorgente:
+  - `git clone https://github.com/filbo0502/fastfood-pmw`
+  - `cd fastfood-pmw`
+- Installare le dipendenze:
+  - `npm install`
+- Aggiungere file `.env` alla root del progetto:
+  - `cp /path/to/.env ./.env`
+  - Il file contiene le seguenti variabili di ambiente:
+    - `PORT`: porta su cui il server sarà in ascolto (default: 3000)
+    - `MONGO_URI`: URI del server MongoDB
+    - `JWT_SECRET`: chiave segreta per firma token JWT
+    - `NODE_ENV`: ambiente di esecuzione (development/production)
+  - _Un file `.env` completo di esempio è stato caricato su upload_
+- Avviare il server (esporrà sia Backend che Frontend):
+  - `npm run dev`
+- Il frontend sarà raggiungibile all'indirizzo [`http://localhost:3000/`](http://localhost:3000/)
+- L'API sarà raggiungibile all'indirizzo [`http://localhost:3000/api/`](http://localhost:3000/api/)
+- La documentazione Swagger sarà disponibile all'indirizzo [`http://localhost:3000/api/swagger`](http://localhost:3000/api/swagger)
 
-#### COS'È NODEJS ED EXPRESS
+Per generare una build per la **fase production**:
 
-**Node.js** ed **Express** costituiscono un binomio potente nell'ambito dello sviluppo web di applicazioni scalabili ed efficienti.  
-*Node.js* fornisce un ambiente runtime JavaScript server-side, ottimizzato per l'efficienza e la scalabilità.  
-*Express*, un framework web basato su Node.js, semplifica la creazione di applicazioni web, offrendo funzionalità come la gestione delle richieste HTTP, routing, middleware e autenticazione.
+_Istruzioni per le fasi ripetute da sopra omesse_
 
-**Architettura del Server**:
+- Clonare il codice sorgente ed entrare nella cartella
+- Installare le dipendenze con `npm install`
+- Aggiungere il file `.env` alla root del progetto (impostare `NODE_ENV=production`)
+- Avviare il server:
+  - `npm start`
+- Il sito sarà raggiungibile all'indirizzo [`http://localhost:3000`](http://localhost:3000)
+- L'API sarà raggiungibile all'indirizzo [`http://localhost:3000/api`](http://localhost:3000/api)
 
-```mermaid
-graph LR
-    A[Client Browser] -->|HTTP/HTTPS| B[Express Server]
-    B -->|REST API| C[Controllers]
-    C -->|Business Logic| D[Models]
-    D -->|Mongoose| E[(MongoDB)]
-    B -->|JWT Auth| F[Auth Middleware]
-    B -->|Static Files| G[Frontend Assets]
-```
+## Struttura del progetto
 
-#### File NODEJS
+Ho organizzato il progetto con architettura monolitica, includendo frontend e backend nella stessa repository. Il backend Node/Express si occupa di esporre le API RESTful e, simultaneamente, di servire i file statici del frontend sulla stessa porta, eliminando eventuali problemi di CORS.
 
-- `/config/` - Questa cartella contiene i file dedicati alla configurazione dell'applicazione, ad eccezione delle variabili d'ambiente. Al suo interno, sono presenti:
-  - `database.js` - _Questo file gestisce la connessione a MongoDB utilizzando Mongoose_
+### Stack tecnologico
 
-- `/controllers/` - Directory contenente la logica di business dell'applicazione:
-  - `authController.js` - _Gestione autenticazione, login, registrazione e logout_
-  - `userController.js` - _Gestione profili utente (lettura, aggiornamento, eliminazione)_
-  - `restaurantController.js` - _Gestione ristoranti (CRUD operations)_
-  - `mealController.js` - _Gestione piatti e ricette_
-  - `orderController.js` - _Gestione ordini (creazione, aggiornamento stato)_
-  - `searchController.js` - _Logica di ricerca ristoranti e piatti_
-  - `statisticsController.js` - _Calcolo statistiche vendite ristoranti_
+**Frontend** (in `JavaScript vanilla`):
 
-- `/models/` - La directory models contiene gli schemi Mongoose per le collezioni MongoDB:
-  - `User.js` - _Schema utenti con validazione e hashing password_
-  - `Restaurant.js` - _Schema ristoranti con menu embedded_
-  - `Meal.js` - _Schema piatti con ingredienti e allergie_
-  - `Order.js` - _Schema ordini con stati e tracking_
+- `HTML5` - la struttura semantica delle pagine
+- `CSS3` + `Bootstrap 5.3.0` - per velocizzare lo styling responsive
+- `JavaScript ES6+` - per la logica client-side
+- `Toastify` - per le notifiche pop up, più belle visivamente rispetto agli `alert()` nativi
+- `Chart.js` - per i grafici delle statistiche
 
-- `/routes/` - Definizione degli endpoint API:
-  - `authRoutes.js` - _Routes per autenticazione_
-  - `userRoutes.js` - _Routes per gestione utenti_
-  - `restaurantRoutes.js` - _Routes per gestione ristoranti_
-  - `mealRoutes.js` - _Routes per gestione piatti_
-  - `orderRoutes.js` - _Routes per gestione ordini_
-  - `statisticsRoutes.js` - _Routes per statistiche_
+**Backend** (in `JavaScript`):
 
-- `/middlewares/` - Middleware personalizzati:
-  - `authMiddleware.js` - _Verifica token JWT e protezione routes_
+- `Node.js` v18+ - runtime JavaScript server-side
+- `Express.js` v5.1.0 - il framework web backend 
+- Per la comunicazione con il database: `Mongoose` v8.15.1
+- Per la gestione autorizzazioni (sessioni): `jsonwebtoken` v9.0.2 (JWT)
+- Per l'upload delle immagini: `Multer` v2.0.2
 
-- `/utils/` - Funzioni utility:
-  - `regex.js` - _Pattern di validazione per email, password, ecc._
-  - `importMeals.js` - _Script per importazione dati iniziali_
-  - `waitTime.js` - _Calcolo tempi di attesa e preparazione_
+**Database**:
 
-- `server.js` - Questo file rappresenta il punto di ingresso principale dell'applicazione, contenente le istruzioni per l'avvio dell'app e la definizione degli endpoint.
+- `MongoDB` - un database NoSQL document-oriented
 
-- `swagger.js` e `swagger.json` - File per la generazione e configurazione della documentazione API Swagger.
+**Utilità**:
 
-La struttura ben organizzata del Back-End garantisce una gestione efficiente delle funzionalità server-side e contribuisce al corretto funzionamento dell'applicazione.
+- Per la validazione delle richieste: `express-validator` v7.2.1 _(backend)_
+- Per l'hasing delle password: `bcryptjs` v3.0.2 _(backend)_
+- Per la documentazione API: `swagger-autogen` + `swagger-ui-express` _(backend)_
+- Le Environment variables: `dotenv` _(backend)_
 
-## Database MONGODB
+### Motivazioni delle scelte tecnologiche
 
-Nel corso di sviluppo dell'applicazione, è stato fatto largo uso del database MongoDB. Qui di seguito, vengono presentate le collezioni che sono state create e utilizzate per immagazzinare i dati essenziali dell'applicazione.
+#### Node.js + Express.js
 
-> **MongoDB:**  
-> MongoDB è un database NoSQL (non relazionale), flessibile e scalabile, noto per la sua struttura orientata ai documenti. Un documento è un record dati in formato BSON (Binary JSON) che può contenere dati di varie forme e dimensioni. Ogni documento è organizzato in *collezioni*, offrendo flessibilità nella modellazione dei dati.  
-> Per lo sviluppo di questa applicazione è stato deciso di utilizzare MongoDB per la sua flessibilità nella gestione di strutture dati complesse come menu e ordini.
+Ho deciso di usare Node.js principalmente per poter scrivere tutto il progetto in JavaScript, sia lato frontend che lato backend. Questo mi ha aiutato molto a non dover saltare continuamente tra linguaggi diversi. Ci ho affiancato Express perché è comodissimo per tirare su il server e gestire tutte le rotte API con poche righe di codice, senza troppe configurazioni complesse.
 
-Per questa applicazione sono state utilizzate le seguenti collections:
-- **users**: Collezione che gestisce i dati degli utenti (clienti e ristoratori)
-- **restaurants**: Collezione che gestisce informazioni dei ristoranti e menu
-- **meals**: Collezione che gestisce i piatti disponibili (catalogo e custom)
-- **orders**: Collezione che gestisce gli ordini effettuati
+#### MongoDB + Mongoose
 
-Di seguito viene riportata una descrizione delle collections e del loro schema.
+I dati di un'app di delivery (come i menu o i dettagli dei ristoranti) si adattano molto bene al modello a documenti di MongoDB. Ad esempio, ho potuto inserire il menu direttamente dentro il documento del ristorante, così mi basta una sola query per recuperare tutto. Per interfacciarmi con il database ho preferito Mongoose al driver nativo perché quest'ultimo è fin troppo permissivo: Mongoose invece mi ha permesso di creare degli Schemi precisi. In questo modo ho potuto impostare campi obbligatori, valori di default e controlli sui tipi senza dover scrivere decine di `if` per validare i dati prima di ogni salvataggio.
 
-### USERS
+#### JWT (JSON Web Token)
 
-#### DESCRIZIONE
+Per far loggare gli utenti ho implementato l'autenticazione tramite token JWT. Il vantaggio principale è che il server non deve salvarsi nulla nel database per ricordarsi chi è connesso. Quando l'utente fa login, gli viene restituito questo token che contiene già il suo ID e il suo ruolo (cliente o ristoratore). Ho impostato la scadenza del token a 2 ore, così se anche dovesse essere rubato non rimarrebbe valido all'infinito.
 
-La collezione *users* è destinata a contenere i dati degli utenti all'interno dell'applicazione. Supporta due tipi di utenti: **customer** (clienti) e **restaurateur** (ristoratori).
+#### bcryptjs
 
-#### ATTRIBUTI
+Per proteggere le password degli utenti ho usato la libreria bcryptjs. A differenza di algoritmi classici e molto veloci, bcrypt rallenta apposta il processo di hashing (ho impostato il "salt" a 10) per difendersi dai tentativi di attacco brute-force. Ho scelto la versione col suffisso "js" perché è scritta interamente in JavaScript e mi ha evitato dei fastidiosi problemi di compatibilità che a volte capitano con la libreria originale in C++.
 
-- **_id**: identificatore univoco di un utente, di tipo ObjectId. È un campo obbligatorio per identificare univocamente un utente nel database.
+#### Bootstrap 5
 
-- **name**: nome dell'utente, di tipo stringa. È un campo obbligatorio e contiene il nome dell'utente. Validato tramite regex.
+L'ho usato per sbrigarmi a fare l'interfaccia. Mi ha permesso di avere un sito responsive (funzionante anche da cellulare) senza dover scrivere tutto il CSS a mano da zero.
 
-- **surname**: cognome dell'utente, di tipo stringa. È un campo obbligatorio e contiene il cognome dell'utente. Validato tramite regex.
+#### Librerie utility (Toastify, Chart.js, Multer)
 
-- **email**: indirizzo email dell'utente, di tipo stringa. È un campo obbligatorio, univoco e contiene l'indirizzo email dell'utente. Validato tramite regex per formato email.
+- **Toastify JS**: L'ho preferito ai popup nativi di Bootstrap perché è molto più facile da richiamare via codice, basta una riga per far comparire la notifica a schermo.
+- **Chart.js**: Ottimo per le statistiche del ristoratore, mi ha permesso di creare grafici a torta e a barre passandogli semplicemente i dati.
+- **Multer**: L'ho integrato su Express per poter ricevere e salvare fisicamente le immagini caricate dai ristoratori per i loro ristoranti e piatti.
+- **express-validator**: È molto comodo per validare i dati che arrivano dal frontend direttamente sulle rotte Express, prima ancora che arrivino ai controller.
+- **swagger-autogen**: L'ho aggiunto per generare in automatico la pagina della documentazione API a partire dai commenti che ho messo nel codice backend.
+
+### Organizzazione codice
+
+**Frontend**:
+
+Il frontend è organizzato in pagine HTML statiche che vengono popolate dinamicamente con JavaScript vanilla. Ogni pagina effettua richieste asincrone all'API REST del backend per ottenere e inviare dati.
+
+Struttura cartelle (in `frontend/`):
+
+- `pages/`: pagine HTML dell'applicazione
+  - `index.html`: homepage
+  - `login.html`, `registration.html`: autenticazione
+  - `searchRestaurant.html`, `searchDish.html`: ricerca
+  - `restaurantDetails.html`: dettagli ristorante e menu
+  - `order.html`, `orderHistory.html`: gestione ordini cliente
+  - `profile.html`: profilo utente
+  - `restaurantDashboard.html`, `menuManagement.html`, `restaurantOrders.html`, `statistics.html`: area ristoratore
+- `css/`: file di stile CSS
+- `js/`: logica JavaScript
+  - `utils.js`: funzioni utility condivise
+  - `auth.js`: gestione stato autenticazione navbar
+  - file specifici per ogni pagina (es: `login.js`, `search.js`, ecc.)
+- `images/`: risorse statiche (loghi, placeholder)
+
+**Backend**:
+
+Il backend espone un'API REST organizzata in router (`routes/`), ognuno gestisce endpoint raggruppati per risorsa. Tutti i router sono utilizzati dal server Express (`server.js`).
+
+Struttura cartelle (in `backend/`):
+
+- `controllers/`: logica di business per ogni risorsa
+  - `authController.js`: registrazione, login, logout
+  - `userController.js`: gestione profili utente
+  - `restaurantController.js`: CRUD ristoranti
+  - `mealController.js`: gestione piatti
+  - `orderController.js`: gestione ordini
+  - `statisticsController.js`: calcolo statistiche
+- `models/`: schemi Mongoose per MongoDB
+  - `User.js`: utenti (customer e restaurateur)
+  - `Restaurant.js`: ristoranti con menu embedded
+  - `Meal.js`: piatti (catalogo e custom)
+  - `Order.js`: ordini con tracking stato
+- `routes/`: definizione endpoint API
+- `middlewares/`: middleware personalizzati
+  - `authMiddleware.js`: protezione route con JWT
+- `config/`: configurazione database
+- `utils/`: utility varie (regex, import dati, calcolo tempi)
+- `server.js`: entry point applicazione
+- `swagger.js`: generazione documentazione API
+
+È anche esposta una documentazione Swagger interattiva all'endpoint `/api/swagger`, generata automaticamente da `swagger-autogen`.
+
+### Database MongoDB
+
+Ho usato MongoDB (NoSQL document-oriented) come database, scelto per la flessibilità nella gestione di strutture dati complesse come menu e ordini. L'applicazione usa Mongoose come ODM (Object Data Modeling) per definire schemi e validazioni.
+
+Per la modellazione dei dati ho usato una combinazione di embedding e referencing: il menu è embedded direttamente nel documento `Restaurant` perché viene sempre letto insieme al ristorante, quindi un'unica query è più efficiente. Gli ordini invece referenziano `User`, `Restaurant` e `Meal` tramite ObjectId perché sono entità indipendenti con ciclo di vita proprio, e il `populate()` di Mongoose permette di arricchirli con i dati correlati solo quando necessario.
+
+**Collezioni principali**:
+
+#### Users
+
+Gestisce i dati degli utenti (clienti e ristoratori).
+
+Attributi principali:
+- `name`, `surname`: nome e cognome (String, obbligatori)
+- `email`: indirizzo email univoco (String, obbligatorio, validato con regex)
+- `password`: password cifrata con bcrypt (String, obbligatorio, min 8 caratteri)
+- `userType`: tipo utente `'customer'` o `'restaurateur'` (String, obbligatorio)
+- `restaurant`: riferimento al ristorante (ObjectId, solo per restaurateur)
+- `paymentInfo`: informazioni pagamento (Object, solo per customer)
+  - `cardType`, `cardNumb`, `CVC`, `expiryDate`
+- `address`: indirizzo (Object)
+  - `street`, `city`, `zipCode`
+- `preferences`: preferenze utente (Object, opzionale)
+  - `wantsSpecialOffers` (Boolean), `favoriteCategory` (String)
+- `createdAt`: timestamp creazione (Date, auto-generato)
+
+Hook Mongoose:
+- pre-save: hash automatico della password con bcrypt
+- pre-delete: eliminazione cascade del ristorante quando si elimina un ristoratore
+
+#### Restaurants
+
+Gestisce informazioni ristoranti e menu.
+
+Attributi principali:
+- `name`: nome ristorante (String, obbligatorio)
+- `owner`: riferimento al proprietario (ObjectId → Users, obbligatorio)
+- `description`: descrizione (String, obbligatorio)
+- `phone`: numero telefono (String, obbligatorio)
+- `vatNumber`: partita IVA (String, obbligatorio)
+- `image`: path immagine (String, opzionale)
+- `address`: indirizzo completo (Object, obbligatorio)
+  - `street`, `city`, `zipCode`
+  - `coordinates`: { `latitude`, `longitude` } (opzionale)
+- `menu`: array piatti nel menu (Array)
+  - `meal`: riferimento piatto (ObjectId → Meals)
+  - `price`: prezzo (Number, min: 0)
+  - `preparationTime`: tempo preparazione in minuti (Number)
+  - `isAvailable`: disponibilità (Boolean, default: true)
 
-- **password**: password dell'utente, di tipo stringa. È un campo obbligatorio e contiene la password dell'utente cifrata con bcrypt (10 salt rounds). Minimo 8 caratteri.
+#### Meals
 
-- **userType**: tipo di utente, di tipo stringa. È un campo obbligatorio con valori possibili: `'customer'` o `'restaurateur'`.
+Catalogo piatti disponibili (standard e personalizzati).
 
-- **restaurant**: riferimento al ristorante (solo per ristoratori), di tipo ObjectId. Campo opzionale che referenzia la collezione restaurants.
+Attributi principali:
+- `idMeal`: identificatore esterno (String, obbligatorio)
+- `strMeal`: nome piatto (String, obbligatorio)
+- `strCategory`: categoria (String, es: "Burger", "Pizza")
+- `strArea`: cucina (String, es: "Italian", "American")
+- `strMealThumb`: URL immagine (String)
+- `ingredients`: array ingredienti (Array di String)
+- `isCustom`: flag piatto personalizzato (Boolean, default: false)
+- `createdBy`: riferimento ristorante creatore (ObjectId, solo per custom)
 
-- **paymentInfo**: informazioni di pagamento (solo per clienti), oggetto contenente:
-  - `cardType`: tipo di carta (Visa, Mastercard, ecc.)
-  - `cardNumb`: numero carta
-  - `CVC`: codice sicurezza
-  - `expiryDate`: data scadenza
+#### Orders
 
-- **address**: indirizzo dell'utente, oggetto contenente:
-  - `street`: via e numero civico
-  - `city`: città
-  - `zipCode`: codice postale
+Gestione ordini clienti.
 
-- **createdAt**: data di creazione dell'utente, di tipo Date. Generato automaticamente.
+Attributi principali:
+- `customer`: riferimento cliente (ObjectId → Users, obbligatorio)
+- `restaurant`: riferimento ristorante (ObjectId → Restaurants, obbligatorio)
+- `items`: array piatti ordinati (Array)
+  - `meal`: riferimento piatto (ObjectId → Meals)
+  - `quantity`: quantità (Number, default: 1)
+  - `price`: prezzo unitario (Number)
+  - `preparationTime`: tempo preparazione (Number)
+- `totalAmount`: importo totale (Number, obbligatorio)
+- `status`: stato ordine (String, enum)
+  - `'ordered'` (default), `'preparing'`, `'ready'`, `'delivered'`
+- `estimatedPreparationTime`: tempo stimato totale (Number)
+- `createdAt`: timestamp creazione (Date, auto-generato)
 
-- **updatedAt**: data ultimo aggiornamento, di tipo Date. Aggiornato automaticamente da Mongoose timestamps.
+## Struttura del sito web
 
-#### HOOKS E MIDDLEWARE
+**Pagine pubbliche** (accessibili senza autenticazione):
+- `/` - Homepage
+- `/pages/about.html` - Informazioni applicazione
+- `/pages/login.html` - Login
+- `/pages/registration.html` - Registrazione
 
-- **Pre-save hook**: Hash automatico della password con bcrypt prima del salvataggio
-- **Pre-delete hook**: Eliminazione cascade dei ristoranti quando si elimina un ristoratore
+**Pagine protette - Cliente** (richiedono autenticazione come customer):
+- `/pages/searchRestaurant.html` - Ricerca ristoranti
+- `/pages/searchDish.html` - Ricerca piatti
+- `/pages/restaurantDetails.html` - Dettagli ristorante e menu
+- `/pages/order.html` - Carrello e checkout
+- `/pages/orderHistory.html` - Storico ordini
+- `/pages/profile.html` - Profilo utente
 
-### RESTAURANTS
+**Pagine protette - Ristoratore** (richiedono autenticazione come restaurateur):
+- `/pages/restaurantDashboard.html` - Dashboard ristorante
+- `/pages/menuManagement.html` - Gestione menu
+- `/pages/restaurantOrders.html` - Gestione ordini in arrivo
+- `/pages/statistics.html` - Statistiche vendite
+- `/pages/profile.html` - Profilo utente
 
-#### DESCRIZIONE
+## Screenshot dell'applicazione
 
-La collezione *restaurants* ha lo scopo di raccogliere l'anagrafica dei ristoranti e i relativi menu.
+### Home
 
-#### ATTRIBUTI
+> ![Schermata Home](screenshots/home.png)
 
-- **_id**: identificatore univoco di un ristorante, di tipo ObjectId. È un campo obbligatorio per identificare univocamente un ristorante nel database.
+### Login
 
-- **name**: nome del ristorante, di tipo stringa. È un campo obbligatorio e contiene il nome del ristorante.
+> ![Schermata Login](screenshots/login.png)
 
-- **owner**: identificatore del proprietario (ristoratore), di tipo ObjectId. È un campo obbligatorio e referenzia la collezione users.
+### Registrazione - Utente
 
-- **description**: descrizione del ristorante, di tipo stringa. È un campo obbligatorio e contiene una descrizione testuale del ristorante.
+> ![Schermata Registrazione](screenshots/registration_user.png)
 
-- **phone**: numero di telefono del ristorante, di tipo stringa. È un campo obbligatorio.
+### Registrazione - Ristoratore
 
-- **vatNumber**: partita IVA del ristorante, di tipo stringa. È un campo obbligatorio per identificazione fiscale.
+> ![Schermata Registrazione Ristoratore](screenshots/registration_restaurant.png)
 
-- **image**: path dell'immagine del ristorante, di tipo stringa. Campo opzionale, default null.
+### Ricerca Ristoranti
 
-- **address**: indirizzo del ristorante, oggetto obbligatorio contenente:
-  - `street`: via e numero civico (obbligatorio)
-  - `city`: città (obbligatorio)
-  - `zipCode`: codice postale (obbligatorio)
-  - `coordinates`: oggetto opzionale con:
-    - `latitude`: latitudine (Number)
-    - `longitude`: longitudine (Number)
+> ![Schermata Ricerca Ristoranti](screenshots/search_restaurant.png)
 
-- **menu**: array di piatti nel menu, ogni elemento contiene:
-  - `meal`: ObjectId che referenzia la collezione meals (obbligatorio)
-  - `price`: prezzo del piatto in questo ristorante (Number, min: 0, obbligatorio)
-  - `preparationTime`: tempo di preparazione in minuti (Number, min: 0, obbligatorio)
-  - `isAvailable`: disponibilità del piatto (Boolean, default: true)
+### Ricerca Piatti
 
-- **createdAt**: data di creazione del ristorante, di tipo Date. Generato automaticamente.
+> ![Schermata Ricerca Piatti](screenshots/search_dish.png)
 
-### MEALS
+### Pagina Ristorante
 
-#### DESCRIZIONE
+> ![Schermata Ristorante](screenshots/restaurant_page.png)
 
-La collezione *meals* è stata creata per salvare i piatti disponibili nell'applicazione. Include sia piatti standard del catalogo che piatti personalizzati creati dai ristoratori.
+### Dashboard Ristoratore
 
-#### ATTRIBUTI
+> ![Schermata Dashboard Ristorante](screenshots/restaurant_dashboard.png)
 
-- **_id**: identificatore univoco del piatto, di tipo ObjectId. È un campo obbligatorio per identificare univocamente un piatto nel database.
+### Gestione Ordini (Ristoratore)
 
-- **idMeal**: identificatore esterno del piatto, di tipo stringa. È un campo obbligatorio.
+> ![Schermata Gestione Ordini](screenshots/restaurant_orders.png)
 
-- **strMeal**: nome del piatto, di tipo stringa. È un campo obbligatorio e contiene il nome del piatto.
+### Carrello
 
-- **strCategory**: categoria del piatto, di tipo stringa. È un campo obbligatorio (es: "Burger", "Pizza", "Pasta").
+> ![Schermata Carrello](screenshots/cart_panel.png)
 
-- **strArea**: area geografica/cucina, di tipo stringa. È un campo obbligatorio (es: "Italian", "American", "Chinese").
+### Storico Ordini (Cliente)
 
-- **strMealThumb**: URL dell'immagine del piatto, di tipo stringa. È un campo obbligatorio.
+> ![Schermata Storico Ordini](screenshots/order_history_client.png)
 
-- **ingredients**: array di ingredienti, di tipo array di stringhe. Contiene la lista degli ingredienti del piatto.
+### Statistiche
 
-- **allergies**: array di allergeni, di tipo array di stringhe. Contiene la lista degli allergeni presenti (es: "Glutine", "Lattosio").
+> ![Schermata Statistiche](screenshots/statistics.png)
 
-- **isCustom**: flag piatto personalizzato, di tipo Boolean. Default: false. Indica se il piatto è stato creato da un ristoratore (true) o fa parte del catalogo standard (false).
+### Gestione Profilo
 
-- **createdBy**: riferimento al ristorante creatore (solo per piatti custom), di tipo ObjectId. Campo opzionale che referenzia la collezione restaurants.
+> ![Schermata About](screenshots/profile_management.png)
 
-- **createdAt**: data di creazione del piatto, di tipo Date. Generato automaticamente.
+## Scelte implementative significative
 
-### ORDERS
+- [Autenticazione ed Autorizzazione (JWT)](#autenticazione-ed-autorizzazione-jwt)
+  - [Accesso endpoint API protetti (middleware `authMiddleware`)](#accesso-endpoint-api-protetti-middleware-authmiddleware)
+  - [Accesso pagine web protette (controllo client-side)](#accesso-pagine-web-protette-controllo-client-side)
+  - [Password hashing con bcrypt](#password-hashing-con-bcrypt)
+- [Validazione richieste](#validazione-richieste)
+  - [Express Validator](#express-validator)
+- [Upload immagini ristoranti](#upload-immagini-ristoranti)
+- [Gestione stati ordini](#gestione-stati-ordini)
+- [Calcolo tempi di attesa](#calcolo-tempi-di-attesa)
+- [Debouncing ricerche](#debouncing-ricerche)
+- [Notifiche utente standardizzate](#notifiche-utente-standardizzate)
+- [Gestione codici HTTP](#gestione-codici-http)
+- [Documentazione API con Swagger](#documentazione-api-con-swagger)
 
-#### DESCRIZIONE
+## Autenticazione ed autorizzazione (JWT)
 
-La collezione *orders* è stata creata per salvare gli ordini effettuati dai clienti presso i ristoranti.
+Per gestire le autorizzazioni di accesso alle varie pagine e ai vari endpoint dell'API ho utilizzato un meccanismo basato sui `JSON Web Token` (JWT):
 
-#### ATTRIBUTI
+- un utente effettua il login mandando all'endpoint `/api/auth/login` una richiesta POST con email e password
+- in caso le credenziali siano corrette il server verifica la password con bcrypt, genera un JWT firmato contenente `userId` e `userType`, e lo invia al client nella risposta
+- il client salva questo token nella `localStorage`:
+  - può inviare richieste agli endpoint dell'API protetti, allegando il token nell'header `Authorization: Bearer <token>`
+  - può accedere alle pagine protette del frontend: viene effettuata una verifica lato client controllando la presenza del token
 
-- **_id**: identificatore univoco dell'ordine, di tipo ObjectId. È un campo obbligatorio per identificare univocamente un ordine nel database.
+### Accesso endpoint API protetti: middleware `authMiddleware`
 
-- **customer**: identificatore del cliente, di tipo ObjectId. È un campo obbligatorio e referenzia la collezione users.
+Gli endpoint che richiedono l'autenticazione utilizzano il middleware `authMiddleware` (in `authMiddleware.js`), il quale:
 
-- **restaurant**: identificatore del ristorante, di tipo ObjectId. È un campo obbligatorio e referenzia la collezione restaurants.
+- verifica la presenza del token JWT nell'header `Authorization`
+- verifica la genuinità del token decodificandolo con la chiave segreta salvata nel file `.env`
+- se valido, associa alla richiesta le informazioni dell'utente (id, userType)
+- se non valido o mancante, restituisce errore 401 Unauthorized
 
-- **items**: array di piatti ordinati, ogni elemento contiene:
-  - `meal`: ObjectId che referenzia la collezione meals (obbligatorio)
-  - `quantity`: quantità ordinata (Number, default: 1, obbligatorio)
-  - `price`: prezzo unitario al momento dell'ordine (Number, obbligatorio)
-  - `preparationTime`: tempo di preparazione in minuti (Number, obbligatorio)
-
-- **totalAmount**: importo totale dell'ordine, di tipo Number. È un campo obbligatorio calcolato come somma di (price * quantity) per ogni item.
-
-- **status**: stato dell'ordine, di tipo stringa. È un campo obbligatorio con valori possibili:
-  - `'ordered'`: ordine appena creato (default)
-  - `'preparing'`: in preparazione
-  - `'delivering'`: in consegna
-  - `'delivered'`: consegnato
-
-- **deliveryType**: tipo di consegna, di tipo stringa. È un campo obbligatorio con valori possibili:
-  - `'pickup'`: ritiro al ristorante
-  - `'delivery'`: consegna a domicilio
-
-- **deliveryAddress**: indirizzo di consegna (solo per delivery), oggetto opzionale contenente:
-  - `street`: via e numero civico
-  - `city`: città
-  - `zipCode`: codice postale
-  - `country`: nazione
-  - `coordinates`: oggetto con latitude e longitude
-
-- **estimatedPreparationTime**: tempo stimato di preparazione totale, di tipo Number. È un campo obbligatorio calcolato in base ai tempi dei singoli piatti.
-
-- **createdAt**: data di creazione dell'ordine, di tipo Date. Generato automaticamente.
-
----
-
-# Configurazione dell'applicazione
-
-Il progetto necessita di un file `.env` nella directory principale dove sono contenuti i parametri necessari per il funzionamento.
-
-Il file `.env` è gestito attraverso il pacchetto npm [dotenv](https://www.npmjs.com/package/dotenv) che si occupa di popolare le relative variabili d'ambiente e renderne semplice l'utilizzo e accesso tramite JavaScript.
-
-*Un esempio di file .env*
-
-```sh
-# Server HOST and PORT
-HOST='localhost'
-PORT=3001
-
-# Parametri MongoDB
-MONGO_URI=mongodb://localhost:27017/fastfood-pmw
-# oppure per MongoDB Atlas:
-# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/fastfood-pmw?retryWrites=true&w=majority
-
-# JWT Secret Key
-JWT_SECRET=your_super_secret_jwt_key_change_in_production_with_long_random_string
-
-# Node Environment
-NODE_ENV=development
-```
-
-**Note importanti**:
-- `JWT_SECRET` deve essere cambiato in produzione con una stringa casuale lunga e sicura
-- `MONGO_URI` deve puntare al database MongoDB (locale o cloud come MongoDB Atlas)
-- `NODE_ENV` deve essere impostato su `production` in ambiente di produzione
-- `PORT` definisce la porta su cui il server Express sarà in ascolto
-
----
-
-# Scelte implementative e features
-
-## Swagger JS
-
-> **Swagger:**  
-> è un framework open-source per la progettazione, la creazione e la documentazione di API RESTful. La sua utilità si concentra sulla semplificazione del processo di sviluppo API, consentendo agli sviluppatori di definire chiaramente le specifiche delle API, testarle e generare automaticamente documentazione dettagliata.
-
-Per la generazione dello swagger è stato utilizzato il module [swagger-autogen](https://www.npmjs.com/package/swagger-autogen) insieme a [swagger-ui-express](https://www.npmjs.com/package/swagger-ui-express).
-
-Tramite la creazione di un file *swagger.js* (`/backend/swagger.js`) con una apposita configurazione, è possibile generare automaticamente una documentazione completa per tutti gli endpoint dell'applicazione.
-
-È possibile visualizzare lo swagger generato all'endpoint **/api/swagger**
-
-### File SWAGGER.JS
-
-> **NB**: Il codice riportato di seguito rappresenta la configurazione utilizzata in questa applicazione!
+Di seguito il codice del middleware `authMiddleware` che intercetta la richiesta:
 
 ```javascript
-import swaggerAutogen from 'swagger-autogen';
+export const authMiddleware = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
+    if (!token) {
+        return res.status(401).json({ message: 'No token, authorization denied' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        res.status(403).json({ message: 'Token is not valid' });
+    }
+};
+```
+
+Esempio di una rotta pubblica (il token non serve):
+
+```javascript
+router.post('/auth/login', async (req, res) => {
+  // req.user : undefined
+  // accessibile senza token
+});
+```
+
+Esempio di una rotta privata (richiede il token):
+
+```javascript
+router.get('/user/profile', authMiddleware, async (req, res) => {
+  // req.user : { id, userType, restaurantId? }
+  // accessibile solo con token valido
+});
+```
+
+### Accesso pagine web protette: controllo client-side
+
+La verifica delle autorizzazioni lato frontend viene effettuata controllando la presenza del token JWT in localStorage e la validità del `userType` per pagine specifiche (es: solo restaurateur può accedere a `/pages/statistics.html`). Le pagine protette verificano all'avvio la presenza del token, altrimenti redirigono l'utente alla pagina di login `/pages/login.html`.
+
+Questa è la funzione client-side che verifica il token e il ruolo:
+
+```javascript
+const checkAuth = () => {
+    const token = localStorage.getItem('jwtToken');
+    const userType = localStorage.getItem('userType');
+
+    if (!token || userType !== 'restaurateur') {
+        window.location.href = '../pages/login.html';
+        return;
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
+    // Il caricamento dei dati statistici prosegue solo se il controllo ha successo
+});
+```
+
+### Password hashing con bcrypt
+
+Per garantire la sicurezza delle password ho usato bcrypt per l'hashing prima del salvataggio nel database. Il salt rounds è impostato a 10 (bilanciamento tra sicurezza e performance), l'hashing è one-way (impossibile recuperare la password originale) e avviene automaticamente tramite un pre-save hook nello schema Mongoose `User.js`, in modo da non doverlo ricordare ogni volta che si salva un utente.
+
+Questo è il pre-save hook che ho configurato nel modello Mongoose:
+
+```javascript
+UserSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
+        return next();
+    }
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+});
+```
+
+E questo è il momento in cui la password viene verificata durante il login:
+
+```javascript
+const user = await User.findOne({ email });
+const isMatch = await bcrypt.compare(password, user.password);
+
+if (!isMatch) {
+    return res.status(401).json({ success: false, message: "Incorrect password." });
+}
+
+const token = jwt.sign({ id: user._id, userType: user.userType },
+                       process.env.JWT_SECRET,
+                       { expiresIn: 7200 });
+```
+
+## Validazione richieste
+
+Ho implementato una validazione degli input su più livelli:
+
+- a livello di frontend: validazione client-side con JavaScript per feedback immediato (verifica regex, campi obbligatori)
+- a livello di backend: validazione server-side con `express-validator` per sicurezza
+- a livello di database: schema Mongoose con validatori per garantire integrità dati
+
+Questo garantisce che anche richieste inviate direttamente all'API (bypassando il frontend) vengano validate e sanificate.
+
+### Express Validator
+
+Per validare le richieste lato backend ho utilizzato la libreria [`express-validator`](https://express-validator.github.io/), che permette di definire regole di validazione per ogni campo della richiesta. Un vantaggio di questo approccio è la possibilità di definire validazioni condizionali (es: campi obbligatori solo per ristoratori) e messaggi di errore personalizzati. Le regole di validazione vengono definite attraverso un array di validation rules.
+
+Ecco come ho configurato l'array di regole per la validazione:
+
+```javascript
+const registrationValidationRules = [
+    body('name').notEmpty().withMessage('Name is required'),
+    body('surname').notEmpty().withMessage('Surname is required'),
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
+    body('confirmPassword').custom((value, { req }) => {
+        if (value !== req.body.password) {
+            throw new Error('Passwords do not match');
+        }
+        return true;
+    }),
+    body('userType').isIn(['customer', 'restaurateur']).withMessage('Invalid user type'),
+
+    // Validazioni condizionali per ristoratori
+    body('restaurantName').if(body('userType').equals('restaurateur')).notEmpty(),
+    body('vatNumber').if(body('userType').equals('restaurateur')).notEmpty(),
+    body('phone').if(body('userType').equals('restaurateur')).notEmpty()
+];
+```
+
+E il modo in cui questo array viene inserito come middleware nella rotta:
+
+```javascript
+router.post('/auth/register', registrationValidationRules, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Salvataggio effettivo nel DB (solo se non ci sono stati errori sopra)
+    // const user = new User({ ... })
+});
+```
+
+## Upload immagini
+
+L'applicazione supporta l'upload di immagini per i ristoranti (durante la registrazione) e per i piatti del menu (tramite form submission supportate dall'oggetto `FormData` in `menuManagement.js`), utilizzando la libreria **Multer**.
+
+```javascript
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/restaurants/');
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'restaurant-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            return cb(null, true);
+        }
+        cb(new Error('Only image files allowed'));
+    }
+});
+```
+
+Il file viene salvato in `/uploads/restaurants/` con un nome univoco (`restaurant-{timestamp}-{random}.{ext}`) per evitare collisioni. La directory è servita staticamente da Express. La validazione controlla il MIME type (non solo l'estensione) per evitare che un utente rinomini un file `.exe` in `.jpg`. Il limite di dimensione è 5MB.
+
+## Gestione stati ordini
+
+Il sistema prevede il ritiro in ristorante (pickup). Gli ordini seguono un flusso di stati ben definito:
+
+1. `ordered`: ordine appena creato dal cliente
+2. `preparing`: ristoratore ha preso in carico l'ordine
+3. `ready`: ordine pronto per il ritiro (segnalato dal ristoratore)
+4. `delivered`: ordine ritirato (confermato dal cliente)
+
+Le transizioni di stato valide sono:
+- ristoratore: `ordered → preparing`, `preparing → ready` (per ordini in ritiro che necessitano di notifica al cliente), oppure `preparing → delivered` (per consegna diretta o ritiro immediato)
+- cliente: `ready → delivered`
+
+Il ristoratore può aggiornare lo stato dalla pagina `/pages/restaurantOrders.html`, che usa un sistema a tab per separare gli ordini attivi (`ordered`, `preparing`, `ready`) da quelli completati. Quando il ristoratore segna un ordine come `ready`, il cliente vede il pulsante "Confirm Pickup" nella pagina `/pages/orderHistory.html` e può portare l'ordine allo stato `delivered`. In caso di transizione diretta a `delivered`, l'ordine verrà automaticamente segnato come completato senza necessità di conferma da parte del cliente.
+
+Nel controller, i cambi di stato vengono autorizzati con una logica di questo tipo:
+
+```javascript
+if (isRestaurateur) {
+    if (status === 'preparing' && order.status === 'ordered') {
+        isValidTransition = true;
+    } else if (status === 'ready' && order.status === 'preparing') {
+        isValidTransition = true;
+    } else if (status === 'delivered' && order.status === 'preparing') {
+        isValidTransition = true;
+    }
+} else {
+    if (status === 'delivered' && order.status === 'ready') {
+        isValidTransition = true;
+    }
+}
+```
+
+## Calcolo tempi di attesa
+
+Il sistema calcola automaticamente il tempo di attesa stimato per ogni nuovo ordine basandosi sulla coda degli ordini attivi del ristorante.
+
+La logica (`utils/waitTime.js`) recupera tutti gli ordini con stato `ordered` o `preparing` per il ristorante, calcola il tempo rimanente di ciascuno (tempo stimato meno il tempo già trascorso dalla creazione), trova il massimo tra tutti e ci somma il tempo di preparazione del nuovo ordine. Si usa il massimo e non la somma perché si assume che la cucina possa lavorare su più ordini in parallelo.
+
+```javascript
+export const calculateWaitTime = async (restaurantId, newOrderPrepTime) => {
+    const pendingOrders = await Order.find({
+        restaurant: restaurantId,
+        status: { $in: ['ordered', 'preparing'] }
+    });
+
+    let maxRemainingTime = 0;
+    const now = new Date();
+
+    pendingOrders.forEach(order => {
+        const elapsedMinutes = Math.floor((now - new Date(order.createdAt)) / 60000);
+        const remainingTime = Math.max(0, order.estimatedPreparationTime - elapsedMinutes);
+        if (remainingTime > maxRemainingTime) maxRemainingTime = remainingTime;
+    });
+
+    return Math.round(maxRemainingTime + newOrderPrepTime);
+};
+```
+
+Il tempo viene mostrato al cliente al momento della conferma dell'ordine e salvato nel database come `estimatedPreparationTime`.
+
+## Debouncing ricerche
+
+La funzionalità di ricerca dei ristoranti implementa il debouncing per ottimizzare le richieste API. Senza debouncing, ogni pressione di tasto durante la digitazione scatenerebbe una richiesta al server, causando troppe richieste simultanee e potenzialmente aggiornamenti dell'UI con risultati non più attuali (se una richiesta più vecchia risponde dopo una più recente).
+
+Con un delay di 300ms, la richiesta parte solo se l'utente non ha premuto altri tasti per almeno 300ms, cioè quando ha finito o ha fermato la digitazione.
+
+La funzione di debounce che ritarda l'esecuzione della chiamata API:
+
+```javascript
+const debounce = (func, timeout = 300) => {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+}
+
+searchInput.addEventListener('input', debounce(performSearch, 300));
+```
+
+## Notifiche utente standardizzate
+
+Per evitare duplicazioni e garantire uno stile uniforme, ho creato una funzione helper centralizzata `showToast()` in `utils.js`, importata da tutte le pagine frontend. La funzione supporta 4 tipi di notifica (`success`, `warning`, `danger`, `info`) con gradienti di colore coerenti per ciascuno.
+
+La funzione è ospitata nel file `utils.js` per poter essere riutilizzata ovunque:
+
+```javascript
+export const showToast = (message, type = 'danger') => {
+    const bgColor = type === 'success'
+        ? 'linear-gradient(to right, #4caf50, #81c784)'
+        : type === 'warning'
+        ? 'linear-gradient(to right, #ff9800, #ffb74d)'
+        : type === 'info'
+        ? 'linear-gradient(to right, #0dcaf0, #33ccff)'
+        : 'linear-gradient(to right, #f44336, #e57373)';
+
+    Toastify({
+        text: message,
+        duration: 3000,
+        gravity: "top",
+        position: "center",
+        style: { background: bgColor }
+    }).showToast();
+};
+```
+
+Tutti i file frontend principali importano questa funzione:
+
+```javascript
+import { showToast } from "./utils.js";
+// (altre istruzioni della pagina...)
+
+showToast("Operazione completata!", "success");
+```
+
+Questo approccio rispetta il principio DRY (Don't Repeat Yourself): il codice di configurazione è scritto una volta sola, e qualsiasi modifica allo stile o alla durata si riflette istantaneamente su tutta l'applicazione.
+
+## Gestione codici HTTP
+
+L'applicazione usa i codici di stato HTTP standard per comunicare l'esito delle richieste:
+
+- `200 OK`: richiesta elaborata correttamente (GET, PUT, DELETE)
+- `201 Created`: nuova risorsa creata con successo (POST)
+- `400 Bad Request`: dati inviati non validi o malformati (validazione fallita)
+- `401 Unauthorized`: autenticazione richiesta (token mancante o non valido)
+- `403 Forbidden`: utente autenticato ma senza permessi per la risorsa
+- `404 Not Found`: risorsa richiesta non esistente
+- `500 Internal Server Error`: errore interno del server
+
+Un esempio di questa logica dal `restaurantController`:
+
+```javascript
+const restaurant = await Restaurant.findById(req.params.id);
+
+if (!restaurant) {
+    return res.status(404).json({ message: 'Restaurant not found' });
+}
+
+if (restaurant.owner.toString() !== req.user.id.toString()) {
+    return res.status(403).json({ message: 'Not authorized to access this resource' });
+}
+
+res.status(200).json(restaurant);
+```
+
+## Documentazione API con Swagger
+
+Ho usato `swagger-autogen` per generare automaticamente la documentazione Swagger dell'API, accessibile all'endpoint `/api/swagger`. La documentazione viene generata dal file `swagger.js` ad ogni avvio del server, quindi è sempre aggiornata con gli endpoint effettivamente esposti.
+
+```javascript
 const document = {
     info: {
         title: 'FastFood PMW API',
-        description: 'API REST per la piattaforma FastFood PMW - Sistema di gestione ordini per ristoranti fast food',
+        description: 'API REST per CodeBite - Sistema gestione ordini fast food',
         version: '1.0.0'
     },
-    host: 'localhost:3001',
-    basePath: '/',
-    schemes: ['http', 'https'],
-    consumes: ['application/json'],
-    produces: ['application/json'],
-    tags: [
-        {
-            name: 'Authentication',
-            description: 'Endpoints per autenticazione e registrazione utenti'
-        },
-        {
-            name: 'Users',
-            description: 'Gestione profili utente'
-        },
-        {
-            name: 'Restaurants',
-            description: 'Gestione ristoranti e menu'
-        },
-        {
-            name: 'Meals',
-            description: 'Gestione piatti e ricette'
-        },
-        {
-            name: 'Orders',
-            description: 'Gestione ordini'
-        },
-        {
-            name: 'Statistics',
-            description: 'Statistiche ristoranti'
-        }
-    ],
+    host: 'localhost:3000',
     securityDefinitions: {
         bearerAuth: {
             type: 'apiKey',
             name: 'Authorization',
             in: 'header',
-            description: 'Inserire il token JWT nel formato: Bearer {token}'
+            description: 'JWT token nel formato: Bearer {token}'
         }
     },
-    definitions: {
-        User: {
-            _id: "507f1f77bcf86cd799439011",
-            name: "Mario",
-            surname: "Rossi",
-            email: "mario.rossi@example.com",
-            userType: "customer"
-        },
-        Restaurant: {
-            _id: "507f1f77bcf86cd799439012",
-            name: "Burger King Milano Centro",
-            owner: "507f1f77bcf86cd799439011",
-            description: "Il miglior fast food di Milano",
-            phone: "+39 02 1234567",
-            vatNumber: "IT12345678901"
-        },
-        Order: {
-            _id: "507f1f77bcf86cd799439014",
-            customer: "507f1f77bcf86cd799439011",
-            restaurant: "507f1f77bcf86cd799439012",
-            totalAmount: 17.00,
-            status: "ordered",
-            deliveryType: "delivery"
-        }
-    }
+    tags: [
+        { name: 'Authentication', description: 'Autenticazione e registrazione' },
+        { name: 'Users', description: 'Gestione profili utente' },
+        { name: 'Restaurants', description: 'Gestione ristoranti' },
+        { name: 'Meals', description: 'Gestione piatti' },
+        { name: 'Orders', description: 'Gestione ordini' },
+        { name: 'Statistics', description: 'Statistiche ristoranti' }
+    ]
 };
 
-const endpointFile = ['./server.js'];
-const outputFile = './swagger.json';
-
-swaggerAutogen(outputFile, endpointFile, document).then(async () => {
-    await import('./server.js');
-});
+swaggerAutogen(outputFile, endpointFiles, document);
 ```
 
-### Interfaccia grafica SWAGGER
-
-La documentazione Swagger fornisce un'interfaccia interattiva completa:
-
-![Swagger API - Header](file:///Users/filippobottaro/.gemini/antigravity/brain/461bc976-5b1a-4ae8-a1dc-b8f79365ed40/swagger_top_1769957733468.png)
-
-![Swagger API - Endpoints](file:///Users/filippobottaro/.gemini/antigravity/brain/461bc976-5b1a-4ae8-a1dc-b8f79365ed40/swagger_endpoints_1769957733766.png)
-
-**Funzionalità Swagger UI**:
-- Lista completa di tutti gli endpoint organizzati per tag
-- Descrizione dettagliata di ogni endpoint
-- Parametri richiesti (body, query, path)
-- Schemi dati con esempi
-- Possibilità di testare le API direttamente dall'interfaccia ("Try it out")
-- Codici di risposta HTTP con esempi
-- Autenticazione Bearer token integrata
-
-### Installazione
-
-```bash
-npm install --save-dev swagger-autogen
-npm install swagger-ui-express
-```
-
-Ulteriori informazioni sono presenti ai link sopra riportati.
-
----
-
-## Gestione codici HTTP
-
-> I codici HTTP sono standard utilizzati per indicare lo stato di una richiesta HTTP effettuata tra un client (spesso un browser web) e un server. Nell'applicazione, vengono ampiamente utilizzati alcuni di questi codici per comunicare lo stato delle richieste e delle risposte:
-
-- **Codice 200 (OK)**: Codice di successo. Indica che la richiesta è stata elaborata correttamente e che il server sta restituendo i dati richiesti al client.
-
-- **Codice 201 (CREATED)**: Indica che una nuova risorsa è stata creata con successo (es: nuovo utente, nuovo ordine).
-
-- **Codice 400 (BAD REQUEST)**: Questo codice indica che la richiesta effettuata dal client è stata malformata o non valida. Viene utilizzato quando i dati inviati non corrispondono alle aspettative del server o falliscono la validazione.
-
-- **Codice 401 (UNAUTHORIZED)**: Indica che l'accesso a una risorsa richiede l'autenticazione. Utilizzato quando il token JWT è mancante, scaduto o non valido.
-
-- **Codice 403 (FORBIDDEN)**: Indica che l'utente autenticato non ha i permessi necessari per accedere alla risorsa richiesta.
-
-- **Codice 404 (NOT FOUND)**: Indica che la risorsa richiesta non è stata trovata sul server. Utilizzato quando si cerca un ristorante, piatto o ordine inesistente.
-
-- **Codice 500 (INTERNAL SERVER ERROR)**: Questo codice indica un errore interno del server. Utilizzato quando si verifica un'eccezione non gestita o un errore del database.
-
----
-
-## Autenticazione JWT
-
-L'applicazione utilizza **JSON Web Tokens (JWT)** per l'autenticazione degli utenti.
-
-**Flusso di autenticazione**:
-
-1. **Registrazione/Login**: L'utente invia credenziali (email e password)
-2. **Verifica**: Il server verifica le credenziali
-3. **Generazione Token**: Se valide, il server genera un JWT contenente userId e userType
-4. **Invio Token**: Il token viene inviato al client
-5. **Storage**: Il client salva il token in localStorage
-6. **Richieste Autenticate**: Per ogni richiesta protetta, il client invia il token nell'header Authorization
-7. **Verifica Token**: Il middleware `authMiddleware.js` verifica la validità del token
-8. **Accesso**: Se valido, la richiesta procede; altrimenti viene restituito 401 Unauthorized
-
-**Implementazione**:
-
-```javascript
-// Generazione token al login
-const token = jwt.sign(
-    { userId: user._id, userType: user.userType },
-    process.env.JWT_SECRET,
-    { expiresIn: '7d' }
-);
-
-// Middleware di verifica
-const protect = async (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ message: 'Not authorized' });
-    
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = await User.findById(decoded.userId).select('-password');
-        next();
-    } catch (error) {
-        res.status(401).json({ message: 'Token not valid' });
-    }
-};
-```
-
-**Scelte implementative**:
-- Token nel header Authorization con formato `Bearer <token>`
-- Scadenza 7 giorni per bilanciamento tra sicurezza e UX
-- Payload minimo (solo userId e userType) per ridurre dimensione
-- Password sempre esclusa dalle query con `.select('-password')`
-
----
-
-## Validazione Input
-
-L'applicazione implementa una **doppia validazione** degli input:
-
-1. **Client-side** (JavaScript): Validazione immediata per migliorare UX
-2. **Server-side** (Express Validator): Validazione sicura e definitiva
-
-**Esempio validazione registrazione**:
-
-```javascript
-const registrationValidationRules = [
-    body('name', 'Name must be provided.').not().isEmpty(),
-    body('surname', 'Surname must be provided.').not().isEmpty(),
-    body('email', 'Please, insert a valid email address.').isEmail(),
-    body('password', 'Password must be at least 8 characters.').isLength({ min: 8 }),
-    body('confirmPassword').custom((value, { req }) => {
-        if(value !== req.body.password) {
-            throw new Error('Passwords do not match!');
-        }
-        return true;
-    }),
-    body('userType', 'You must select a user type.').isIn(['customer', 'restaurateur']),
-    // Validazioni condizionali per ristoratori
-    body('restaurantName').if(body('userType').equals('restaurateur')).not().isEmpty(),
-    body('vatNumber').if(body('userType').equals('restaurateur')).not().isEmpty(),
-    body('phone').if(body('userType').equals('restaurateur')).not().isEmpty(),
-    body('addressStreet').if(body('userType').equals('restaurateur')).not().isEmpty(),
-    body('addressCity').if(body('userType').equals('restaurateur')).not().isEmpty(),
-    body('addressZip').if(body('userType').equals('restaurateur')).not().isEmpty()
-];
-```
-
-**Pattern regex personalizzati** (`/backend/utils/regex.js`):
-- Email: validazione formato email standard
-- Password: minimo 8 caratteri con requisiti di complessità
-- Nome e Cognome: solo caratteri alfabetici e spazi
-
----
-
-## Upload File
-
-L'applicazione supporta l'upload di immagini per i ristoranti utilizzando **Multer**.
-
-**Configurazione**:
-
-```javascript
-import multer from 'multer';
-import path from 'path';
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    }
-});
-
-export const upload = multer({
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
-    fileFilter: (req, file, cb) => {
-        const allowedTypes = /jpeg|jpg|png|gif/;
-        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = allowedTypes.test(file.mimetype);
-        
-        if (mimetype && extname) {
-            return cb(null, true);
-        }
-        cb(new Error('Only image files are allowed (JPEG, JPG, PNG, GIF)'));
-    }
-});
-```
-
-**Caratteristiche**:
-- Limite dimensione: 5MB per file
-- Tipi consentiti: JPEG, JPG, PNG, GIF
-- Nome univoco: timestamp + numero random per evitare collisioni
-- Directory dedicata: `/uploads` servita staticamente da Express
-- Validazione tipo file: controllo sia estensione che MIME type
-
----
-
-# Esempi di Utilizzo
-
-## Homepage
-
-![Homepage CodeBite](file:///Users/filippobottaro/.gemini/antigravity/brain/461bc976-5b1a-4ae8-a1dc-b8f79365ed40/homepage_overview_1769957668071.png)
-
-**Elementi visibili**:
-- **Navbar**: Logo CodeBite, menu navigazione (Home, About, Restaurants, Dishes, Contact)
-- **Hero section**: Titolo "Food Delivery Made Easy" con descrizione
-- **Call-to-action**: Pulsanti "Order Now" e "Learn More"
-- **Sezione servizi**: Browse Restaurants, Place Your Order, Fast Delivery
-- **Footer**: Link utili e tecnologie utilizzate (Node.js, Express, MongoDB)
-
-**Funzionalità**:
-- Design responsive per tutti i dispositivi
-- Animazioni smooth su hover delle card servizi
-- Navbar con effetto blur allo scroll
-- Link funzionanti a tutte le sezioni principali
-
-## Registrazione
-
-![Pagina Registrazione](file:///Users/filippobottaro/.gemini/antigravity/brain/461bc976-5b1a-4ae8-a1dc-b8f79365ed40/registration_page_1769957682719.png)
-
-**Elementi visibili**:
-- **Form registrazione**: Campi per Nome, Cognome, Email, Password, Conferma Password
-- **Selezione tipo utente**: Dropdown per scegliere tra Customer e Restaurateur
-- **Campi condizionali**: Campi aggiuntivi per ristoratori (nascosti di default)
-- **Validazione visiva**: Indicatori per campi obbligatori e errori
-
-**Funzionalità**:
-- Form dinamico che mostra/nasconde campi in base al tipo utente selezionato
-- Validazione client-side in tempo reale
-- Upload immagine ristorante (solo per ristoratori)
-- Gestione errori con messaggi specifici
-- Creazione account customer o restaurateur con ristorante associato
-
-## Login
-
-![Pagina Login](file:///Users/filippobottaro/.gemini/antigravity/brain/461bc976-5b1a-4ae8-a1dc-b8f79365ed40/login_page_1769957695717.png)
-
-**Elementi visibili**:
-- **Form login**: Campi per Email e Password
-- **Toggle password**: Icona per mostrare/nascondere password
-- **Link registrazione**: Per nuovi utenti
-- **Pulsante login**: Submit del form
-
-**Funzionalità**:
-- Autenticazione con email e password
-- Generazione e salvataggio token JWT
-- Redirect automatico alla pagina appropriata dopo login
-- Gestione errori (credenziali errate, account non esistente)
-- Toggle visibilità password per migliorare UX
-
-## Ricerca Ristoranti
-
-![Ricerca Ristoranti](file:///Users/filippobottaro/.gemini/antigravity/brain/461bc976-5b1a-4ae8-a1dc-b8f79365ed40/restaurant_search_page_1769957708303.png)
-
-**Elementi visibili**:
-- **Barra ricerca**: Input per cercare ristoranti per nome
-- **Titolo**: "Discover Amazing Restaurants"
-- **Navbar completa**: Con tutte le opzioni di navigazione
-
-**Funzionalità**:
-- Caricamento automatico lista ristoranti all'apertura
-- Ricerca in tempo reale con debouncing
-- Filtri per città e categoria cucina
-- Visualizzazione card responsive con immagini
-- Click su card per accedere ai dettagli e menu del ristorante
-
-## Ricerca Piatti
-
-![Ricerca Piatti](file:///Users/filippobottaro/.gemini/antigravity/brain/461bc976-5b1a-4ae8-a1dc-b8f79365ed40/dish_search_page_1769957719965.png)
-
-**Elementi visibili**:
-- **Barra ricerca**: Input per cercare piatti per nome
-- **Titolo**: "Find Your Favorite Dish"
-- **Layout griglia**: Design responsive per visualizzazione piatti
-
-**Funzionalità**:
-- Caricamento catalogo completo piatti
-- Ricerca per nome piatto in tempo reale
-- Filtri per categoria (Burger, Pizza, Pasta, Dessert, etc.)
-- Visualizzazione ingredienti e informazioni allergeni
-- Click per vedere dettagli piatto e ristoranti che lo offrono
-
-## Documentazione API
-
-![Swagger API Documentation](file:///Users/filippobottaro/.gemini/antigravity/brain/461bc976-5b1a-4ae8-a1dc-b8f79365ed40/swagger_top_1769957733468.png)
-
-![Swagger API Endpoints](file:///Users/filippobottaro/.gemini/antigravity/brain/461bc976-5b1a-4ae8-a1dc-b8f79365ed40/swagger_endpoints_1769957733766.png)
-
-**Elementi visibili**:
-- **Header**: Titolo "FastFood PMW API" con versione 1.0.0
-- **Descrizione**: Sistema di gestione ordini per ristoranti fast food
-- **Base URL**: localhost:3001
-- **Sezioni organizzate**: Authentication, Users, Restaurants, Meals, Orders, Statistics
-
-**Funzionalità**:
-- Documentazione auto-generata da codice
-- Tutti gli endpoint documentati con parametri e risposte
-- Schemi dati completi (User, Restaurant, Meal, Order)
-- Esempi di richieste e risposte
-- Interfaccia "Try it out" per testare API direttamente
-- Supporto autenticazione Bearer token
-
----
-
-# Lingua
-
-La scelta di utilizzare la lingua inglese come standard di programmazione è ampiamente diffusa nell'industria del software ed è guidata principalmente dal desiderio di aderire allo standard internazionale. Questo standard è anche noto nella community di programmatori come **"English-based programming"**.
-
-Adottare questa convenzione ha numerosi vantaggi:
-- Rende il codice più leggibile e comprensibile per un pubblico globale di sviluppatori
-- Facilita la collaborazione in team internazionali
-- Permette una migliore integrazione con librerie e framework esistenti
-- Migliora la manutenibilità del codice nel lungo termine
-
-Tuttavia, per questa applicazione:
-- **Codice e variabili**: in inglese (standard internazionale)
-- **Commenti**: in italiano per facilitare la comprensione accademica
-- **Documentazione**: in italiano (questa relazione)
-- **Interfaccia utente**: in italiano per il target di utenti italiani
-- **Messaggi di errore**: in inglese lato server, in italiano lato client
-
-Questa scelta bilanciata permette di mantenere gli standard professionali del codice garantendo al contempo l'accessibilità per il contesto accademico italiano.
-
----
-
-**Fine Relazione Tecnica**
-
-*Documento generato il 1 Febbraio 2026*  
-*Progetto FastFood PMW - CodeBite v1.0.0*
+L'interfaccia permette di visualizzare tutti gli endpoint organizzati per tag, vedere gli schemi dati con esempi, testare le API direttamente con il pulsante "Try it out" e autenticarsi con token JWT per testare gli endpoint protetti.

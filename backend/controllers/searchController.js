@@ -3,40 +3,14 @@ import Restaurant from '../models/Restaurant.js';
 import Meal from '../models/Meal.js';
 
 /**
- * @desc Cerca ristoranti per città e nome
- * @route GET /api/search/restaurants
- * @access Public
- */
-export const searchRestaurants = asyncHandler(async (req, res) => {
-    const { name, location } = req.query;
-
-    let query = {};
-
-    if (name) {
-        query.name = { $regex: name, $options: 'i' };
-    }
-
-    if (location) {
-        query.$or = [
-            { 'address.street': { $regex: location, $options: 'i' } },
-            { 'address.city': { $regex: location, $options: 'i' } },
-            { 'address.zipCode': { $regex: location, $options: 'i' } }
-        ];
-    }
-
-    const restaurants = await Restaurant.find(query)
-        .select('name address phone image')
-        .limit(20);
-
-    res.json({ restaurants });
-});
-
-/**
  * @desc Cerca piatti per nome, tipo e prezzo
  * @route GET /api/search/meals
  * @access Public
  */
 export const searchMeals = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Search']
+        #swagger.description = 'Endpoint per cercare piatti per nome, tipo e prezzo.' 
+    */
     const { name, category, minPrice, maxPrice } = req.query;
 
     let matchConditions = {
@@ -98,6 +72,9 @@ export const searchMeals = asyncHandler(async (req, res) => {
  * @access Public
  */
 export const getMealCategories = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Search']
+        #swagger.description = 'Endpoint per ottenere le categorie dei piatti.' 
+    */
     const categories = await Meal.distinct('strCategory');
     res.json({ categories });
 });

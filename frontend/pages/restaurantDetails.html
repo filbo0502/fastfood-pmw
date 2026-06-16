@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Details - CodeBite</title>
-    <link rel="icon" type="image/x-icon" href="./images/logo.png">
+    <link rel="icon" type="image/x-icon" href="../images/logo.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link href="../css/styles.css" rel="stylesheet">
 </head>
 
@@ -37,9 +38,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="./searchDish.html">Dishes</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
-                    </li>
                     <li class="nav-item cart-link d-none">
                         <a class="nav-link" href="./order.html">
                             <i class="fas fa-shopping-cart"></i> Cart
@@ -57,128 +55,27 @@
         </div>
     </nav>
 
-    <section id="menu-management" class="main-section" style="margin-top: 80px;">
+    <section class="main-section" style="margin-top: 80px; padding: 3rem 0;">
         <div class="container">
-            <div class="row mb-4">
-                <div class="col-md-8">
-                    <h2 class="h1 fw-bold text-primary">Menu Management</h2>
-                    <p class="text-muted">Manage your restaurant's custom meals and browse available options</p>
-                </div>
-                <div class="col-md-4 text-end">
-                    <button id="add-custom-meal" class="btn btn-primary btn-lg">
-                        <i class="fas fa-plus me-2"></i>Create Custom Meal
-                    </button>
+            <div id="restaurant-info" class="mb-5">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary"></div>
+                    <p class="mt-3 text-muted">Loading restaurant details...</p>
                 </div>
             </div>
 
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-search"></i>
-                                </span>
-                                <input type="text" id="meal-search" class="form-control form-control-lg"
-                                    placeholder="Search meals by name or category...">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-lg-6 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-header bg-primary text-white">
-                            <h3 class="card-title mb-0">
-                                <i class="fas fa-database me-2"></i>Available Meals Database
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div id="available-meals" class="row g-3">
-                            </div>
-                        </div>
-                    </div>
+            <div id="menu-section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold text-primary">
+                        <i class="fas fa-utensils me-2"></i>Menu
+                    </h2>
                 </div>
 
-                <div class="col-lg-6 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-header bg-success text-white">
-                            <h3 class="card-title mb-0">
-                                <i class="fas fa-utensils me-2"></i>Your Custom Meals
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div id="current-menu" class="row g-3">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div id="menu-items" class="row g-4"></div>
             </div>
         </div>
     </section>
 
-    <div class="modal fade" id="custom-meal-modal" tabindex="-1" aria-labelledby="customMealModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="customMealModalLabel">
-                        <i class="fas fa-plus-circle me-2"></i>Custom Meal
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="custom-meal-form">
-                        <div class="row">
-                            <div class="col-md-8 mb-3">
-                                <label for="meal-name" class="form-label fw-bold">
-                                    <i class="fas fa-utensils me-1"></i>Meal Name *
-                                </label>
-                                <input type="text" id="meal-name" name="meal-name" class="form-control" required>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="meal-price" class="form-label fw-bold">
-                                    <i class="fas fa-euro-sign me-1"></i>Price (€) *
-                                </label>
-                                <input type="number" id="meal-price" name="meal-price" class="form-control" step="0.01"
-                                    min="0" required>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="meal-category" class="form-label fw-bold">
-                                <i class="fas fa-tags me-1"></i>Category
-                            </label>
-                            <input type="text" id="meal-category" name="meal-category" class="form-control"
-                                placeholder="e.g., Burger, Pizza, Salad">
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="meal-available"
-                                    name="meal-available" checked>
-                                <label class="form-check-label fw-bold" for="meal-available">
-                                    <i class="fas fa-check-circle me-1"></i>Available for ordering
-                                </label>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i>Cancel
-                    </button>
-                    <button type="submit" form="custom-meal-form" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i>Create Meal
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
     <footer class="bg-dark text-white py-5">
         <div class="container">
             <div class="row gy-4">
@@ -194,9 +91,9 @@
                 <div class="col-lg-4 col-md-6">
                     <h5>Useful Links</h5>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-white-50 text-decoration-none">Home</a></li>
-                        <li><a href="./pages/login.html" class="text-white-50 text-decoration-none">Login</a></li>
-                        <li><a href="./pages/registration.html" class="text-white-50 text-decoration-none">Register</a>
+                        <li><a href="../index.html" class="text-white-50 text-decoration-none">Home</a></li>
+                        <li><a href="./login.html" class="text-white-50 text-decoration-none">Login</a></li>
+                        <li><a href="./registration.html" class="text-white-50 text-decoration-none">Register</a>
                         </li>
                     </ul>
                 </div>
@@ -215,7 +112,7 @@
 
             <div class="row">
                 <div class="col-12 text-center">
-                    <p class="text-white-50 mb-0">&copy; 2025 Fast Food. All rights reserved</p>
+                    <p class="text-white-50 mb-0">&copy; 2025 CodeBite. All rights reserved</p>
                 </div>
             </div>
         </div>
@@ -223,6 +120,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="../js/auth.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module" src="../js/restaurantDetails.js"></script>
 </body>
 

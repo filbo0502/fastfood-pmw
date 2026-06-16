@@ -9,6 +9,9 @@ import mongoose from 'mongoose';
  * @access Private (Restaurant owner)
  */
 export const getRestaurantStats = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Statistics']
+        #swagger.description = 'Endpoint per ottenere le statistiche di un ristorante con i dati per i grafici.' 
+    */
     const restaurantId = req.params.id;
 
     const restaurant = await Restaurant.findById(restaurantId);

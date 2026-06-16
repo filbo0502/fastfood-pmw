@@ -1,65 +1,67 @@
-import CONFIG from "./config.js";
-import { getImageUrl } from "./utils.js";
+import { getImageUrl, showToast } from "./utils.js";
+import { logout } from "./auth.js";
 
-const API_BASE_URL = CONFIG.API_BASE_URL;
-
-let allRestaurants = [];
 let filteredRestaurants = [];
-
 let searchInput;
 
 const getRestaurant = async () => {
-    try {
-        //Qui controlla che l'utente sia loggato
-        const token = localStorage.getItem('jwtToken');
-
-        if (!token) {
-            const container = document.getElementById('restaurant-container');
-            container.innerHTML = `
-                <div class="col-12 text-center">
-                    <div class="alert alert-info" role="alert">
-                        <h4 class="alert-heading">Login Required</h4>
-                        <p>Please log in to view available restaurants.</p>
-                        <a href="./login.html" class="btn btn-primary">Go to Login</a>
-                    </div>
+    // Check if user is logged in
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+        const container = document.getElementById('restaurant-container');
+        container.innerHTML = `
+            <div class="col-12 text-center">
+                <div class="alert alert-info" role="alert">
+                    <h4 class="alert-heading">Login Required</h4>
+                    <p>Please log in to view available restaurants.</p>
+                    <a href="./login.html" class="btn btn-primary">Go to Login</a>
                 </div>
-            `;
-            return;
+            </div>
+        `;
+        return;
+    }
+
+    initializeSearch();
+    // Initial load
+    performSearch();
+}
+
+const debounce = (func, timeout = 300) => {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+}
+
+const performSearch = async () => {
+    const searchTerm = searchInput ? searchInput.value.trim() : '';
+    const token = localStorage.getItem('jwtToken');
+    
+    if (!token) return;
+
+    try {
+        let url = `/api/restaurants`;
+        if (searchTerm) {
+            url = `/api/restaurants/search?q=${encodeURIComponent(searchTerm)}`;
         }
 
-        const response = await fetch(`${API_BASE_URL}/restaurants`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (!response.ok) {
             if (response.status === 401) {
-                localStorage.removeItem('jwtToken');
-                localStorage.removeItem('userID');
-                const container = document.getElementById('restaurant-container');
-                container.innerHTML = `
-                    <div class="col-12 text-center">
-                        <div class="alert alert-warning" role="alert">
-                            <h4 class="alert-heading">Session Expired</h4>
-                            <p>Your session has expired. Please log in again.</p>
-                            <a href="./login.html" class="btn btn-primary">Go to Login</a>
-                        </div>
-                    </div>
-                `;
+                showToast('Your session has expired. Logging out...', 'warning');
+                setTimeout(() => { logout(); }, 2000);
                 return;
             }
             throw new Error('Error during server call.');
         }
 
-        allRestaurants = await response.json();
-        console.log('Restaurants data: ', allRestaurants); // utile per debugging
-
-        initializeSearch();
-
-        filteredRestaurants = [...allRestaurants];
+        filteredRestaurants = await response.json();
+        
+        updateSearchResultsInfo(searchTerm);
         showRestaurant(filteredRestaurants);
 
     } catch (error) {
@@ -70,37 +72,10 @@ const getRestaurant = async () => {
                 <div class="alert alert-danger" role="alert">
                     <h4 class="alert-heading">Error</h4>
                     <p>${error.message}</p>
-                    <a href="./login.html" class="btn btn-primary">Try Logging In</a>
                 </div>
             </div>
         `;
     }
-}
-
-const initializeSearch = () => {
-    searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', debounce(performSearch, 300));
-}
-
-const performSearch = () => {
-    const searchTerm = searchInput.value.toLowerCase().trim();
-
-    if (!searchTerm) {
-        filteredRestaurants = [...allRestaurants];
-    } else {
-        filteredRestaurants = allRestaurants.filter(restaurant => {
-            const matchesName = restaurant.name && restaurant.name.toLowerCase().includes(searchTerm);
-            const matchesDescription = restaurant.description && restaurant.description.toLowerCase().includes(searchTerm);
-            const matchesCity = restaurant.addressCity && restaurant.addressCity.toLowerCase().includes(searchTerm);
-            const matchesStreet = restaurant.addressStreet && restaurant.addressStreet.toLowerCase().includes(searchTerm);
-
-            return matchesName || matchesDescription || matchesCity || matchesStreet;
-        });
-    }
-
-    updateSearchResultsInfo(searchTerm);
-
-    showRestaurant(filteredRestaurants);
 }
 
 const updateSearchResultsInfo = (searchTerm) => {
@@ -112,14 +87,6 @@ const updateSearchResultsInfo = (searchTerm) => {
             searchResultsInfo.textContent = `Showing all ${filteredRestaurants.length} restaurants`;
         }
     }
-}
-
-const debounce = (func, wait) => {
-    let timeout;
-    return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func(...args), wait);
-    };
 }
 
 const showRestaurant = (restaurants) => {
@@ -156,13 +123,13 @@ const showRestaurant = (restaurants) => {
              </div>` : '';
 
         let addressDisplay = '';
-        if (restaurant.addressStreet || restaurant.addressCity) {
+        if (restaurant.address?.street || restaurant.address?.city) {
             addressDisplay = `
                 <p class="card-text text-muted">
                     <i class="fa-solid fa-map-marker-alt me-2"></i>
-                    ${restaurant.addressStreet ? restaurant.addressStreet : ''}
-                    ${restaurant.addressStreet && restaurant.addressCity ? ', ' : ''}
-                    ${restaurant.addressCity ? restaurant.addressCity : ''}
+                    ${restaurant.address?.street || ''}
+                    ${restaurant.address?.street && restaurant.address?.city ? ', ' : ''}
+                    ${restaurant.address?.city || ''}
                 </p>
             `;
         }
@@ -193,6 +160,11 @@ const showRestaurant = (restaurants) => {
 
         container.appendChild(card);
     })
+}
+
+const initializeSearch = () => {
+    searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', debounce(performSearch, 300));
 }
 
 const clearSearch = () => {

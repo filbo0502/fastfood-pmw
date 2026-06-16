@@ -1,74 +1,97 @@
 import mongoose from "mongoose";
+import fs from 'fs/promises';
+import path from 'path';
 
 const RestaurantSchema = new mongoose.Schema({
-    name:{
+    name: {
         type: String,
         required: true
     },
-    owner:{
+    owner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
+        ref: 'User',
         required: true
     },
-    description:{
+    description: {
         type: String,
         required: true
     },
-    phone:{
+    phone: {
         type: String,
         required: true
     },
-    vatNumber:{
+    vatNumber: {
         type: String,
         required: true
     },
-    image:{
+    image: {
         type: String,
         required: false,
         default: null
     },
-    address:{
-        street:{
+    address: {
+        street: {
             type: String,
             required: true
         },
-        city:{
+        city: {
             type: String,
             required: true
         },
-        zipCode:{
+        zipCode: {
             type: String,
             required: true
         },
-        coordinates:{
-            langitude: Number,
+        coordinates: {
+            latitude: Number,
             longitude: Number
         }
     },
-    menu:[{
-        meal:{
+    menu: [{
+        meal: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Meal',
             required: true
         },
-        price:{
+        price: {
             type: Number,
             required: true,
             min: [0, 'Price could not be negative.']
         },
-        preparationTime:{
+        preparationTime: {
             type: Number,
             required: true,
             min: [0, 'Preparation time could not be negative.']
         },
-        isAvailable:{
+        isAvailable: {
             type: Boolean,
             default: true
         }
-    }],
-    createdAt:{
-        type: Date,
-        default: Date.now
+    }]
+});
+
+RestaurantSchema.pre('findOneAndDelete', async function (next) {
+    try {
+        const restaurant = await this.model.findOne(this.getQuery());
+        if (restaurant) {
+            if (restaurant.image && restaurant.image.startsWith('/uploads/')) {
+                const imagePath = path.join(process.cwd(), restaurant.image);
+                try {
+                    await fs.unlink(imagePath);
+                    console.log(`Deleted restaurant image: ${imagePath}`);
+                } catch (err) {
+                    console.error(`Failed to delete restaurant image: ${imagePath}`, err);
+                }
+            }
+            const { default: Meal } = await import('./Meal.js');
+            const meals = await Meal.find({ createdBy: restaurant._id });
+            for (const meal of meals) {
+                await Meal.findByIdAndDelete(meal._id);
+            }
+        }
+        next();
+    } catch (error) {
+        next(error);
     }
 });
 

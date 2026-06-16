@@ -1,5 +1,4 @@
-import CONFIG from "./config.js";
-const API_BASE_URL = CONFIG.API_BASE_URL;
+import { showToast } from "./utils.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     const credModalEl = document.getElementById('credentialsModal');
@@ -17,20 +16,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 const loginForm = document.getElementById('login_form');
-if (loginForm) {
-    loginForm.addEventListener('submit', handleLogin);
-} else {
-    console.error('Form element with ID "login_form" not found.');
-}
 
-async function handleLogin(event) {
-    event.preventDefault();
+const handleLogin = async (e) => {
+    e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
     // Validazione email base prima di inviare al server
     if (!validateEmail(email)) {
-        showGenericError('Invalid email format. Please enter a valid email address.');
+        showToast("Invalid email format. Please enter a valid email address.", "error");
         return;
     }
 
@@ -42,7 +36,7 @@ async function handleLogin(event) {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        const response = await fetch(`/api/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -51,7 +45,6 @@ async function handleLogin(event) {
         });
 
         const data = await response.json();
-        // console.log('Risposta login:', data); // debug
 
         if (response.ok) {
             // Salva il token di autenticazione
@@ -66,15 +59,7 @@ async function handleLogin(event) {
                 localStorage.setItem('restaurantId', data.restaurantId);
             }
 
-            Toastify({
-                text: "Login successful!",
-                duration: 3000,
-                gravity: "top",
-                position: "center",
-                style: {
-                    background: "linear-gradient(to right, #4caf50, #81c784)",
-                }
-            }).showToast();
+            showToast("Login successful!", "success");
 
             // Aspetta un po' prima del redirect così l'utente vede il messaggio di successo
             setTimeout(() => {
@@ -98,12 +83,12 @@ async function handleLogin(event) {
     }
 }
 
-function validateEmail(email) {
+const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 }
 
-function showGenericError(message) {
+const showGenericError = (message) => {
     if (window.genericErrorModal) {
         const modalText = document.querySelector('#genericErrorModal .modal-body p');
         if (modalText) modalText.textContent = message;
@@ -113,3 +98,8 @@ function showGenericError(message) {
     }
 }
 
+if (loginForm) {
+    loginForm.addEventListener('submit', handleLogin);
+} else {
+    console.error('Form element with ID "login_form" not found.');
+}

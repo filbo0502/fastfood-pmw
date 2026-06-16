@@ -1,40 +1,21 @@
-import CONFIG from "../config.js";
+import { showToast } from "./utils.js";
+import { requireRestaurateurAuth } from "./auth.js";
 
-const API_BASE_URL = CONFIG.API_BASE_URL;
+const token = localStorage.getItem('jwtToken');
 
 let restaurantData = null;
 let dailyChart = null;
 let statusChart = null;
 
-document.addEventListener('DOMContentLoaded', function () {
-    checkAuth();
+document.addEventListener('DOMContentLoaded', () => {
+    requireRestaurateurAuth();
     loadRestaurantData();
-    document.getElementById('logoutBtn').addEventListener('click', logout);
 });
 
-const checkAuth = () => {
-    const token = localStorage.getItem('jwtToken');
-    const userType = localStorage.getItem('userType');
-
-    if (!token || userType !== 'restaurateur') {
-        window.location.href = '../pages/login.html';
-        return;
-    }
-};
-
-const logout = () => {
-    localStorage.clear();
-    window.location.href = '../pages/login.html';
-};
-
-async function loadRestaurantData() {
+const loadRestaurantData = async () => {
     try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_BASE_URL}/api/restaurants/my-restaurant`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+        const response = await fetch(`/api/restaurants/my-restaurant`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (response.ok) {
@@ -47,22 +28,18 @@ async function loadRestaurantData() {
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error loading restaurant data');
+        showToast('Error loading restaurant data', 'danger');
     }
 }
 
-async function loadStatistics() {
+const loadStatistics = async () => {
     if (!restaurantData) return;
 
     try {
         document.getElementById('loading').style.display = 'block';
 
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_BASE_URL}/api/statistics/restaurant/${restaurantData._id}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+        const response = await fetch(`/api/statistics/restaurant/${restaurantData._id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (response.ok) {
@@ -75,13 +52,13 @@ async function loadStatistics() {
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error loading statistics');
+        showToast('Error loading statistics', 'danger');
     } finally {
         document.getElementById('loading').style.display = 'none';
     }
 }
 
-function updateStats(stats) {
+const updateStats = (stats) => {
     document.getElementById('totalOrders').textContent = stats.totalOrders || 0;
     document.getElementById('completedOrders').textContent = stats.completedOrders || 0;
     document.getElementById('totalRevenue').textContent = `€${(stats.totalRevenue || 0).toFixed(2)}`;
@@ -91,13 +68,13 @@ function updateStats(stats) {
     document.getElementById('successRate').textContent = `${successRate}%`;
 }
 
-function createCharts(stats) {
+const createCharts = (stats) => {
     createDailyOrdersChart(stats.dailyOrders);
     createStatusChart(stats.statusDistribution);
 }
 
 //Chart.js
-function createDailyOrdersChart(dailyData) {
+const createDailyOrdersChart = (dailyData) => {
     const ctx = document.getElementById('dailyOrdersChart').getContext('2d');
 
     if (dailyChart) {
@@ -136,7 +113,7 @@ function createDailyOrdersChart(dailyData) {
     });
 }
 
-function createStatusChart(statusData) {
+const createStatusChart = (statusData) => {
     const ctx = document.getElementById('statusChart').getContext('2d');
 
     if (statusChart) {
@@ -155,14 +132,14 @@ function createStatusChart(statusData) {
     const statusColors = {
         'ordered': '#ffc107',
         'preparing': '#20c997',
-        'delivering': '#17a2b8',
+        'ready': '#17a2b8',
         'delivered': '#28a745',
     };
 
     const statusNames = {
         'ordered': 'Ordered',
         'preparing': 'Preparing',
-        'delivering': 'Delivering',
+        'ready': 'Ready for Pickup',
         'delivered': 'Delivered',
     };
 
@@ -193,7 +170,7 @@ function createStatusChart(statusData) {
     });
 }
 
-function updateTopMeals(topMeals) {
+const updateTopMeals = (topMeals) => {
     const container = document.getElementById('topMealsList');
 
     if (!topMeals || topMeals.length === 0) {
@@ -216,7 +193,7 @@ function updateTopMeals(topMeals) {
     `).join('');
 }
 
-function prepareChartData(dailyData) {
+const prepareChartData = (dailyData) => {
     const labels = [];
     const data = [];
 

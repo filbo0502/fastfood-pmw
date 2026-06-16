@@ -1,12 +1,46 @@
 import Meal from "../models/Meal.js";
 import asyncHandler from "express-async-handler";
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadPath = 'uploads/meals';
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'meal-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only image files are allowed!'), false);
+    }
+};
+
+export const uploadMealImage = multer({
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: fileFilter
+});
 
 /**
- * @desc    Get all meals in DB (including custom meals filtering)
+ * @desc    Ottieni tutti i piatti nel DB
  * @route   GET /api/meals
  * @access  Public
  */
 export const getMeals = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Meals']
+        #swagger.description = 'Endpoint per ottenere tutti i piatti nel DB.' 
+    */
     const { custom, userId } = req.query;
 
     let query = {};
@@ -31,23 +65,7 @@ export const getMeals = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Get a meal by ID
- * @route   GET /api/meals/:id
- * @access  Public
- */
-export const getMealById = asyncHandler(async (req, res) => {
-    const meal = await Meal.findById(req.params.id);
-
-    if (meal) {
-        res.status(200).json(meal);
-    } else {
-        res.status(404);
-        throw new Error("Meal not found.");
-    }
-});
-
-/**
- * @desc    Create a new meal
+ * @desc    Crea un nuovo piatto
  * @route   POST /api/meals
  * @access  Private
  */
@@ -59,7 +77,6 @@ export const createMeal = asyncHandler(async (req, res) => {
         strArea,
         strMealThumb,
         ingredients,
-        allergies,
         price,
         isAvailable,
         preparationTime,
@@ -82,17 +99,30 @@ export const createMeal = asyncHandler(async (req, res) => {
         throw new Error("Price is required for custom meals.");
     }
 
+    let parsedIngredients = [];
+    if (ingredients) {
+        if (typeof ingredients === 'string') {
+            parsedIngredients = ingredients.split(',').map(i => i.trim()).filter(i => i);
+        } else if (Array.isArray(ingredients)) {
+            parsedIngredients = ingredients;
+        }
+    }
+
+    let finalStrMealThumb = strMealThumb;
+    if (req.file) {
+        finalStrMealThumb = `/uploads/meals/${req.file.filename}`;
+    }
+
     try {
         const mealData = {
             idMeal: finalIdMeal,
             strMeal,
             strCategory: strCategory || (isCustom ? 'Custom' : undefined),
             strArea,
-            strMealThumb,
-            ingredients: ingredients || [],
-            allergies: allergies || [],
+            strMealThumb: finalStrMealThumb,
+            ingredients: parsedIngredients,
             price: price || 0,
-            isAvailable: isAvailable !== false,
+            isAvailable: isAvailable !== false && isAvailable !== 'false',
             preparationTime
         };
 
@@ -120,11 +150,14 @@ export const createMeal = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Delete a meal
+ * @desc    Elimina un piatto
  * @route   DELETE /api/meals/:id
  * @access  Private
  */
 export const deleteMeal = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Meals']
+        #swagger.description = 'Endpoint per eliminare un piatto.' 
+    */
     const meal = await Meal.findById(req.params.id);
 
     if (!meal) {
@@ -142,11 +175,14 @@ export const deleteMeal = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Update a meal
+ * @desc    Aggiorna un piatto
  * @route   POST /api/meals/:id (as per your routes)
  * @access  Private
  */
 export const updateMeal = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Meals']
+        #swagger.description = 'Endpoint per aggiornare un piatto.' 
+    */
     const meal = await Meal.findById(req.params.id);
 
     if (!meal) {
@@ -159,7 +195,31 @@ export const updateMeal = asyncHandler(async (req, res) => {
         throw new Error("You can only update your own custom meals.");
     }
 
-    const updatedMeal = await Meal.findByIdAndUpdate(req.params.id, req.body, {
+    let parsedIngredients = meal.ingredients;
+    if (req.body.ingredients) {
+        if (typeof req.body.ingredients === 'string') {
+            parsedIngredients = req.body.ingredients.split(',').map(i => i.trim()).filter(i => i);
+        } else if (Array.isArray(req.body.ingredients)) {
+            parsedIngredients = req.body.ingredients;
+        }
+    }
+
+    let finalStrMealThumb = meal.strMealThumb;
+    if (req.file) {
+        finalStrMealThumb = `/uploads/meals/${req.file.filename}`;
+    }
+
+    const updateData = {
+        ...req.body,
+        ingredients: parsedIngredients,
+        strMealThumb: finalStrMealThumb
+    };
+
+    if (req.body.isAvailable !== undefined) {
+        updateData.isAvailable = req.body.isAvailable !== false && req.body.isAvailable !== 'false';
+    }
+
+    const updatedMeal = await Meal.findByIdAndUpdate(req.params.id, updateData, {
         new: true,
         runValidators: true
     });

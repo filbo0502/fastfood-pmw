@@ -20,12 +20,13 @@ const UserSchema = new mongoose.Schema({
         unique: true,
         match: emailRegex
     },
+    phone: {
+        type: String,
+        required: false
+    },
     password: {
         type: String,
         required: true,
-        match: passwordRegex,
-        minLength: 8,
-        maxLength: 128
     },
     userType: {
         type: String,
@@ -47,16 +48,22 @@ const UserSchema = new mongoose.Schema({
         city: String,
         zipCode: String,
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
+    preferences: {
+        wantsSpecialOffers: {
+            type: Boolean,
+            default: false
+        },
+        favoriteCategory: {
+            type: String,
+            default: ''
+        }
     }
 }, {
     timestamps: true
 });
 
 // Hash della password prima di salvare nel database
-// Esegue l'hash solo se la password è stata modificata (importante per gli aggiornamenti)
+// Esegue l'hash solo se la password è stata modificata
 UserSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
@@ -66,12 +73,14 @@ UserSchema.pre('save', async function (next) {
 });
 
 // Quando un ristoratore viene eliminato, elimina anche il suo ristorante
-// Questo previene ristoranti orfani nel database
 UserSchema.pre('findOneAndDelete', async function (next) {
     try {
         const user = await this.model.findOne(this.getQuery());
         if (user && user.userType === 'restaurateur') {
-            await Restaurant.deleteMany({ owner: user._id });
+            const restaurants = await Restaurant.find({ owner: user._id });
+            for (const rest of restaurants) {
+                await Restaurant.findByIdAndDelete(rest._id);
+            }
         }
         next();
     } catch (error) {

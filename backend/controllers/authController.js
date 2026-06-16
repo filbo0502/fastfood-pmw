@@ -9,14 +9,14 @@ import path from 'path';
 import fs from 'fs';
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: (req, file, cb) => {
         const uploadPath = 'uploads/restaurants';
         if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath, { recursive: true });
         }
         cb(null, uploadPath);
     },
-    filename: function (req, file, cb) {
+    filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, 'restaurant-' + uniqueSuffix + path.extname(file.originalname));
     }
@@ -49,12 +49,19 @@ export const upload = multer({
  * @access  Public
  */
 export const register = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Authentication']
+        #swagger.description = 'Endpoint per la registrazione di un utente.' 
+    */
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, surname, email, password, confirmPassword, userType } = req.body;
+    const { 
+        name, surname, email, password, confirmPassword, userType, phone,
+        addressStreet, addressCity, addressZip,
+        wantsSpecialOffers, favoriteCategory
+    } = req.body;
 
     if (password !== confirmPassword) {
         return res.status(400).json({ message: 'Password and confirm password don\'t matches' });
@@ -71,8 +78,18 @@ export const register = asyncHandler(async (req, res) => {
         name,
         surname,
         email,
+        phone: phone || undefined,
         password,
-        userType
+        userType,
+        address: {
+            street: addressStreet,
+            city: addressCity,
+            zipCode: addressZip
+        },
+        preferences: {
+            wantsSpecialOffers: wantsSpecialOffers === true || wantsSpecialOffers === 'true',
+            favoriteCategory: favoriteCategory || ''
+        }
     });
     await user.save();
 
@@ -114,7 +131,12 @@ export const register = asyncHandler(async (req, res) => {
 
         // Il token scade dopo 2 ore
         const tokenDuration = 2 * 3600;
-        const token = jwt.sign({ id: user._id, userType: user.userType }, process.env.JWT_SECRET, { expiresIn: tokenDuration });
+        const tokenPayload = { id: user._id, userType: user.userType };
+        if (user.userType === 'restaurateur' && user.restaurant) {
+            tokenPayload.restaurantId = user.restaurant.toString();
+        }
+
+        const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: tokenDuration });
 
         res.cookie('jwtToken', token, {
             httpOnly: true,
@@ -145,7 +167,7 @@ export const register = asyncHandler(async (req, res) => {
             return res.status(400).json({ success: false, message: error.message });
         }
 
-        res.status(500).json({ success: false, message: "Errore durante la creazione dell'utente." });
+        res.status(500).json({ success: false, message: "Error during the registration." });
     }
 });
 
@@ -155,6 +177,9 @@ export const register = asyncHandler(async (req, res) => {
  * @access  Public
  */
 export const login = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Authentication']
+        #swagger.description = 'Endpoint per il login di un utente.' 
+    */
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).json({ message: "All fields are required." });
@@ -171,16 +196,20 @@ export const login = asyncHandler(async (req, res) => {
     }
 
     const tokenDuration = 2 * 3600;
-    const token = jwt.sign({ id: user._id, userType: user.userType }, process.env.JWT_SECRET, { expiresIn: tokenDuration });
 
-    // Per i ristoratori, si deve inviare anche l'ID del ristorante
+    // Include anche restaurantId in JWT per i ristoratori
+    const tokenPayload = { id: user._id, userType: user.userType };
     let restaurantId = null;
+
     if (user.userType === 'restaurateur') {
         const restaurant = await Restaurant.findOne({ owner: user._id });
         if (restaurant) {
             restaurantId = restaurant._id.toString();
+            tokenPayload.restaurantId = restaurantId;
         }
     }
+
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: tokenDuration });
 
     res.cookie('jwtToken', token, {
         httpOnly: true,
@@ -207,6 +236,9 @@ export const login = asyncHandler(async (req, res) => {
  * @access  Private
  */
 export const logout = asyncHandler(async (req, res) => {
+    /*  #swagger.tags = ['Authentication']
+        #swagger.description = 'Endpoint per il logout di un utente.' 
+    */
     res.cookie('jwtToken', '', {
         httpOnly: true,
         expires: new Date(0)

@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Confirmation - CodeBite</title>
-    <link rel="icon" type="image/x-icon" href="./images/logo.png">
+    <link rel="icon" type="image/x-icon" href="../images/logo.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link href="../css/styles.css" rel="stylesheet">
 </head>
 
@@ -36,9 +37,6 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="./searchDish.html">Dishes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
                     </li>
                     <li class="nav-item cart-link d-none">
                         <a class="nav-link" href="./order.html">
@@ -89,7 +87,7 @@
                             </h3>
                         </div>
                         <div class="card-body">
-                            <div class="alert alert-info mb-0" role="alert">
+                            <div class="alert alert-info mb-0">
                                 <i class="fas fa-info-circle me-2"></i>
                                 <strong>Pickup at Restaurant:</strong> Your order will be ready for pickup at the
                                 restaurant.
@@ -111,17 +109,13 @@
                                 <span class="fw-bold">Subtotal:</span>
                                 <span id="subtotal-price">0.00€</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-3">
-                                <span class="fw-bold">Delivery Cost:</span>
-                                <span id="delivery-cost-display">0.00€</span>
-                            </div>
                             <hr>
                             <div class="d-flex justify-content-between mb-4">
                                 <span class="h5 fw-bold">Total:</span>
                                 <span class="h5 fw-bold text-primary" id="final-price">0.00€</span>
                             </div>
 
-                            <div id="wait-time-display" class="alert alert-info d-none" role="alert">
+                            <div id="wait-time-display" class="alert alert-info d-none">
                                 <i class="fas fa-clock me-2"></i>
                                 <strong>Estimated Wait Time:</strong> <span id="wait-time-value">--</span> minutes
                             </div>
@@ -155,9 +149,9 @@
                 <div class="col-lg-4 col-md-6">
                     <h5>Useful Links</h5>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-white-50 text-decoration-none">Home</a></li>
-                        <li><a href="./pages/login.html" class="text-white-50 text-decoration-none">Login</a></li>
-                        <li><a href="./pages/registration.html" class="text-white-50 text-decoration-none">Register</a>
+                        <li><a href="../index.html" class="text-white-50 text-decoration-none">Home</a></li>
+                        <li><a href="./login.html" class="text-white-50 text-decoration-none">Login</a></li>
+                        <li><a href="./registration.html" class="text-white-50 text-decoration-none">Register</a>
                         </li>
                     </ul>
                 </div>
@@ -183,6 +177,7 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module" src="../js/auth.js"></script>
     <script type="module" src="../js/order.js"></script>
 </body>

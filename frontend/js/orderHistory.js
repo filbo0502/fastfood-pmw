@@ -1,5 +1,4 @@
-import CONFIG from "./config.js";
-const API_BASE_URL = CONFIG.API_BASE_URL;
+import { showToast, formatStatus } from "./utils.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
@@ -9,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const checkAuth = () => {
     const token = localStorage.getItem('jwtToken');
     if (!token) {
+        console.warn('User not authenticated. Redirecting to login.');
         window.location.href = './login.html';
     }
 }
@@ -16,7 +16,7 @@ const checkAuth = () => {
 const loadOrders = async () => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await fetch(`${API_BASE_URL}/orders/user`, {
+        const response = await fetch(`/api/orders/user`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -84,15 +84,6 @@ const createOrderCard = (order, isActive) => {
     const restaurantName = order.restaurant?.name || 'Unknown Restaurant';
     const statusBadge = getStatusBadge(order.status);
 
-    // Mostra il pulsante solo per ordini in consegna
-    let actionButton = '';
-    if (isActive && order.status === 'delivering') {
-        actionButton = `
-            <button class="btn btn-success w-100 mt-3 confirm-delivery-btn" data-id="${order._id}">
-                <i class="fas fa-check-circle me-2"></i>Confirm Delivery
-            </button>
-        `;
-    }
 
     const itemsList = order.items.map(item => `
         <div class="d-flex justify-content-between small mb-1">
@@ -104,7 +95,7 @@ const createOrderCard = (order, isActive) => {
     col.innerHTML = `
         <div class="card h-100 shadow-sm order-card status-${order.status}">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                <span class="fw-bold"><i class="fas fa-store me-1"></i>${restaurantName}</span>
+                <span class="fw-bold"><i class="fa-solid fa-store me-1"></i>${restaurantName}</span>
                 <span class="small text-muted">${date}</span>
             </div>
             <div class="card-body">
@@ -119,18 +110,13 @@ const createOrderCard = (order, isActive) => {
                 
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="badge ${statusBadge}">${formatStatus(order.status)}</span>
-                    <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i>${order.deliveryType}</small>
+                    <small class="text-muted"><i class="fas fa-store me-1"></i>Pickup</small>
                 </div>
-
-                ${actionButton}
             </div>
         </div>
     `;
 
-    const btn = col.querySelector('.confirm-delivery-btn');
-    if (btn) {
-        btn.addEventListener('click', () => confirmDelivery(order._id));
-    }
+
 
     return col;
 }
@@ -139,49 +125,9 @@ const getStatusBadge = (status) => {
     switch (status) {
         case 'ordered': return 'bg-warning text-dark';
         case 'preparing': return 'bg-info text-white';
-        case 'delivering': return 'bg-primary';
-        case 'delivered': return 'bg-success';
+        case 'ready': return 'bg-success';
+        case 'delivered': return 'bg-secondary';
         default: return 'bg-secondary';
     }
 }
 
-const formatStatus = (status) => {
-    return status.charAt(0).toUpperCase() + status.slice(1);
-}
-
-const confirmDelivery = async (orderId) => {
-    if (!confirm('Have you received your order?')) return;
-
-    try {
-        const token = localStorage.getItem('jwtToken');
-        const response = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ status: 'delivered' })
-        });
-
-        if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.message || 'Error updating status');
-        }
-
-        Toastify({
-            text: "Order confirmed as delivered!",
-            backgroundColor: "#28a745",
-            duration: 3000
-        }).showToast();
-
-        loadOrders();
-
-    } catch (error) {
-        console.error('Error:', error);
-        Toastify({
-            text: error.message,
-            backgroundColor: "#dc3545",
-            duration: 3000
-        }).showToast();
-    }
-}

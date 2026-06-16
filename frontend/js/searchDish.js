@@ -1,53 +1,82 @@
-import CONFIG from "./config.js";
 import { getImageUrl } from "./utils.js";
+import { logout } from "./auth.js";
 
-const API_BASE_URL = CONFIG.API_BASE_URL;
+let dishNameInput;
+let dishCategorySelect;
+let dishMinPrice;
+let dishMaxPrice;
+let searchDishBtn;
 
-let dishSearchInput;
-let searchTimeout;
+const initializeSearch = async () => {
+    dishNameInput = document.getElementById('dishNameInput');
+    dishCategorySelect = document.getElementById('dishCategorySelect');
+    dishMinPrice = document.getElementById('dishMinPrice');
+    dishMaxPrice = document.getElementById('dishMaxPrice');
+    searchDishBtn = document.getElementById('searchDishBtn');
 
-const initializeSearch = () => {
-    dishSearchInput = document.getElementById('dishSearchInput');
-    if (dishSearchInput) {
-        dishSearchInput.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(performDishSearch, 500);
-        });
+    if (searchDishBtn) {
+        searchDishBtn.addEventListener('click', performDishSearch);
     }
+
+    // Carica le categorie
+    try {
+        const response = await fetch('/api/search/meals/categories');
+        if (response.ok) {
+            const data = await response.json();
+            data.categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                dishCategorySelect.appendChild(option);
+            });
+        }
+    } catch (err) {
+        console.error('Failed to load categories:', err);
+    }
+    
+    // Caricamento iniziale
+    performDishSearch();
 }
 
 const performDishSearch = async () => {
-    const searchTerm = dishSearchInput.value.trim();
+    const name = dishNameInput.value.trim();
+    const category = dishCategorySelect.value;
+    const minPrice = dishMinPrice.value;
+    const maxPrice = dishMaxPrice.value;
+
     const container = document.getElementById('dish-container');
     const infoText = document.getElementById('searchDishResultsInfo');
-
-    if (searchTerm.length < 2) {
-        container.innerHTML = '';
-        infoText.textContent = 'Please enter at least 2 characters';
-        return;
-    }
 
     try {
         infoText.textContent = 'Searching...';
 
-        const response = await fetch(`${API_BASE_URL}/restaurants/search/dish?dishName=${encodeURIComponent(searchTerm)}`);
+        const queryParams = new URLSearchParams();
+        if (name) queryParams.append('name', name);
+        if (category) queryParams.append('category', category);
+        if (minPrice) queryParams.append('minPrice', minPrice);
+        if (maxPrice) queryParams.append('maxPrice', maxPrice);
+
+        const response = await fetch(`/api/search/meals?${queryParams.toString()}`);
 
         if (!response.ok) {
-            if (response.status === 404) {
-                container.innerHTML = `
-                    <div class="col-12 text-center">
-                        <div class="alert alert-info">No restaurants found serving "${searchTerm}"</div>
-                    </div>
-                `;
-                infoText.textContent = `No results for "${searchTerm}"`;
-                return;
-            }
             throw new Error('Search failed');
         }
 
-        const restaurants = await response.json();
-        infoText.textContent = `Found ${restaurants.length} restaurant(s) serving "${searchTerm}"`;
-        displayResults(restaurants);
+        const data = await response.json();
+        const meals = data.meals;
+
+        if (meals.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center">
+                    <div class="alert alert-info">No dishes found matching your criteria.</div>
+                </div>
+            `;
+            infoText.textContent = `No results found`;
+            return;
+        }
+
+        infoText.textContent = `Found ${meals.length} dish(es)`;
+        displayResults(meals);
 
     } catch (error) {
         console.error('Search error:', error);
@@ -59,36 +88,37 @@ const performDishSearch = async () => {
     }
 }
 
-const displayResults = (restaurants) => {
+const displayResults = (meals) => {
     const container = document.getElementById('dish-container');
     container.innerHTML = '';
 
-    restaurants.forEach(restaurant => {
-
-        const searchTerm = dishSearchInput.value.toLowerCase();
-        const matchingMeals = restaurant.menu.filter(item =>
-            item.meal && item.meal.strMeal && item.meal.strMeal.toLowerCase().includes(searchTerm)
-        );
-
+    meals.forEach(item => {
         const card = document.createElement('div');
         card.className = 'col-md-6 col-lg-4 mb-4';
 
-        const imageUrl = getImageUrl(restaurant.image);
-
-        const matchingMealsHtml = matchingMeals.map(item =>
-            `<span class="badge bg-success me-1">${item.meal.strMeal} (€${item.price})</span>`
-        ).join('');
+        let imageUrl = '../images/spaghetti.png';
+        if (item.image) {
+            imageUrl = item.image.startsWith('http') ? item.image : `/${item.image.replace(/^\//, '')}`;
+        }
 
         card.innerHTML = `
             <div class="card h-100 shadow-sm">
-                <img src="${imageUrl}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="${restaurant.name}">
-                <div class="card-body">
-                    <h5 class="card-title">${restaurant.name}</h5>
-                    <div class="mb-2">
-                        ${matchingMealsHtml}
+                <img src="${imageUrl}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="${item.name}">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">${item.name}</h5>
+                    <p class="card-text text-muted mb-2">Category: ${item.category || 'Custom'}</p>
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="h5 text-primary mb-0">€${item.price.toFixed(2)}</span>
+                        </div>
+                        <div class="bg-light p-2 rounded mb-3">
+                            <small class="text-muted d-block mb-1">Available at:</small>
+                            <strong>${item.restaurant.name}</strong>
+                        </div>
+                        <a href="./restaurantDetails.html?id=${item.restaurant._id}" class="btn btn-outline-primary w-100">
+                            View Restaurant Menu
+                        </a>
                     </div>
-                    <p class="card-text text-truncate">${restaurant.description || ''}</p>
-                    <a href="./restaurantDetails.html?id=${restaurant._id}" class="btn btn-primary w-100">View Menu</a>
                 </div>
             </div>
         `;

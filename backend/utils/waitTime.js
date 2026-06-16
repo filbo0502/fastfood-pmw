@@ -2,15 +2,14 @@ import Order from '../models/Order.js';
 
 /**
  * @param {string} restaurantId - L'ID del ristorante.
- * @param {number} newOrderPrepTime - Il tempo di preparazione stimato per il *nuovo* ordine (in minuti).
+ * @param {number} newOrderPrepTime - Il tempo di preparazione stimato per il nuovo ordine (in minuti).
  * @returns {Promise<number>} - Il tempo di attesa totale stimato (in minuti).
  */
 export const calculateWaitTime = async (restaurantId, newOrderPrepTime) => {
-    
+
     const pendingOrders = await Order.find({
         restaurant: restaurantId,
-        deliveryType: 'pickup', 
-        status: { $in: ['ordered', 'preparing'] } 
+        status: { $in: ['ordered', 'preparing'] }
     });
 
     let maxRemainingTime = 0;

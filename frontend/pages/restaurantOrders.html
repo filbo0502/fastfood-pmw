@@ -54,21 +54,41 @@
 
     <div class="container" style="margin-top: 100px; margin-bottom: 50px;">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-clipboard-list me-2"></i>Incoming Orders</h2>
+            <h2><i class="fa-solid fa-clipboard-list me-2"></i>Restaurant Orders</h2>
             <button class="btn btn-outline-primary" onclick="loadRestaurantOrders()"><i
-                    class="fas fa-sync-alt me-2"></i>Refresh</button>
+                    class="fa-solid fa-rotate me-2"></i>Refresh</button>
         </div>
 
-        <div id="orders-container" class="row g-4">
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+        <ul class="nav nav-tabs mb-4" id="orderTabs">
+            <li class="nav-item">
+                <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active"
+                    type="button">Active Orders</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="delivered-tab" data-bs-toggle="tab" data-bs-target="#delivered"
+                    type="button">Delivered Orders</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="orderTabsContent">
+            <div class="tab-pane fade show active" id="active">
+                <div id="active-orders-container" class="row g-4">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="delivered">
+                <div id="delivered-orders-container" class="row g-4">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Toastify & Bootstrap -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.js"></script>
 
